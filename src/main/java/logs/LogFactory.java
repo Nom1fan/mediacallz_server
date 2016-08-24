@@ -3,12 +3,9 @@ package logs;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +24,7 @@ public abstract class LogFactory {
 	/**
 	 * @return The global server side logger
 	 */
-	public static Logger get_serverLogger() {
+	public static Logger get_serverLogger(Level level) {
 		
 		if(_serverLogger ==null)
 		{
@@ -40,6 +37,7 @@ public abstract class LogFactory {
 				String pattern = "Server"+"%g"+".log";
 				fh = new FileHandler(LOG_DIR +pattern, limit ,numLogFiles, true);
 				fh.setFormatter(new SingleLineFormatter());
+				_serverLogger.setLevel(level);
 				_serverLogger.addHandler(fh);
 				_serverLogger.setUseParentHandlers(false);
 			}

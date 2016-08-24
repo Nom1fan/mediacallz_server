@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @SpringBootApplication
@@ -30,6 +31,6 @@ public class Application {
             e.printStackTrace();
         }
 
-        return LogFactory.get_serverLogger();
+        return LogFactory.get_serverLogger(Level.INFO);
     }
 }
