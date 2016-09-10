@@ -29,8 +29,8 @@ public class StringsFactoryImpl implements StringsFactory {
     public LangStrings getStrings(String locale) {
         LangStrings langStrings = lang2StringsMap.get(locale);
         if(langStrings == null) {
-            logger.warning(String.format("Invalid locale '%s'. Assuming English", locale));
-            return new EnglishStrings();
+            logger.warning(String.format("Invalid locale '%s'. Assuming " + DEFAULT_LANG, locale));
+            langStrings = lang2StringsMap.get(DEFAULT_LANG);
         }
         return langStrings;
     }
