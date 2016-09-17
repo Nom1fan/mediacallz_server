@@ -18,7 +18,7 @@ public class DefaultProfileMediaPathHandler implements SpMediaPathHandler {
         String messageInitiaterId = data.get(DataKeys.DESTINATION_ID).toString();
         String extension = data.get(DataKeys.EXTENSION).toString();
 
-        filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(messageInitiaterId).append("\\").
+        filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(messageInitiaterId).append("/").
                 append(ServerConstants.MY_DEFAULT_PROFILE_MEDIA_FOLDER).
                 append(ServerConstants.MY_DEFAULT_PROFILE_MEDIA_FILENAME).
                 append(extension);

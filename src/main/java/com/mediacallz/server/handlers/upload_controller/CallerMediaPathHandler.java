@@ -20,7 +20,7 @@ public class CallerMediaPathHandler implements SpMediaPathHandler {
         String srcWithExtension = data.get(DataKeys.SOURCE_WITH_EXTENSION).toString();
 
         // Caller Media is saved in the destination's caller media folder,
-        filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(destId).append("\\").
+        filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(destId).append("/").
                 append(ServerConstants.CALLER_MEDIA_FOLDER).append(srcWithExtension);
         return filePathBuilder;
     }

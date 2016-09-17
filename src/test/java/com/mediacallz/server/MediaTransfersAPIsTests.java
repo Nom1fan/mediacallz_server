@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class UsersAPIsTests {
+public class MediaTransfersAPIsTests {
 
     @Autowired
     ConnectionToServer connectionToServer;

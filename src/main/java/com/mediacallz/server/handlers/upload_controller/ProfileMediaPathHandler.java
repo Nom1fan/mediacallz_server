@@ -20,7 +20,7 @@ public class ProfileMediaPathHandler implements SpMediaPathHandler {
         String extension = data.get(DataKeys.EXTENSION).toString();
         String srcWithExtension = destId + "." + extension;
 
-        filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(destId).append("\\").
+        filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(destId).append("/").
                 append(ServerConstants.PROFILE_MEDIA_RECEIVED_FOLDER).append(srcWithExtension);
         return filePathBuilder;
     }
