@@ -42,11 +42,13 @@ public class ServletLoggingUtilsImpl implements ServletLoggingUtils {
     public String buildParamsLog(ServletRequest request) {
         StringBuilder paramsBuilder = new StringBuilder("Request params:[");
         Set<String> keySet = request.getParameterMap().keySet();
-        for (String key : keySet) {
-            paramsBuilder.append(key).append("=").append(request.getParameter(key))
-                    .append(",");
+        if(!keySet.isEmpty()) {
+            for (String key : keySet) {
+                paramsBuilder.append(key).append("=").append(request.getParameter(key))
+                        .append(",");
+            }
+            paramsBuilder.deleteCharAt(paramsBuilder.lastIndexOf(","));
         }
-        paramsBuilder.deleteCharAt(paramsBuilder.lastIndexOf(","));
         paramsBuilder.append("]");
         return paramsBuilder.toString();
     }

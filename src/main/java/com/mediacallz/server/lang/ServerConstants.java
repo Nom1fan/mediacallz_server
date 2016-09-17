@@ -6,5 +6,9 @@ package com.mediacallz.server.lang;
 public abstract class ServerConstants {
 
     public static final double MIN_SUPPORTED_APP_VERSION = 0.2;
-    public static final double APP_VERSION_1_13 = 1.13; // Introduced user device record support
+    public static final String UPLOAD_FOLDER = "/uploads/";
+    public static final String CALLER_MEDIA_FOLDER = "/caller_media/";
+    public static final String PROFILE_MEDIA_RECEIVED_FOLDER = "/profile_media_received/";
+    public static final String MY_DEFAULT_PROFILE_MEDIA_FOLDER = "/my_default_profile_media/";
+    public static final String MY_DEFAULT_PROFILE_MEDIA_FILENAME = "MyDefaultProfileMedia";
 }

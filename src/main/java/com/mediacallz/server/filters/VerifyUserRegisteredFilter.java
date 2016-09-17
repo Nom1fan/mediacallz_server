@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -48,7 +49,10 @@ public class VerifyUserRegisteredFilter implements Filter {
                     boolean isRegistered = usersDataAccess.isRegistered(messageInitiaterId);
                     if (!isRegistered) {
                         verificationOK = false;
-                        logger.warning("User " + messageInitiaterId + " attempted a request in url:" + url + "but is unregistered. Request was blocked.");
+                        logger.warning("User " + messageInitiaterId + " attempted a request in url:" + url + " but is unregistered. Request was blocked.");
+                        HttpServletResponse httpResponse = (HttpServletResponse)servletResponse;
+                        httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
+                        break;
                     }
                 }
             }

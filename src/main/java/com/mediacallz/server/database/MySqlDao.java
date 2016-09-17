@@ -389,7 +389,7 @@ public class MySqlDao implements Dao {
     public int insertMediaTransferRecord(Map data) throws SQLException {
 
         String extension = (String) data.get(DataKeys.EXTENSION);
-        long fileSize = (long) data.get(DataKeys.FILE_SIZE);
+        long fileSize = Long.valueOf(data.get(DataKeys.FILE_SIZE).toString());
 
         insertMediaFileRecord(
                 data.get(DataKeys.MD5).toString(),

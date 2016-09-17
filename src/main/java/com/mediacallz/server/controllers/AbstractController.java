@@ -1,5 +1,6 @@
 package com.mediacallz.server.controllers;
 
+import com.mediacallz.server.lang.StringsFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.logging.Logger;
@@ -10,7 +11,10 @@ import java.util.logging.Logger;
 public abstract class AbstractController {
 
     @Autowired
-    Logger logger;
+    protected Logger logger;
+
+    @Autowired
+    protected StringsFactory stringsFactory;
 
 
 }

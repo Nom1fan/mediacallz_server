@@ -19,7 +19,7 @@ public abstract class LogFactory {
 
 	private static Logger _serverLogger = null;
     private static HashMap<String, Logger> _loggers = new HashMap<>();
-	private static final String LOG_DIR = Paths.get("").toAbsolutePath().toString() + "\\logs\\";
+	private static final String LOG_DIR = Paths.get("").toAbsolutePath().toString() + "/logs/";
 
 	/**
 	 * @return The global server side logger

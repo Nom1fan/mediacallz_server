@@ -33,19 +33,17 @@ public class GetSmsAuthController extends PreRegistrationController {
     @Autowired
     private SmsSender smsSender;
 
-    @Value("${sms.maxCode}")
+    @Value("${sms.maxcode}")
     private int maxCode;
 
-    @Value("${sms.minCode}")
+    @Value("${sms.mincode}")
     private int minCode;
-
-    private int code;
 
     @ResponseBody
     @RequestMapping(value = url, method = RequestMethod.POST)
     public MessageToClient getSmsAuthCode(HttpServletRequest request) throws IOException {
 
-        code = generateSmsVerificationCode();
+        int code = generateSmsVerificationCode();
 
         String messageInitiaterId = request.getParameter(DataKeys.MESSAGE_INITIATER_ID.toString());
         String internationalPhoneNumber = request.getParameter(DataKeys.INTERNATIONAL_PHONE_NUMBER.toString());
