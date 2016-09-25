@@ -1,4 +1,4 @@
-package logs;
+package com.mediacallz.server.logs;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

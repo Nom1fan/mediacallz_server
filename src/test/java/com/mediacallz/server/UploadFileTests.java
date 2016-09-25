@@ -1,12 +1,13 @@
 package com.mediacallz.server;
 
 import com.google.gson.reflect.TypeToken;
+import com.mediacallz.server.client.ConnectionToServer;
 import com.mediacallz.server.exceptions.FileDoesNotExistException;
 import com.mediacallz.server.exceptions.FileExceedsMaxSizeException;
 import com.mediacallz.server.exceptions.FileInvalidFormatException;
 import com.mediacallz.server.exceptions.FileMissingExtensionException;
 import com.mediacallz.server.model.*;
-import logs.LogFactory;
+import com.mediacallz.server.logs.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -25,13 +26,12 @@ import java.util.logging.Logger;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MediaTransfersAPIsTests implements IServerProxy, ProgressListener {
+public class UploadFileTests implements IServerProxy, ProgressListener {
 
-    private final Logger logger = LogFactory.getLogger("uploadCallerMedia");
+    private final Logger logger = LogFactory.getLogger(UploadFileTests.class.getSimpleName());
 
     private static final String SAMPLE_FILEPATH = Paths.get("").toAbsolutePath().toString() + "\\sampleFiles\\sample.mp4";
     private static final String ROOT_URL = "http://localhost:8080";
-    private static final String REGISTER_URL = ROOT_URL + "/v1/Register";
     private static final String UPLOAD_URL = ROOT_URL + "/v1/UploadFile";
 
     private static final Type responseType = new TypeToken<MessageToClient<EventReport>>() {
@@ -62,6 +62,7 @@ public class MediaTransfersAPIsTests implements IServerProxy, ProgressListener {
         MessageToClient<EventReport> msgEventReport = (MessageToClient<EventReport>) msg;
         Assert.assertEquals(ClientActionType.TRIGGER_EVENT, msgEventReport.getActionType());
         Assert.assertEquals(EventType.UPLOAD_SUCCESS, msgEventReport.getResult().getStatus());
+        connectionToServer.closeConnection();
     }
 
     @Override

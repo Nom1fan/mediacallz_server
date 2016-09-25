@@ -1,7 +1,10 @@
-package com.mediacallz.server.model;
+package com.mediacallz.server.client;
 
 
 import com.google.gson.Gson;
+import com.mediacallz.server.model.IServerProxy;
+import com.mediacallz.server.model.MessageToClient;
+import com.mediacallz.server.model.ProgressiveEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -13,6 +16,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import static java.util.AbstractMap.SimpleEntry;
@@ -70,6 +75,71 @@ public class ConnectionToServer {
                 post.releaseConnection();
 
         }
+    }
+
+    public void download(String url, String pathToDownload, String fileName, long fileSize ,List<SimpleEntry> data) {
+
+        BufferedOutputStream bos = null;
+        try
+        {
+            sendRequest(url, data);
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+
+                // Creating file and directories for downloaded file
+                String downloadDir = Paths.get("").toAbsolutePath().toString() + pathToDownload;
+                File newDir = new File(downloadDir);
+                newDir.mkdirs();
+                String downloadFilePath = downloadDir + fileName;
+                File newFile = new File(downloadFilePath);
+                newFile.createNewFile();
+
+                FileOutputStream fos = new FileOutputStream(newFile);
+                bos = new BufferedOutputStream(fos);
+                DataInputStream dis = new DataInputStream(conn.getInputStream());
+
+                System.out.println("Reading data...");
+                byte[] buf = new byte[1024 * 8];
+                long fileSizeConst = fileSize;
+                int bytesRead;
+                Double progPercent, prevProgPercent = 0.0;
+
+                while (fileSize > 0 && (bytesRead = dis.read(buf, 0, (int) Math.min(buf.length, fileSize))) != -1) {
+                    bos.write(buf, 0, bytesRead);
+                    progPercent = calcProgressPercentage(fileSize, fileSizeConst);
+                    if(progPercent - prevProgPercent >= 1) {
+                        publishProgress(progPercent);
+                        prevProgPercent = progPercent;
+                    }
+                    fileSize -= bytesRead;
+                }
+
+                if (fileSize > 0)
+                    throw new IOException("download was stopped abruptly");
+            }
+            else
+                System.out.println("Download failed. Response code:" + responseCode);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(bos!=null)
+                try {
+                    bos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                closeConnection();
+        }
+    }
+
+    private void publishProgress(double progPercent) {
+        System.out.println("Download progress:" + new DecimalFormat("#").format(progPercent) + "%");
+    }
+
+    private double calcProgressPercentage(long fileSize, long fileSizeConst) {
+
+        return ((fileSizeConst - fileSize) / (double) fileSizeConst) * 100;
     }
 
     private void sendRequest(String url, List<SimpleEntry> params) throws IOException {

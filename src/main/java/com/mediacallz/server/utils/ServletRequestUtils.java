@@ -10,4 +10,6 @@ import java.util.Map;
  */
 public interface ServletRequestUtils {
     Map<DataKeys, Object> extractParametersMap(HttpServletRequest httpServletRequest);
+
+    String getClientIpAddr(HttpServletRequest request);
 }

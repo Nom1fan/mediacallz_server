@@ -33,10 +33,12 @@ public class IsRegisteredController extends AbstractController {
     public MessageToClient isRegistered(HttpServletRequest request) {
 
         String messageInitiaterId = request.getParameter(DataKeys.MESSAGE_INITIATER_ID.toString());
-        String id = request.getParameter(DataKeys.DESTINATION_ID.toString());
-        logger.info(messageInitiaterId + " is checking if " + id + " is logged in...");
-        Map data = new HashMap();
-        data.put(DataKeys.IS_REGISTERED, userDataAccess.isRegistered(id));
+        String destId = request.getParameter(DataKeys.DESTINATION_ID.toString());
+        logger.info(messageInitiaterId + " is checking if " + destId + " is logged in...");
+        Map<DataKeys,Object> data = new HashMap<>();
+        data.put(DataKeys.DESTINATION_ID, destId);
+        data.put(DataKeys.IS_REGISTERED, userDataAccess.isRegistered(destId));
+
         return new MessageToClient<>(ClientActionType.IS_REGISTERED_RES, data);
     }
 }

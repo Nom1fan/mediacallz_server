@@ -119,6 +119,7 @@ public class BatchPushSender implements PushSender {
 
 
     private void pushData(String postData) throws Exception {
+        logger.info("Sending push data:" + postData);
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response;
         HttpEntity entity;

@@ -1,6 +1,5 @@
 package com.mediacallz.server.controllers;
 
-import com.google.gson.Gson;
 import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.database.UserDataAccess;
 import com.mediacallz.server.handlers.upload_controller.SpMediaPathHandler;
@@ -130,14 +129,6 @@ public class UploadController extends AbstractController {
                     e.printStackTrace();
                 }
         }
-    }
-
-    private void sendResponse(HttpServletResponse servletResponse, MessageToClient response, int status) throws IOException {
-        PrintWriter responseWriter = servletResponse.getWriter();
-        servletResponse.setStatus(status);
-        responseWriter.write(new Gson().toJson(response));
-        responseWriter.flush();
-        responseWriter.close();
     }
 
     private String prepareFileUploadInfoMsg(SpecialMediaType specialMediaType, String messageInitiaterId, String destId, long fileSize) {

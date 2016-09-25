@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -23,7 +24,7 @@ public class ErrorHandleFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        //
+        // ...
     }
 
     @Override
@@ -35,7 +36,7 @@ public class ErrorHandleFilter implements Filter {
             chain.doFilter(request, response);
         } catch (Exception ex) {
             ex.printStackTrace();
-            logger.severe("Failed to do filter");
+            logger.log(Level.SEVERE, "Failed while handling request", ex);
         }
 
     }

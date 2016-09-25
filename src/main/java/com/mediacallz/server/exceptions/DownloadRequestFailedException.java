@@ -5,7 +5,9 @@ package com.mediacallz.server.exceptions;
  */
 public class DownloadRequestFailedException extends Exception {
 
-    public DownloadRequestFailedException() {}
+    public DownloadRequestFailedException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 
     public DownloadRequestFailedException(String msg) {
         super(msg);

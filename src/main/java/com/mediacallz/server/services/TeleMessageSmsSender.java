@@ -53,19 +53,19 @@ public class TeleMessageSmsSender implements SmsSender {
 
     }
 
-    private void sendSmsGET(String url, String userid, String password, String to, String text) throws Exception {
+    private void sendSmsGET(String url, String userId,String password,String to,String text) throws Exception {
 
         RequestBuilder builder = RequestBuilder.get().setUri(url);
-        builder.addParameter("userid", userid);
+        builder.addParameter("userid", userId);
         builder.addParameter("password", password);
         builder.addParameter("to", to);
         builder.addParameter("text", text);
+        logger.info("Sending SMS to [User]:" + to);
         HttpResponse response = HttpClients.createDefault().execute(builder.build());
 
         if (response != null && response.getStatusLine().getStatusCode() == 200) {
-
-            response.getEntity().writeTo(System.out);
-
+            //response.getEntity().writeTo(System.out);
+            logger.info("SMS GET Response: 200 OK");
         } else if (response != null) {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));

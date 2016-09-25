@@ -76,7 +76,6 @@ public class RegisterController extends PreRegistrationController {
         String deviceModel = request.getParameter(DataKeys.DEVICE_MODEL.toString());
         String androidVersion = request.getParameter(DataKeys.ANDROID_VERSION.toString());
         dao.registerUser(messageInitiaterId, pushToken, deviceModel, androidVersion);
-        dao.registerUser(messageInitiaterId, pushToken);
         replyData.put(DataKeys.IS_REGISTER_SUCCESS, true);
         logger.info("[User]:" + messageInitiaterId + " registered successfully.");
     }

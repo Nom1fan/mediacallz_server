@@ -82,4 +82,18 @@ public class UserDBO {
 
         this.uid = uid;
     }
+
+    @Override
+    public String toString() {
+        return "UserDBO{" +
+                "uid='" + uid + '\'' +
+                ", token='" + token + '\'' +
+                ", registered_date=" + registered_date +
+                ", userStatus=" + userStatus +
+                ", unregistered_date=" + unregistered_date +
+                ", unregistered_count=" + unregistered_count +
+                ", deviceModel='" + deviceModel + '\'' +
+                ", androidVersion='" + androidVersion + '\'' +
+                '}';
+    }
 }

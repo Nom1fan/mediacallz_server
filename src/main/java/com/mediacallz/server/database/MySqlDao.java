@@ -8,6 +8,7 @@ import com.mediacallz.server.model.DataKeys;
 import com.mediacallz.server.model.FileManager;
 import com.mediacallz.server.model.SpecialMediaType;
 import com.mediacallz.server.model.UserStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Created by Mor on 19/12/2015.
@@ -40,6 +42,9 @@ public class MySqlDao implements Dao {
 
     @Value(value = "${db.password}")
     private String dbPassword;
+
+    @Autowired
+    private Logger logger;
 
     private Connection dbConn;
 
@@ -162,6 +167,7 @@ public class MySqlDao implements Dao {
     public UserDBO getUserRecord(String uid) throws SQLException {
 
         String query = "SELECT *" + " FROM " + TABLE_USERS + " WHERE " + COL_UID + "=" + quote(uid);
+        logger.config("Executing SQL query:[" + query + "]");
         Statement st = null;
         ResultSet resultSet = null;
         UserDBO record = null;
@@ -181,6 +187,7 @@ public class MySqlDao implements Dao {
                         resultSet.getString(7),                                 // device_model
                         resultSet.getString(8)                                  // android_version
                 );
+                logger.config("Response user record received:" + record.toString());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -644,7 +651,7 @@ public class MySqlDao implements Dao {
     }
 
     private void executeQuery(String query) throws SQLException {
-
+        logger.config("Executing SQL query:[" + query + "]");
 
         Statement stmt = null;
         try {
