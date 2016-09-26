@@ -100,7 +100,7 @@ public class UploadController extends AbstractController {
 
 
             // Informing source (uploader) that the file is on the way
-            MessageToClient response = new MessageToClient<>(ClientActionType.TRIGGER_EVENT, new EventReport(EventType.UPLOAD_SUCCESS, data));
+            MessageToClient response = new MessageToClient<>(ClientActionType.TRIGGER_EVENT, new EventReport(EventType.UPLOAD_SUCCESS));
             sendResponse(servletResponse, response, HttpServletResponse.SC_OK);
 
             // Inserting the record of the file upload, retrieving back the commId
