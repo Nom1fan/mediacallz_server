@@ -1,13 +1,9 @@
 package com.mediacallz.server.database;
 
-import com.mediacallz.server.database.dbos.AppMetaDBO;
-import com.mediacallz.server.database.dbos.CallRecordDBO;
-import com.mediacallz.server.database.dbos.MediaTransferDBO;
-import com.mediacallz.server.database.dbos.UserDBO;
+import com.mediacallz.server.database.dbos.*;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Mor on 16/11/2015.
@@ -34,6 +30,7 @@ public interface Dao {
     String COL_TRANSFER_ID          =   "transfer_id";
     String COL_TRANSFER_SUCCESS     =   "transfer_success";
     String COL_TRANSFER_DATETIME    =   "transfer_datetime";
+    String COL_DATETIME             =   "datetime";
     //endregion
 
     String TABLE_MEDIA_CALLS        =   "media_calls";
@@ -77,27 +74,46 @@ public interface Dao {
     //endregion
     //endregion
 
-    void initConn() throws SQLException;
-    void closeConn();
     void registerUser(String uid, String token) throws SQLException;
+
     void registerUser(String uid, String token, String deviceModel, String androidVersion) throws SQLException;
+
     void unregisterUser(String uid, String token) throws SQLException;
+
     void reRegisterUser(String uid, String token) throws SQLException;
+
     void reRegisterUser(String uid, String token, String deviceModel, String androidVersion) throws SQLException;
+
     void updateUserRecord(String uid, UserDBO userRecord) throws SQLException;
-    int insertMediaTransferRecord(Map data) throws SQLException;
-    void insertMediaCallRecord(CallRecordDBO callRecordDBO) throws SQLException;
+
+    int insertMediaTransferRecord(MediaTransferDBO mediaTransferDBO, MediaFileDBO mediaFileDBO) throws SQLException;
+
     UserDBO getUserRecord(String uid) throws SQLException;
+
     void updateMediaTransferRecord(int commId, String column, Object value) throws SQLException;
+
     void updateMediaTransferRecord(int commId, String[] columns, Object[] values) throws SQLException;
+
     void incrementColumn(String table, String col, String whereCol, String whereVal) throws SQLException;
+
     void updateAppRecord(double lastSupportedVersion) throws SQLException;
+
     AppMetaDBO getAppMetaRecord() throws SQLException;
-    void insertMediaFileRecord(String md5, String extension, long size, String countColToInc) throws SQLException;
+
+    void insertMediaCallRecord(MediaCallDBO mediaCallDBO, MediaFileDBO mediaFileDBO) throws SQLException;
+
+    void insertMediaFileRecord(MediaFileDBO mediaFileDBO, String countColToInc) throws SQLException;
+
+    MediaFileDBO getMediaFileRecord(String md5) throws SQLException;
+
     void insertUserSmsVerificationCode(String uid, int code) throws SQLException;
+
     void updateUserSmsVerificationCode(String uid, int code) throws SQLException;
-    int getUserSmsVerificationCode(String uid) throws SQLException;
+
+    int getSmsVerificationCode(String uid) throws SQLException;
+
     List<MediaTransferDBO> getAllUserMediaTransferRecords(String uid) throws SQLException;
+
     void delete(String table, String col, String condition, String val) throws SQLException;
 }
 

@@ -1,7 +1,9 @@
 package com.mediacallz.server;
 
 import com.google.gson.Gson;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mediacallz.server.logs.LogFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +18,21 @@ import java.util.logging.Logger;
 
 @SpringBootApplication
 public class Application {
+
+    @Value(value = "${db.host}")
+    private String dbHost;
+
+    @Value(value = "${db.port}")
+    private int dbPort;
+
+    @Value(value = "${db.name}")
+    private String dbName;
+
+    @Value(value = "${db.username}")
+    private String dbUsername;
+
+    @Value(value = "${db.password}")
+    private String dbPassword;
 
     private static Map<String,Level> logLevelsMap = new HashMap<String,Level>() {{
         put("DEBUG", Level.CONFIG);
@@ -41,6 +58,16 @@ public class Application {
     @Bean
     public Gson getGson() {
         return new Gson();
+    }
+
+    @Bean
+    ComboPooledDataSource getDataSource() {
+        ComboPooledDataSource dataSource = new ComboPooledDataSource();
+        String jdbcUrl = "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName;
+        dataSource.setJdbcUrl(jdbcUrl);
+        dataSource.setUser(dbUsername);
+        dataSource.setPassword(dbPassword);
+        return dataSource;
     }
 
     @Bean

@@ -39,7 +39,7 @@ public class SmsVerificationAccessImpl implements SmsVerificationAccess {
     public int getSmsVerificationCode(String uid) {
 
         try {
-            int code = dao.getUserSmsVerificationCode(uid);
+            int code = dao.getSmsVerificationCode(uid);
             return code != 0 ? code : NO_SMS_CODE;
         } catch (SQLException e) {
             e.printStackTrace();

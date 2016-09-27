@@ -2,6 +2,8 @@ package com.mediacallz.server.controllers;
 
 import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.database.UserDataAccess;
+import com.mediacallz.server.database.dbos.MediaFileDBO;
+import com.mediacallz.server.database.dbos.MediaTransferDBO;
 import com.mediacallz.server.handlers.upload_controller.SpMediaPathHandler;
 import com.mediacallz.server.lang.LangStrings;
 import com.mediacallz.server.model.*;
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,8 +107,7 @@ public class UploadController extends AbstractController {
             sendResponse(servletResponse, response, HttpServletResponse.SC_OK);
 
             // Inserting the record of the file upload, retrieving back the commId
-            Integer commId = dao.insertMediaTransferRecord(data);
-            logger.info("commId returned:" + commId);
+            Integer commId = insertFileUploadRecord(data, specialMediaType, destId, fileSize);
 
             // Sending file to destination
             data.put(DataKeys.COMM_ID, commId.toString());
@@ -129,6 +131,19 @@ public class UploadController extends AbstractController {
                     e.printStackTrace();
                 }
         }
+    }
+
+    private Integer insertFileUploadRecord(Map<DataKeys, Object> data, SpecialMediaType specialMediaType, String destId, long fileSize) throws SQLException {
+        String md5 = data.get(DataKeys.MD5).toString();
+        String extension = data.get(DataKeys.EXTENSION).toString();
+        MediaTransferDBO mediaTransferDBO = new MediaTransferDBO(
+                specialMediaType,
+                md5,
+                data.get(DataKeys.SOURCE_ID).toString(),
+                destId);
+        Integer commId = dao.insertMediaTransferRecord(mediaTransferDBO, new MediaFileDBO(md5, extension, fileSize));
+        logger.info("commId returned:" + commId);
+        return commId;
     }
 
     private String prepareFileUploadInfoMsg(SpecialMediaType specialMediaType, String messageInitiaterId, String destId, long fileSize) {

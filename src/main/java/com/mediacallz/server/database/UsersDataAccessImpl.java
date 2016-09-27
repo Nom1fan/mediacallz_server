@@ -46,8 +46,8 @@ public class UsersDataAccessImpl implements UserDataAccess {
 
             // Creating a set of all destinations who received media from the user
             for(MediaTransferDBO record : records) {
-                if(record.is_transfer_success())
-                    destinations.add(record.get_dest_uid());
+                if(record.isTransfer_success())
+                    destinations.add(record.getUid_dest());
             }
 
             // Clearing all media sent to these destinations by user

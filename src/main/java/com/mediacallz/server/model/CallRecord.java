@@ -1,17 +1,14 @@
-package com.mediacallz.server.database.dbos;
-
-import com.mediacallz.server.model.FileManager;
-import com.mediacallz.server.model.SpecialMediaType;
+package com.mediacallz.server.model;
 
 import java.io.Serializable;
 
 /**
  * Created by Mor on 10/03/2016.
  */
-public class CallRecordDBO implements Serializable {
+public class CallRecord implements Serializable {
 
     private static final long serialVersionUID = 7408472793374531808L;
-    private static final String TAG = CallRecordDBO.class.getSimpleName();
+    private static final String TAG = CallRecord.class.getSimpleName();
 
     private String _sourceId;
     private String _destinationId;
@@ -24,7 +21,7 @@ public class CallRecordDBO implements Serializable {
 
     private SpecialMediaType sepecialMediaType;
 
-    public CallRecordDBO(String source,
+    public CallRecord(String source,
                       String destination,
                       FileManager visualMediaFile,
                       String visualM5,
@@ -46,7 +43,7 @@ public class CallRecordDBO implements Serializable {
 
         sepecialMediaType = spMediaType;
 
-        System.out.println("I/" + TAG + ": CallRecordDBO:" + this.toString());
+        System.out.println("I/" + TAG + ": CallRecord:" + this.toString());
     }
 
     @Override
