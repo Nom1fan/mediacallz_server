@@ -75,7 +75,7 @@ public class DownloadController extends AbstractController {
 
     private void initiateDownloadFlow(Map data, String filePathOnServer) {
         try {
-            initiateDownload(data, filePathOnServer);
+            initiateDownload(filePathOnServer);
 
             informSrcOfSuccess(data);
 
@@ -83,25 +83,17 @@ public class DownloadController extends AbstractController {
             char TRUE = '1';
             dao.updateMediaTransferRecord(commId, Dao.COL_TRANSFER_SUCCESS, TRUE);
 
-        } catch (DownloadRequestFailedException | SQLException e) {
-            handleDownloadFailure(response, e, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } catch (IOException e) {
-            handleDownloadFailure(response, e, HttpServletResponse.SC_REQUEST_TIMEOUT);
+        } catch (DownloadRequestFailedException | SQLException | IOException e) {
+            handleDownloadFailure(e);
         }
     }
 
-    private void initiateDownload(Map data, String filePathOnServer) throws DownloadRequestFailedException, IOException {
+    private void initiateDownload(String filePathOnServer) throws DownloadRequestFailedException, IOException {
         BufferedInputStream bis = null;
         OutputStream os = response.getOutputStream();
         try {
 
             File fileForDownload = new File(filePathOnServer);
-//            MessageToClient msgDF = new MessageToClient<>(ClientActionType.DOWNLOAD_FILE, data);
-//            try {
-//                sendResponse(response, msgDF, HttpServletResponse.SC_OK);
-//            } catch (IOException e) {
-//                throw new DownloadRequestFailedException("Failed to initiate download sequence.", e);
-//            }
             // get MIME type of the file
             String mimeType = request.getServletContext().getMimeType(filePathOnServer);
             if (mimeType == null) {
@@ -152,7 +144,7 @@ public class DownloadController extends AbstractController {
             logger.warning("Failed to inform user " + sourceId + " of transfer success to user: " + destId);
     }
 
-    private void handleDownloadFailure(HttpServletResponse response, Exception e, int status) {
+    private void handleDownloadFailure(Exception e) {
 
         logger.severe("User " + messageInitiaterId + " download request failed. Exception:" + e.getMessage());
 
@@ -174,16 +166,6 @@ public class DownloadController extends AbstractController {
 
         if (!sent)
             logger.severe("Failed trying to Inform sender:" + sourceId + " that file did not reach destination:" + destId + ". Empty token");
-
-//        // informing destination of request failure
-//        logger.severe("Informing destination:" + destId + " that download request failed");
-//        HashMap<DataKeys, Object> replyData = new HashMap<>();
-//        replyData.put(DataKeys.EVENT_REPORT, new EventReport(EventType.DOWNLOAD_FAILURE));
-//
-//        try {
-//            sendResponse(response, new MessageToClient<>(ClientActionType.TRIGGER_EVENT, replyData), status);
-//        } catch (IOException ignored) {
-//        }
 
         // Marking in communication history record that the transfer has failed
         char FALSE = '0';
