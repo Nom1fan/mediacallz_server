@@ -21,6 +21,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,6 +142,9 @@ public class UploadController extends AbstractController {
                 md5,
                 data.get(DataKeys.SOURCE_ID).toString(),
                 destId);
+
+        mediaTransferDBO.setDatetime(new Date());
+
         Integer commId = dao.insertMediaTransferRecord(mediaTransferDBO, new MediaFileDBO(md5, extension, fileSize));
         logger.info("commId returned:" + commId);
         return commId;
