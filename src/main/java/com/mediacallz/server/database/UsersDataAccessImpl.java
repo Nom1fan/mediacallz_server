@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  * @author Mor
  */
 @Component
-public class UsersDataAccessImpl implements UserDataAccess {
+public class UsersDataAccessImpl implements UsersDataAccess {
 
     @Autowired
     private PushSender pushSender;
@@ -61,7 +61,7 @@ public class UsersDataAccessImpl implements UserDataAccess {
                 // Clearing all types of special media
                 for(SpecialMediaType specialMediaType : specialMediaTypes) {
 
-                    HashMap<DataKeys,Object> data = new HashMap();
+                    HashMap<DataKeys,Object> data = new HashMap<>();
                     data.put(DataKeys.SPECIAL_MEDIA_TYPE, specialMediaType);
                     data.put(DataKeys.SOURCE_ID, userId);
                     boolean sent = pushSender.sendPush(destToken, pushEventAction, data);

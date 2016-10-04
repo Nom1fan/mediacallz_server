@@ -1,6 +1,6 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.database.UserDataAccess;
+import com.mediacallz.server.database.UsersDataAccess;
 import com.mediacallz.server.model.ClientActionType;
 import com.mediacallz.server.model.DataKeys;
 import com.mediacallz.server.model.MessageToClient;
@@ -21,11 +21,11 @@ import java.util.Map;
 public class IsRegisteredController extends AbstractController {
 
     private final
-    UserDataAccess userDataAccess;
+    UsersDataAccess usersDataAccess;
 
     @Autowired
-    public IsRegisteredController(UserDataAccess userDataAccess) {
-        this.userDataAccess = userDataAccess;
+    public IsRegisteredController(UsersDataAccess usersDataAccess) {
+        this.usersDataAccess = usersDataAccess;
     }
 
     @ResponseBody
@@ -37,7 +37,7 @@ public class IsRegisteredController extends AbstractController {
         logger.info(messageInitiaterId + " is checking if " + destId + " is logged in...");
         Map<DataKeys,Object> data = new HashMap<>();
         data.put(DataKeys.DESTINATION_ID, destId);
-        data.put(DataKeys.IS_REGISTERED, userDataAccess.isRegistered(destId));
+        data.put(DataKeys.IS_REGISTERED, usersDataAccess.isRegistered(destId));
 
         return new MessageToClient<>(ClientActionType.IS_REGISTERED_RES, data);
     }

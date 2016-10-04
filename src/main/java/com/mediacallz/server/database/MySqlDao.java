@@ -3,6 +3,7 @@ package com.mediacallz.server.database;
 import com.mchange.v2.c3p0.PooledDataSource;
 import com.mediacallz.server.database.dbos.*;
 import com.mediacallz.server.database.rowmappers.*;
+import com.mediacallz.server.model.MediaFile;
 import com.mediacallz.server.model.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -240,7 +241,6 @@ public class MySqlDao implements Dao {
     @Override
     public void updateUserRecord(String uid, UserDBO userRecord) throws SQLException {
 
-
         StringBuilder query = new StringBuilder("UPDATE " + TABLE_USERS);
         uid = quote(uid);
         String androidVersion = quote(userRecord.getAndroidVersion());
@@ -297,14 +297,19 @@ public class MySqlDao implements Dao {
     }
 
     @Override
-    public void insertMediaCallRecord(MediaCallDBO mediaCallDBO, MediaFileDBO mediaFileDBO) throws SQLException {
+    public int insertMediaCallRecord(MediaCallDBO mediaCallDBO, List<MediaFile> mediaFiles) throws SQLException {
 
-        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(dataSource);
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(dataSource).
+                withTableName(TABLE_MEDIA_CALLS).
+                usingGeneratedKeyColumns(COL_CALL_ID);
 
-        insertMediaFileRecord(mediaFileDBO, COL_TRANSFER_COUNT);
+        for (MediaFile mediaFile : mediaFiles) {
+            if (mediaFile != null)
+                insertMediaFileRecord(new MediaFileDBO(mediaFile.getMd5(), mediaFile.get_extension(), mediaFile.get_size()), COL_TRANSFER_COUNT);
+        }
 
         SqlParameterSource parameters = new BeanPropertySqlParameterSource(mediaCallDBO);
-        jdbcInsert.execute(parameters);
+        return jdbcInsert.executeAndReturnKey(parameters).intValue();
     }
 
     @Override

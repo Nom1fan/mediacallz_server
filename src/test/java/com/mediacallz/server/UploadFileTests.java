@@ -44,10 +44,10 @@ public class UploadFileTests implements IServerProxy, ProgressListener {
         String destId = "0500000000";
         String destName = "Abubu";
         File fileForUpload = new File(SAMPLE_FILEPATH);
-        FileManager fileManager = new FileManager(fileForUpload);
-        long fileSize = fileManager.getFileSize();
+        MediaFile mediaFile = new MediaFile(fileForUpload);
+        long fileSize = mediaFile.get_size();
 
-        ProgressiveEntity progressiveEntity = prepareProgressiveEntity(srcId, destId, destName, fileForUpload, fileManager, fileSize);
+        ProgressiveEntity progressiveEntity = prepareProgressiveEntity(srcId, destId, destName, fileForUpload, mediaFile, fileSize);
         ConnectionToServer connToServer = new ConnectionToServer(this, responseType);
         connToServer.sendMultipartToServer(UPLOAD_URL, progressiveEntity);
     }
@@ -70,17 +70,17 @@ public class UploadFileTests implements IServerProxy, ProgressListener {
 
     }
 
-    private ProgressiveEntity prepareProgressiveEntity(String srcId, String destId, String destName, File fileForUpload, FileManager fileManager, long fileSize) {
+    private ProgressiveEntity prepareProgressiveEntity(String srcId, String destId, String destName, File fileForUpload, MediaFile mediaFile, long fileSize) {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
         FileBody fb = new FileBody(fileForUpload);
         builder.addPart("fileForUpload", fb);
-        prepareDataForUpload(builder, srcId, destId, destName, fileManager, SpecialMediaType.CALLER_MEDIA);
+        prepareDataForUpload(builder, srcId, destId, destName, mediaFile, SpecialMediaType.CALLER_MEDIA);
         HttpEntity httpEntity = builder.build();
         return new ProgressiveEntity(httpEntity, fileSize, this);
     }
 
-    private void prepareDataForUpload(MultipartEntityBuilder builder, String srcId, String destId, String destName, FileManager fileForUpload, SpecialMediaType specialMediaType) {
+    private void prepareDataForUpload(MultipartEntityBuilder builder, String srcId, String destId, String destName, MediaFile fileForUpload, SpecialMediaType specialMediaType) {
         String appVersion = "1.43";
 
         builder.addTextBody(DataKeys.MESSAGE_INITIATER_ID.toString(), srcId);
@@ -90,12 +90,12 @@ public class UploadFileTests implements IServerProxy, ProgressListener {
         builder.addTextBody(DataKeys.DESTINATION_ID.toString(), destId);
         builder.addTextBody(DataKeys.DESTINATION_CONTACT_NAME.toString(), destName);
         builder.addTextBody(DataKeys.MD5.toString(), fileForUpload.getMd5());
-        builder.addTextBody(DataKeys.EXTENSION.toString(), fileForUpload.getFileExtension());
-        builder.addTextBody(DataKeys.FILE_PATH_ON_SRC_SD.toString(), fileForUpload.getFile().getAbsolutePath());
-        builder.addTextBody(DataKeys.FILE_SIZE.toString(), String.valueOf(fileForUpload.getFileSize()));
-        builder.addTextBody(DataKeys.FILE_TYPE.toString(), fileForUpload.getFileType().toString());
+        builder.addTextBody(DataKeys.EXTENSION.toString(), fileForUpload.get_extension());
+        builder.addTextBody(DataKeys.FILE_PATH_ON_SRC_SD.toString(), fileForUpload.get_file().getAbsolutePath());
+        builder.addTextBody(DataKeys.FILE_SIZE.toString(), String.valueOf(fileForUpload.get_size()));
+        builder.addTextBody(DataKeys.FILE_TYPE.toString(), fileForUpload.get_fileType().toString());
         builder.addTextBody(DataKeys.SPECIAL_MEDIA_TYPE.toString(), specialMediaType.toString());
-        builder.addTextBody(DataKeys.SOURCE_WITH_EXTENSION.toString(), srcId + "." + fileForUpload.getFileExtension());
+        builder.addTextBody(DataKeys.SOURCE_WITH_EXTENSION.toString(), srcId + "." + fileForUpload.get_extension());
     }
 }
 

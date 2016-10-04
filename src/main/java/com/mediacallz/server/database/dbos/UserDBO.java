@@ -3,6 +3,7 @@ package com.mediacallz.server.database.dbos;
 import com.mediacallz.server.model.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.Date;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class UserDBO {
 

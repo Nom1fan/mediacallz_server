@@ -1,7 +1,7 @@
 package com.mediacallz.server.controllers;
 
 import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.database.UserDataAccess;
+import com.mediacallz.server.database.UsersDataAccess;
 import com.mediacallz.server.exceptions.DownloadRequestFailedException;
 import com.mediacallz.server.lang.LangStrings;
 import com.mediacallz.server.model.DataKeys;
@@ -40,7 +40,7 @@ public class DownloadController extends AbstractController {
     private PushSender pushSender;
 
     @Autowired
-    private UserDataAccess userDataAccess;
+    private UsersDataAccess usersDataAccess;
 
     @Autowired
     private ServletRequestUtils servletRequestUtils;
@@ -138,7 +138,7 @@ public class DownloadController extends AbstractController {
     private void informSrcOfSuccess(Map data) {
         String title = strings.media_ready_title();
         String msg = String.format(strings.media_ready_body(), !destContact.equals("") ? destContact : destId);
-        String token = userDataAccess.getUserRecord(sourceId).getToken();
+        String token = usersDataAccess.getUserRecord(sourceId).getToken();
         boolean sent = pushSender.sendPush(token, PushEventKeys.TRANSFER_SUCCESS, title, msg, data);
         if (!sent)
             logger.warning("Failed to inform user " + sourceId + " of transfer success to user: " + destId);
@@ -161,7 +161,7 @@ public class DownloadController extends AbstractController {
 
         // Informing sender that file did not reach destination
         logger.severe("Informing sender:" + sourceId + " that file did not reach destination:" + destId);
-        String senderToken = userDataAccess.getUserRecord(sourceId).getToken();
+        String senderToken = usersDataAccess.getUserRecord(sourceId).getToken();
         boolean sent = pushSender.sendPush(senderToken, PushEventKeys.SHOW_ERROR, title, msgTransferFailed, data);
 
         if (!sent)

@@ -1,13 +1,14 @@
 package com.mediacallz.server.controllers;
 
 import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.database.UserDataAccess;
+import com.mediacallz.server.database.UsersDataAccess;
 import com.mediacallz.server.database.dbos.MediaFileDBO;
 import com.mediacallz.server.database.dbos.MediaTransferDBO;
 import com.mediacallz.server.handlers.upload_controller.SpMediaPathHandler;
 import com.mediacallz.server.lang.LangStrings;
 import com.mediacallz.server.model.*;
 import com.mediacallz.server.services.PushSender;
+import com.mediacallz.server.utils.MediaFilesUtils;
 import com.mediacallz.server.utils.ServletRequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,7 +34,7 @@ import java.util.Map;
 public class UploadController extends AbstractController {
 
     @Autowired
-    private UserDataAccess userDataAccess;
+    private UsersDataAccess usersDataAccess;
 
     @Autowired
     private PushSender pushSender;
@@ -153,7 +154,7 @@ public class UploadController extends AbstractController {
                 ". [Destination]:" + destId + "." +
                 " [Special Media Type]:" + specialMediaType +
                 " [File size]:" +
-                FileManager.getFileSizeFormat(fileSize);
+                MediaFilesUtils.getFileSizeFormat(fileSize);
     }
 
     private void sendMediaUndeliveredMsgToUploader(Map<DataKeys, Object> data) {
@@ -176,7 +177,7 @@ public class UploadController extends AbstractController {
         HashMap<DataKeys, Object> replyData = new HashMap<>();
         replyData.put(DataKeys.HTML_STRING, errMsgHtml);
 
-        String initiaterToken = userDataAccess.getUserRecord(messageInitiaterId).getToken();
+        String initiaterToken = usersDataAccess.getUserRecord(messageInitiaterId).getToken();
 
         // Informing source (uploader) that the file was not sent to destination
         pushSender.sendPush(initiaterToken, PushEventKeys.SHOW_ERROR, title, errMsg, replyData);
