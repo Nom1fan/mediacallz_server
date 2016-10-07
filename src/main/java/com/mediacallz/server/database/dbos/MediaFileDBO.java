@@ -11,13 +11,14 @@ public class MediaFileDBO {
     String md5;
     String content_ext;
     long content_size;
-    String transfer_count;
-    String call_count;
+    int transfer_count;
+    int call_count;
 
 
     public MediaFileDBO(String md5, String fileExtension, long fileSize) {
         this.md5 = md5;
-        this.content_ext = fileExtension;
-        this.content_size = fileSize;
+        content_ext = fileExtension;
+        content_size = fileSize;
+        transfer_count = 0;
     }
 }

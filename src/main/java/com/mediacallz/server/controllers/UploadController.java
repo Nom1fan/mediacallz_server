@@ -75,9 +75,9 @@ public class UploadController extends AbstractController {
         BufferedOutputStream bos = null;
         try {
 
-            long fileSize = fileForUpload.getSize();
-            data.put(DataKeys.FILE_SIZE, String.valueOf(fileSize));
-            String infoMsg = prepareFileUploadInfoMsg(specialMediaType, messageInitiaterId, destId, fileSize);
+            long bytesLeft = fileForUpload.getSize();
+            data.put(DataKeys.FILE_SIZE, String.valueOf(bytesLeft));
+            String infoMsg = prepareFileUploadInfoMsg(specialMediaType, messageInitiaterId, destId, bytesLeft);
             logger.info(infoMsg);
 
             // Preparing file placeholder
@@ -92,14 +92,14 @@ public class UploadController extends AbstractController {
             logger.info("Reading data...");
             byte[] buf = new byte[1024 * 8];
             int bytesRead;
-            while (fileSize > 0 && (bytesRead = dis.read(buf, 0, (int) Math.min(buf.length, fileSize))) != -1) {
+            while (bytesLeft > 0 && (bytesRead = dis.read(buf, 0, (int) Math.min(buf.length, bytesLeft))) != -1) {
                 bos.write(buf, 0, bytesRead);
-                fileSize -= bytesRead;
+                bytesLeft -= bytesRead;
             }
 
-            if (fileSize > 0)
+            if (bytesLeft > 0)
                 throw new IOException("Upload was stopped abruptly");
-            else if (fileSize < 0)
+            else if (bytesLeft < 0)
                 throw new IOException("Read too many bytes. Upload seems corrupted.");
 
 
@@ -108,7 +108,7 @@ public class UploadController extends AbstractController {
             sendResponse(servletResponse, response, HttpServletResponse.SC_OK);
 
             // Inserting the record of the file upload, retrieving back the commId
-            Integer commId = insertFileUploadRecord(data, specialMediaType, destId, fileSize);
+            Integer commId = insertFileUploadRecord(data, specialMediaType, destId, fileForUpload.getSize());
 
             // Sending file to destination
             data.put(DataKeys.COMM_ID, commId.toString());
