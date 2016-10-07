@@ -6,12 +6,10 @@ import com.mediacallz.server.database.dbos.MediaCallDBO;
 import com.mediacallz.server.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,11 +45,13 @@ public class InsertMediaCallRecordController extends AbstractController {
 
     }
 
-    private List<MediaFile> prepareMediaFiles(@RequestBody final CallRecord callRecord) {
-        return new LinkedList<MediaFile>() {{
-            add(callRecord.getVisualMediaFile());
-            add(callRecord.getAudioMediaFile()) ;
-        }};
+    private List<MediaFile> prepareMediaFiles(final CallRecord callRecord) {
+        LinkedList<MediaFile> mediaFiles = new LinkedList<>();
+        if(callRecord.getVisualMediaFile()!=null)
+            mediaFiles.add(callRecord.getVisualMediaFile());
+        if(callRecord.getAudioMediaFile()!=null)
+            mediaFiles.add(callRecord.getAudioMediaFile());
+        return mediaFiles;
     }
 
     private MediaCallDBO prepareMediaCallDBO(CallRecord callRecord) {
