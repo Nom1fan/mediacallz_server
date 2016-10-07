@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -38,14 +37,11 @@ public class ClearMediaController extends AbstractController {
         String pushEventAction = PushEventKeys.CLEAR_MEDIA;
         boolean sent = pushSender.sendPush(destToken, pushEventAction, data);
 
-        HashMap<DataKeys,Object> replyData = new HashMap<>();
         if(sent) {
-            replyData.put(DataKeys.EVENT_REPORT, new EventReport(EventType.CLEAR_SENT));
-            return new MessageToClient<>(ClientActionType.TRIGGER_EVENT, replyData);
+            return new MessageToClient<>(ClientActionType.TRIGGER_EVENT, new EventReport(EventType.CLEAR_SENT));
         }
         else {
-            replyData.put(DataKeys.EVENT_REPORT, new EventReport(EventType.CLEAR_FAILURE));
-            return new MessageToClient <>(ClientActionType.TRIGGER_EVENT, replyData);
+            return new MessageToClient <>(ClientActionType.TRIGGER_EVENT, new EventReport(EventType.CLEAR_FAILURE));
         }
     }
 }
