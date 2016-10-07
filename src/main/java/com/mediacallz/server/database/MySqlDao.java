@@ -6,6 +6,7 @@ import com.mediacallz.server.database.rowmappers.*;
 import com.mediacallz.server.model.MediaFile;
 import com.mediacallz.server.model.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -329,9 +330,13 @@ public class MySqlDao implements Dao {
 
     @Override
     public MediaFileDBO getMediaFileRecord(String md5) throws SQLException {
-        JdbcOperations jdbcOperations = new JdbcTemplate(dataSource);
-        String query = "SELECT * FROM " + TABLE_MEDIA_FILES + " WHERE " + COL_MD5  + "=" + quote(md5);
-        return jdbcOperations.queryForObject(query, new MediaFileRowMapper());
+        MediaFileDBO result = null;
+        try {
+            JdbcOperations jdbcOperations = new JdbcTemplate(dataSource);
+            String query = "SELECT * FROM " + TABLE_MEDIA_FILES + " WHERE " + COL_MD5 + "=" + quote(md5);
+            result = jdbcOperations.queryForObject(query, new MediaFileRowMapper());
+        } catch(EmptyResultDataAccessException ignored) {}
+        return result;
     }
 
     @Override
