@@ -37,8 +37,9 @@ public class GetAppMetaController extends AbstractController {
         } catch(Exception e) {
             replyData.put(DataKeys.RESPONSE_CODE, ResponseCodes.INTERNAL_SERVER_ERR);
             String errMsg = "Failed to retrieve app meta from DB. " + (e.getMessage()!=null ? "Exception:" + e.getMessage() : "");
+            logger.severe(errMsg);
             replyData.put(DataKeys.ERR_MSG, errMsg);
-            return new MessageToClient<>(ClientActionType.GENERIC_ERROR, replyData);
+            return new MessageToClient<>(ClientActionType.GET_APP_RECORD_RES, replyData);
         }
     }
 }
