@@ -141,9 +141,8 @@ public class UploadController extends AbstractController {
                 specialMediaType,
                 md5,
                 data.get(DataKeys.SOURCE_ID).toString(),
-                destId);
-
-        mediaTransferDBO.setDatetime(new Date());
+                destId
+                ,new Date());
 
         Integer commId = dao.insertMediaTransferRecord(mediaTransferDBO, new MediaFileDBO(md5, extension, fileSize));
         logger.info("commId returned:" + commId);

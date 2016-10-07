@@ -20,7 +20,7 @@ public class MediaTransferDBO {
     final String md5;
     final String uid_src;
     final String uid_dest;
-    Date datetime;
+    final Date datetime;
     boolean transfer_success;
     Date transfer_datetime;
 }
