@@ -13,5 +13,4 @@ public enum ClientActionType {
     UPDATE_RES,
     PING,
     TRIGGER_EVENT,
-    GENERIC_ERROR,
 }
