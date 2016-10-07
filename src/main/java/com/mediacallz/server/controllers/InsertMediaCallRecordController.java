@@ -39,7 +39,7 @@ public class InsertMediaCallRecordController extends AbstractController {
             List<MediaFile> mediaFiles = prepareMediaFiles(callRecord);
             int callId = dao.insertMediaCallRecord(mediaCallDBO, mediaFiles);
             logger.info("Insert call record was successful. Call Id returned:[" + callId + "]");
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             logger.log(Level.SEVERE, "Insert call record failed. Exception:[" + e.getMessage() + "]", e);
         }
