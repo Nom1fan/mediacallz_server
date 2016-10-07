@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  * @author Mor
  */
 @Component
-public class UsersDataAccessImpl implements UserDataAccess {
+public class UsersDataAccessImpl implements UsersDataAccess {
 
     @Autowired
     private PushSender pushSender;

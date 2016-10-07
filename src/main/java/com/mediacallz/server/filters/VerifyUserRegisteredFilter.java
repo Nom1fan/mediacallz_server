@@ -1,7 +1,7 @@
 package com.mediacallz.server.filters;
 
 import com.mediacallz.server.controllers.PreRegistrationController;
-import com.mediacallz.server.database.UserDataAccess;
+import com.mediacallz.server.database.UsersDataAccess;
 import com.mediacallz.server.model.DataKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ public class VerifyUserRegisteredFilter implements Filter {
     Logger logger;
 
     @Autowired
-    private UserDataAccess usersDataAccess;
+    private UsersDataAccess usersDataAccess;
 
     @Autowired
     public void initPreRegistrationList(List<PreRegistrationController> preRegistrationControllers) {
