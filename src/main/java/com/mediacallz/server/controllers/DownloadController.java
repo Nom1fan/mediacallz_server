@@ -120,12 +120,17 @@ public class DownloadController extends AbstractController {
             bis = new BufferedInputStream(fis);
 
             byte[] buf = new byte[1024 * 8];
-            long bytesToRead = fileForDownload.length();
+            long fileSize = fileForDownload.length();
+            long bytesToRead = fileSize;
             int bytesRead;
             while (bytesToRead > 0 && (bytesRead = bis.read(buf, 0, (int) Math.min(buf.length, bytesToRead))) != -1) {
                 dos.write(buf, 0, bytesRead);
                 bytesToRead -= bytesRead;
             }
+
+            if(bytesToRead > 0)
+                throw new IOException("download was stopped abruptly. " + bytesToRead + " out of " + fileSize + " bytes left.");
+
         } finally {
             if (bis != null)
                 try {
