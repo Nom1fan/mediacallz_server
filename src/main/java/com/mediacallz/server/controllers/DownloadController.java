@@ -58,7 +58,8 @@ public class DownloadController extends AbstractController {
         Map<DataKeys, Object> data = servletRequestUtils.extractParametersMap(request);
 
         messageInitiaterId = (String) data.get(DataKeys.MESSAGE_INITIATER_ID);
-        commId = Integer.valueOf(data.get(DataKeys.COMM_ID).toString());
+        try { commId = Integer.valueOf(data.get(DataKeys.COMM_ID).toString()); }
+        catch(Exception e) { commId = Double.valueOf(data.get(DataKeys.COMM_ID).toString()).intValue(); }
         sourceId = (String) data.get(DataKeys.SOURCE_ID);
         destId = (String) data.get(DataKeys.DESTINATION_ID);
         destContact = (String) data.get(DataKeys.DESTINATION_CONTACT_NAME);
