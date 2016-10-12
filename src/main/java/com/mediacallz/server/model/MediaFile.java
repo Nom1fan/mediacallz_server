@@ -11,21 +11,20 @@ import java.io.Serializable;
 public class MediaFile implements Serializable {
 
     private String md5;
-    private File _file;
-    private String _extension;
-    private long _size;
-    private FileType _fileType;
-    private String _uncompdFileFullPath;
+    private File file;
+    private String extension;
+    private long size;
+    private FileType fileType;
     private boolean isCompressed = false;
 
     public enum FileType { IMAGE, VIDEO, AUDIO }
 
     public MediaFile(File file) {
         md5 = MediaFilesUtils.getMD5(file.getAbsolutePath());
-        _file = file;
-        _extension = FilenameUtils.getExtension(file.getAbsolutePath());
-        _size = file.length();
-        _fileType = MediaFilesUtils.getFileType(_extension);
+        this.file = file;
+        extension = FilenameUtils.getExtension(file.getAbsolutePath());
+        size = file.length();
+        fileType = MediaFilesUtils.getFileType(extension);
     }
 
 }

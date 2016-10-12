@@ -306,7 +306,7 @@ public class MySqlDao implements Dao {
 
         for (MediaFile mediaFile : mediaFiles) {
             if (mediaFile != null)
-                insertMediaFileRecord(new MediaFileDBO(mediaFile.getMd5(), mediaFile.get_extension(), mediaFile.get_size()), COL_TRANSFER_COUNT);
+                insertMediaFileRecord(new MediaFileDBO(mediaFile.getMd5(), mediaFile.getExtension(), mediaFile.getSize()), COL_TRANSFER_COUNT);
         }
 
         SqlParameterSource parameters = new BeanPropertySqlParameterSource(mediaCallDBO);
@@ -362,12 +362,15 @@ public class MySqlDao implements Dao {
 
     @Override
     public int getSmsVerificationCode(String uid) throws SQLException {
+        int smsCode = 0;
+        try {
+            String query = "SELECT * FROM " + TABLE_SMS_VERIFICATION + " WHERE " + COL_UID + "=" + quote(uid);
+            JdbcOperations jdbcOperations = new JdbcTemplate(dataSource);
 
-        String query = "SELECT * FROM " + TABLE_SMS_VERIFICATION + " WHERE " + COL_UID + "=" + quote(uid);
-        JdbcOperations jdbcOperations = new JdbcTemplate(dataSource);
-
-        SmsVerificationDBO smsVerificationDBO = jdbcOperations.queryForObject(query, new SmsVerificationRowMapper());
-        return smsVerificationDBO.getCode();
+            SmsVerificationDBO smsVerificationDBO = jdbcOperations.queryForObject(query, new SmsVerificationRowMapper());
+            smsCode = smsVerificationDBO.getCode();
+        } catch (EmptyResultDataAccessException ignored) {}
+        return smsCode;
     }
 
     @Override

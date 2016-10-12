@@ -8,6 +8,7 @@ import com.mediacallz.server.handlers.upload_controller.SpMediaPathHandler;
 import com.mediacallz.server.lang.LangStrings;
 import com.mediacallz.server.model.*;
 import com.mediacallz.server.services.PushSender;
+import com.mediacallz.server.utils.MediaFilesUtils;
 import com.mediacallz.server.utils.ServletRequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -154,7 +155,7 @@ public class UploadController extends AbstractController {
                 ". [Destination]:" + destId + "." +
                 " [Special Media Type]:" + specialMediaType +
                 " [File size]:" +
-                FileManager.getFileSizeFormat(fileSize);
+                MediaFilesUtils.getFileSizeFormat(fileSize);
     }
 
     private void sendMediaUndeliveredMsgToUploader(Map<DataKeys, Object> data) {
