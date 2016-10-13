@@ -19,20 +19,35 @@ import java.util.logging.Logger;
 @SpringBootApplication
 public class Application {
 
-    @Value(value = "${db.host}")
+    @Value("${db.host}")
     private String dbHost;
 
-    @Value(value = "${db.port}")
+    @Value("${db.port}")
     private int dbPort;
 
-    @Value(value = "${db.name}")
+    @Value("${db.name}")
     private String dbName;
 
-    @Value(value = "${db.username}")
+    @Value("${db.username}")
     private String dbUsername;
 
-    @Value(value = "${db.password}")
+    @Value("${db.password}")
     private String dbPassword;
+
+    @Value("${db.maxPoolSize}")
+    private int maxPoolSize;
+
+    @Value("${db.acquireIncrement}")
+    private int acquireIncrement;
+
+    @Value("${db.testConnectionOnCheckIn}")
+    private Boolean testConnectionOnCheckIn;
+
+    @Value("${db.idleConnectionTestPeriod}")
+    private int idleConnectionTestPeriod;
+
+    @Value("${db.maxIdleTimeExcessConnections}")
+    private int maxIdleTimeExcessConnections;
 
     private static Map<String,Level> logLevelsMap = new HashMap<String,Level>() {{
         put("DEBUG", Level.CONFIG);
@@ -67,6 +82,11 @@ public class Application {
         dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setUser(dbUsername);
         dataSource.setPassword(dbPassword);
+        dataSource.setMaxPoolSize(maxPoolSize);
+        dataSource.setAcquireIncrement(acquireIncrement);
+        dataSource.setTestConnectionOnCheckin(testConnectionOnCheckIn);
+        dataSource.setIdleConnectionTestPeriod(idleConnectionTestPeriod);
+        dataSource.setMaxIdleTimeExcessConnections(maxIdleTimeExcessConnections);
         return dataSource;
     }
 
