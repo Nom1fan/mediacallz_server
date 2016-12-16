@@ -5,10 +5,10 @@
 
 	<groupId>com.mediacallz</groupId>
 	<artifactId>com.mediacallz.server</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>server.mediacallz.com</name>
+	<name>mediacallz.com.server</name>
 	<description>MediaCallz Server</description>
 
 	<parent>
