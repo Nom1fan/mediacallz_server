@@ -4,14 +4,16 @@ import mediacallz.com.server.database.Dao;
 import mediacallz.com.server.database.SmsVerificationAccess;
 import mediacallz.com.server.model.ClientActionType;
 import mediacallz.com.server.model.DataKeys;
-import mediacallz.com.server.model.MessageToClient;
+import mediacallz.com.server.model.response.Response;
+import mediacallz.com.server.model.request.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -34,29 +36,30 @@ public class RegisterController extends PreRegistrationController {
 
     @ResponseBody
     @RequestMapping(value = url, method = RequestMethod.POST)
-    public MessageToClient register(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        String messageInitiaterId = request.getParameter(DataKeys.MESSAGE_INITIATER_ID.toString());
+    public Response register(@RequestBody RegisterRequest request, HttpServletResponse response) throws IOException {
+        String messageInitiaterId = request.getMessageInitiaterId();
         logger.info("[User]:" + messageInitiaterId + " is attempting to register.");
 
         Map<DataKeys, Object> replyData = new HashMap<>();
-        int smsCode = Integer.valueOf(request.getParameter(DataKeys.SMS_CODE.toString()));
-        String pushToken = request.getParameter(DataKeys.PUSH_TOKEN.toString());
+        int smsCode = request.getSmsCode();
         int expectedSmsCode = smsVerificationAccess.getSmsVerificationCode(messageInitiaterId);
 
         if (smsCode != SmsVerificationAccess.NO_SMS_CODE && smsCode == expectedSmsCode) {
             try {
-                registerUser(request, messageInitiaterId, replyData, pushToken);
+                replyData = registerUser(request);
             } catch (SQLException e) {
-                handleSQLException(messageInitiaterId, replyData, e);
+                handleException(messageInitiaterId, replyData, e);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            } catch(DuplicateKeyException e) {
+                handleException(messageInitiaterId, replyData, e);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         } else {
             registrationRejected(messageInitiaterId, replyData, smsCode, expectedSmsCode);
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
 
-        return new MessageToClient<>(ClientActionType.REGISTER_RES, replyData);
+        return new Response<>(ClientActionType.REGISTER_RES, replyData);
     }
 
     //region Assisting methods
@@ -66,18 +69,24 @@ public class RegisterController extends PreRegistrationController {
         replyData.put(DataKeys.IS_REGISTER_SUCCESS, false);
     }
 
-    private void handleSQLException(String messageInitiaterId, Map<DataKeys, Object> replyData, SQLException e) {
+    private void handleException(String messageInitiaterId, Map<DataKeys, Object> replyData, Exception e) {
         logger.severe("Failed registration for [User]:" + messageInitiaterId +
                 ". [Exception]:" + (e.getMessage() != null ? e.getMessage() : e));
         replyData.put(DataKeys.IS_REGISTER_SUCCESS, false);
     }
 
-    private void registerUser(HttpServletRequest request, String messageInitiaterId, Map<DataKeys, Object> replyData, String pushToken) throws SQLException {
-        String deviceModel = request.getParameter(DataKeys.DEVICE_MODEL.toString());
-        String androidVersion = request.getParameter(DataKeys.ANDROID_VERSION.toString());
-        dao.registerUser(messageInitiaterId, pushToken, deviceModel, androidVersion);
+    private Map<DataKeys,Object> registerUser(RegisterRequest request) throws SQLException {
+        String messageInitiaterId = request.getMessageInitiaterId();
+        String deviceModel = request.getDeviceModel();
+        String androidVersion = request.getAndroidVersion();
+        String pushToken = request.getPushToken();
+        String iOSVersion = request.getIosVersion();
+        String appVersion = request.getAppVersion();
+        dao.registerUser(messageInitiaterId, pushToken, deviceModel, androidVersion, iOSVersion, appVersion);
+        Map<DataKeys,Object> replyData = new HashMap<>();
         replyData.put(DataKeys.IS_REGISTER_SUCCESS, true);
         logger.info("[User]:" + messageInitiaterId + " registered successfully.");
+        return replyData;
     }
     //endregion
 

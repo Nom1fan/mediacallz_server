@@ -8,6 +8,7 @@ import mediacallz.com.server.exceptions.FileInvalidFormatException;
 import mediacallz.com.server.exceptions.FileMissingExtensionException;
 import mediacallz.com.server.logs.LogFactory;
 import mediacallz.com.server.model.*;
+import mediacallz.com.server.model.response.Response;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -34,7 +35,7 @@ public class UploadFileTests implements IServerProxy, ProgressListener {
     private static final String ROOT_URL = "http://localhost:8080";
     private static final String UPLOAD_URL = ROOT_URL + "/v1/UploadFile";
 
-    private static final Type responseType = new TypeToken<MessageToClient<EventReport>>() {
+    private static final Type responseType = new TypeToken<Response<EventReport>>() {
     }.getType();
 
     @Test
@@ -58,8 +59,8 @@ public class UploadFileTests implements IServerProxy, ProgressListener {
     }
 
     @Override
-    public void handleMessageFromServer(MessageToClient msg, ConnectionToServer connectionToServer) {
-        MessageToClient<EventReport> msgEventReport = (MessageToClient<EventReport>) msg;
+    public void handleMessageFromServer(Response msg, ConnectionToServer connectionToServer) {
+        Response<EventReport> msgEventReport = (Response<EventReport>) msg;
         Assert.assertEquals(ClientActionType.TRIGGER_EVENT, msgEventReport.getActionType());
         Assert.assertEquals(EventType.UPLOAD_SUCCESS, msgEventReport.getResult().getStatus());
         connectionToServer.closeConnection();

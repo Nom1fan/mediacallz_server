@@ -25,4 +25,6 @@ public class UserDBO {
     private int unregistered_count;
     private String deviceModel;
     private String androidVersion;
+    private String iOSVersion;
+    private String appVersion;
 }

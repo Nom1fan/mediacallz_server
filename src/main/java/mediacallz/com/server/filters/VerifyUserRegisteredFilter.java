@@ -1,8 +1,9 @@
 package mediacallz.com.server.filters;
 
+import com.google.gson.Gson;
 import mediacallz.com.server.controllers.PreRegistrationController;
 import mediacallz.com.server.database.UsersDataAccess;
-import mediacallz.com.server.model.DataKeys;
+import mediacallz.com.server.model.request.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,9 @@ public class VerifyUserRegisteredFilter implements Filter {
     private UsersDataAccess usersDataAccess;
 
     @Autowired
+    private Gson gson;
+
+    @Autowired
     public void initPreRegistrationList(List<PreRegistrationController> preRegistrationControllers) {
         preRegistrationUrls = new ArrayList<>(preRegistrationControllers.size());
         for (PreRegistrationController preRegistrationController : preRegistrationControllers) {
@@ -44,31 +48,60 @@ public class VerifyUserRegisteredFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if (servletRequest instanceof HttpServletRequest) {
-            boolean verificationOK = true;
-            String url = ((HttpServletRequest) servletRequest).getRequestURL().toString();
+         if (servletRequest instanceof HttpServletRequest) {
+            try {
+                boolean verificationOK = true;
+                ServletRequestWrapper requestWrapper = new ServletRequestWrapper((HttpServletRequest) servletRequest);
+                String jsonPayload = requestWrapper.getJsonPayload();
+                Request request = gson.fromJson(jsonPayload, Request.class);
+                String messageInitiaterId = request.getMessageInitiaterId();
+                String token = request.getPushToken();
+                String url = requestWrapper.getRequestURI();
 
-            String messageInitiaterId = servletRequest.getParameter(DataKeys.MESSAGE_INITIATER_ID.toString());
-            if (messageInitiaterId == null) {
-                verificationOK = false;
-                sendForbiddenError((HttpServletResponse) servletResponse, url, ((HttpServletRequest) servletRequest).getRemoteUser());
-            }
-            else if (!isPreRegistrationRequest(url)) { // The request requires the user to already be registered
+                // Verify user credentials
+                if (messageInitiaterId == null || token == null) {
+                    verificationOK = false;
+                    sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest)servletRequest, request);
+                } else if (!isPreRegistrationRequest(url)) { // The request requires the user to already be registered
                     boolean isRegistered = usersDataAccess.isRegistered(messageInitiaterId);
                     if (!isRegistered) {
                         verificationOK = false;
-                        sendForbiddenError((HttpServletResponse) servletResponse, url, messageInitiaterId);
+                        sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest)servletRequest, request);
                     }
-            }
+                    String expectedToken = usersDataAccess.getUserRecord(messageInitiaterId).getToken();
+                    if(!expectedToken.equals(token)) {
+                        verificationOK = false;
+                        sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest)servletRequest, request);
+                    }
+                }
 
-            if (verificationOK)
-                filterChain.doFilter(servletRequest, servletResponse);
+                if (verificationOK)
+                    filterChain.doFilter(requestWrapper, servletResponse);
+            } catch(Exception malformedJsonException) {
+                malformedJsonException.printStackTrace();
+                logger.warning("Failed to process request, responding with bad request (403). [Exception]:" + malformedJsonException.getMessage());
+                ((HttpServletResponse)servletResponse).sendError(HttpServletResponse.SC_BAD_REQUEST);
+            }
         }
     }
 
-    private void sendForbiddenError(HttpServletResponse servletResponse, String url, String messageInitiaterId) throws IOException {
-        logger.warning("User " + messageInitiaterId + " attempted a request in url:" + url + " but is unregistered. Request was blocked.");
+    private void sendForbiddenError(HttpServletResponse servletResponse, String url, HttpServletRequest servletRequest, Request request) throws IOException {
+        String userId = getUserId(servletRequest, request);
+        userId = (userId !=null ? userId : "anonymous");
+        logger.warning("User " + userId + " attempted a request in url:" + url + " but is unregistered. Request was blocked.");
         servletResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
+    }
+
+    private String getUserId(HttpServletRequest servletRequest, Request request) {
+        String user = null;
+        if(request.getMessageInitiaterId()!=null)
+            user = request.getMessageInitiaterId();
+        else if(servletRequest.getRemoteUser()!=null)
+            user = servletRequest.getRemoteUser();
+        else if(servletRequest.getRemoteAddr()!=null)
+            user = servletRequest.getRemoteAddr();
+
+        return user;
     }
 
     private boolean isPreRegistrationRequest(String url) {

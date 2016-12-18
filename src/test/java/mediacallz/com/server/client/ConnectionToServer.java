@@ -3,7 +3,7 @@ package mediacallz.com.server.client;
 
 import com.google.gson.Gson;
 import mediacallz.com.server.model.IServerProxy;
-import mediacallz.com.server.model.MessageToClient;
+import mediacallz.com.server.model.response.Response;
 import mediacallz.com.server.model.ProgressiveEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -66,7 +66,7 @@ public class ConnectionToServer {
             HttpResponse response = client.execute(post);
             BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             String responseMessage = br.readLine();
-            MessageToClient msg = extractResponse(responseMessage);
+            Response msg = extractResponse(responseMessage);
             serverProxy.handleMessageFromServer(msg, this);
         } catch (IOException e) {
             connectionException(e);
@@ -159,7 +159,7 @@ public class ConnectionToServer {
     private void readResponse() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
         String responseMessage = br.readLine();
-        MessageToClient response = extractResponse(responseMessage);
+        Response response = extractResponse(responseMessage);
         serverProxy.handleMessageFromServer(response, this);
     }
 
@@ -203,7 +203,7 @@ public class ConnectionToServer {
         return result.toString();
     }
 
-    private MessageToClient extractResponse(String resJson) {
+    private Response extractResponse(String resJson) {
         return gson.fromJson(resJson, responseType);
     }
 

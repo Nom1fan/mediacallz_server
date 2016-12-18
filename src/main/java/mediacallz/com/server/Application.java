@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,9 @@ import java.util.logging.Logger;
 
 @SpringBootApplication
 public class Application {
+
+    @Value("${server.port}")
+    private int serverPort;
 
     @Value("${db.host}")
     private String dbHost;
@@ -49,6 +53,11 @@ public class Application {
     @Value("${db.maxIdleTimeExcessConnections}")
     private int maxIdleTimeExcessConnections;
 
+    @PostConstruct
+    public void init() {
+        logger().info("Server running on port:" + serverPort + "...");
+    }
+
     private static Map<String,Level> logLevelsMap = new HashMap<String,Level>() {{
         put("DEBUG", Level.CONFIG);
         put("CONFIG", Level.CONFIG);
@@ -61,7 +70,6 @@ public class Application {
         if(args.length > 0)
             setLogLevel(args[0]);
         SpringApplication.run(Application.class, args);
-        logger.info("Server running on port 8080...");
         logger.info("Log level:" + logger.getLevel());
     }
 

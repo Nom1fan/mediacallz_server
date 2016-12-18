@@ -9,7 +9,7 @@ import mediacallz.com.server.exceptions.FileMissingExtensionException;
 import mediacallz.com.server.logs.LogFactory;
 import mediacallz.com.server.model.DataKeys;
 import mediacallz.com.server.model.IServerProxy;
-import mediacallz.com.server.model.MessageToClient;
+import mediacallz.com.server.model.response.Response;
 import mediacallz.com.server.model.SpecialMediaType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +37,7 @@ public class DownloadFileTests implements IServerProxy {
     private static final String ROOT_URL = "http://localhost:8080";
     private static final String DOWNLOAD_URL = ROOT_URL + "/v1/DownloadFile";
 
-    private static final Type responseType = new TypeToken<MessageToClient<Map<DataKeys,Object>>>() {
+    private static final Type responseType = new TypeToken<Response<Map<DataKeys,Object>>>() {
     }.getType();
 
     @Test
@@ -55,7 +55,7 @@ public class DownloadFileTests implements IServerProxy {
     }
 
     @Override
-    public void handleMessageFromServer(MessageToClient msg, ConnectionToServer connectionToServer) {
+    public void handleMessageFromServer(Response msg, ConnectionToServer connectionToServer) {
 
     }
 

@@ -3,7 +3,6 @@ package mediacallz.com.server.utils;
 import mediacallz.com.server.model.MediaFile;
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,16 +39,6 @@ public abstract class MediaFilesUtils {
     public static boolean isValidVideoFormat(String pathOrUrl) {
         String extension = pathOrUrl.substring(pathOrUrl.lastIndexOf(".") + 1);
         return videoFormatsList.contains(extension.toLowerCase());
-    }
-
-    public static MediaFile createMediaFile(File file) {
-        MediaFile result = null;
-        try {
-            result = new MediaFile(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
     }
 
     public static String getFileNameByUrl(String url) {

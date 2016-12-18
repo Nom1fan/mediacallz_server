@@ -38,7 +38,7 @@ public class MySqlDao implements Dao {
         UserDBO record = getUserRecord(uid);
 
         // User registering for the first time
-        if(record == null) {
+        if (record == null) {
 
             StringBuilder query = new StringBuilder();
             uid = quote(uid);
@@ -60,15 +60,14 @@ public class MySqlDao implements Dao {
                     append(")");
 
             executeQuery(query.toString());
-        }
-        else {
+        } else {
             // User re-registering
             reRegisterUser(uid, token);
         }
     }
 
     @Override
-    public void registerUser(String uid, String token, String deviceModel, String androidVersion) throws SQLException {
+    public void registerUser(String uid, String token, String deviceModel, String androidVersion, String iOSVersion, String appVersion) throws SQLException {
 
         StringBuilder query = new StringBuilder();
         deviceModel = quote(deviceModel);
@@ -76,6 +75,7 @@ public class MySqlDao implements Dao {
 
         registerUser(uid, token);
         uid = quote(uid);
+        appVersion = quote(appVersion);
 
         query.
                 append("UPDATE ").
@@ -88,6 +88,14 @@ public class MySqlDao implements Dao {
                 append(COL_ANDROID_VERSION).
                 append("=").
                 append(androidVersion).
+                append(", ").
+                append(COL_IOS_VERSION).
+                append("=").
+                append(iOSVersion).
+                append(", ").
+                append(COL_APP_VERSION).
+                append("=").
+                append(appVersion).
                 append(" WHERE ").
                 append(COL_UID).
                 append("=").
@@ -137,7 +145,8 @@ public class MySqlDao implements Dao {
             String query = "SELECT *" + " FROM " + TABLE_USERS + " WHERE " + COL_UID + "=" + quote(uid);
             logger.config("Executing SQL query:[" + query + "]");
             result = jdbcOperations.queryForObject(query, new UserDboRowMapper());
-        } catch(EmptyResultDataAccessException ignored) {}
+        } catch (EmptyResultDataAccessException ignored) {
+        }
         return result;
     }
 
@@ -246,14 +255,24 @@ public class MySqlDao implements Dao {
     @Override
     public void updateUserRecord(String uid, UserDBO userRecord) throws SQLException {
 
-        StringBuilder query = new StringBuilder("UPDATE " + TABLE_USERS);
+        StringBuilder query = new StringBuilder("UPDATE " + TABLE_USERS).append(" SET ");
         uid = quote(uid);
-        String androidVersion = quote(userRecord.getAndroidVersion());
+        String androidVersion = userRecord.getAndroidVersion() == null ? "NULL" : quote(userRecord.getAndroidVersion());
+        String iOSVersion = userRecord.getIOSVersion() == null ? "NULL" : quote(userRecord.getIOSVersion());
+        String appVersion = userRecord.getAppVersion() == null ? "NULL" : quote(userRecord.getAppVersion());
+
         query.
-                append(" SET ").
                 append(COL_ANDROID_VERSION).
                 append("=").
                 append(androidVersion).
+                append(",").
+                append(COL_IOS_VERSION).
+                append("=").
+                append(iOSVersion).
+                append(",").
+                append(COL_APP_VERSION).
+                append("=").
+                append(appVersion).
                 append(" WHERE ").
                 append(COL_UID).
                 append("=").
@@ -320,7 +339,7 @@ public class MySqlDao implements Dao {
     @Override
     public void insertMediaFileRecord(MediaFileDBO mediaFileDBO, String countColToInc) throws SQLException {
 
-        if(getMediaFileRecord(mediaFileDBO.getMd5())!=null) {
+        if (getMediaFileRecord(mediaFileDBO.getMd5()) != null) {
             incrementColumn(TABLE_MEDIA_FILES, countColToInc, COL_MD5, mediaFileDBO.getMd5());
             return;
         }
@@ -339,7 +358,8 @@ public class MySqlDao implements Dao {
             JdbcOperations jdbcOperations = new JdbcTemplate(dataSource);
             String query = "SELECT * FROM " + TABLE_MEDIA_FILES + " WHERE " + COL_MD5 + "=" + quote(md5);
             result = jdbcOperations.queryForObject(query, new MediaFileRowMapper());
-        } catch(EmptyResultDataAccessException ignored) {}
+        } catch (EmptyResultDataAccessException ignored) {
+        }
         return result;
     }
 
@@ -373,7 +393,8 @@ public class MySqlDao implements Dao {
 
             SmsVerificationDBO smsVerificationDBO = jdbcOperations.queryForObject(query, new SmsVerificationRowMapper());
             smsCode = smsVerificationDBO.getCode();
-        } catch (EmptyResultDataAccessException ignored) {}
+        } catch (EmptyResultDataAccessException ignored) {
+        }
         return smsCode;
     }
 
@@ -396,7 +417,7 @@ public class MySqlDao implements Dao {
                 append(col).
                 append("=").
                 append(col).append(" + 1").
-                append( " WHERE ").
+                append(" WHERE ").
                 append(whereCol).
                 append("=").
                 append(quote(whereVal));

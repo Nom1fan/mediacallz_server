@@ -6,10 +6,12 @@ import mediacallz.com.server.exceptions.DownloadRequestFailedException;
 import mediacallz.com.server.lang.LangStrings;
 import mediacallz.com.server.model.DataKeys;
 import mediacallz.com.server.model.PushEventKeys;
+import mediacallz.com.server.model.request.DownloadFileRequest;
 import mediacallz.com.server.services.PushSender;
-import mediacallz.com.server.utils.ServletRequestUtils;
+import mediacallz.com.server.utils.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -30,7 +32,7 @@ public class DownloadController extends AbstractController {
     private String messageInitiaterId;
     private String sourceId;
     private String destId;
-    private String destContact;
+    private String destContactName;
     private int commId;
 
     @Autowired
@@ -43,41 +45,40 @@ public class DownloadController extends AbstractController {
     private UsersDataAccess usersDataAccess;
 
     @Autowired
-    private ServletRequestUtils servletRequestUtils;
-
-    private HttpServletRequest request;
+    private RequestUtils requestUtils;
 
     private HttpServletResponse response;
 
+    private HttpServletRequest servletRequest;
+
     @RequestMapping(value = "/v1/DownloadFile", method = RequestMethod.POST)
-    public void downloadFile(HttpServletRequest request, HttpServletResponse response) {
-        this.request = request;
+    public void downloadFile(@RequestBody DownloadFileRequest request, HttpServletResponse response, HttpServletRequest servletRequest) {
         this.response = response;
+        this.servletRequest = servletRequest;
 
-        Map<DataKeys, Object> data = servletRequestUtils.extractParametersMap(request);
-
-        messageInitiaterId = (String) data.get(DataKeys.MESSAGE_INITIATER_ID);
-        try { commId = Integer.valueOf(data.get(DataKeys.COMM_ID).toString()); }
-        catch(Exception e) { commId = Double.valueOf(data.get(DataKeys.COMM_ID).toString()).intValue(); }
-        sourceId = (String) data.get(DataKeys.SOURCE_ID);
-        destId = (String) data.get(DataKeys.DESTINATION_ID);
-        destContact = (String) data.get(DataKeys.DESTINATION_CONTACT_NAME);
-        String sourceLocale = (String) data.get(DataKeys.SOURCE_LOCALE);
-        String filePathOnServer = (String) data.get(DataKeys.FILE_PATH_ON_SERVER);
+        messageInitiaterId = request.getMessageInitiaterId();
+        try {
+            commId = Integer.valueOf(String.valueOf(request.getCommId())); }
+        catch(Exception e) { commId = Double.valueOf(String.valueOf(request.getCommId())).intValue(); }
+        sourceId = request.getSourceId();
+        destId = request.getDestinationId();
+        destContactName = request.getDestinationContactName();
+        String sourceLocale = request.getSourceLocale();
+        String filePathOnServer = request.getFilePathOnServer();
 
         if (sourceLocale != null)
             strings = stringsFactory.getStrings(sourceLocale);
 
         logger.info(messageInitiaterId + " is requesting download from:" + sourceId + ". File path on server:" + filePathOnServer + "...");
 
-        initiateDownloadFlow(data, filePathOnServer);
+        initiateDownloadFlow(request);
     }
 
-    private void initiateDownloadFlow(Map data, String filePathOnServer) {
+    private void initiateDownloadFlow(DownloadFileRequest request) {
         try {
-            initiateDownload(filePathOnServer);
+            initiateDownload(request.getFilePathOnServer());
 
-            informSrcOfSuccess(data);
+            informSrcOfSuccess(request);
 
             // Marking in communication history record that the transfer was successful
             char TRUE = '1';
@@ -95,7 +96,7 @@ public class DownloadController extends AbstractController {
 
             File fileForDownload = new File(filePathOnServer);
             // get MIME type of the file
-            String mimeType = request.getServletContext().getMimeType(filePathOnServer);
+            String mimeType = servletRequest.getServletContext().getMimeType(filePathOnServer);
             if (mimeType == null) {
                 // set to binary type if MIME mapping not found
                 mimeType = "application/octet-stream";
@@ -140,11 +141,11 @@ public class DownloadController extends AbstractController {
     }
 
     // Informing source (uploader) that file received by user (downloader)
-    private void informSrcOfSuccess(Map data) {
+    private void informSrcOfSuccess(DownloadFileRequest request) {
         String title = strings.media_ready_title();
-        String msg = String.format(strings.media_ready_body(), !destContact.equals("") ? destContact : destId);
+        String msg = String.format(strings.media_ready_body(), !destContactName.equals("") ? destContactName : destId);
         String token = usersDataAccess.getUserRecord(sourceId).getToken();
-        boolean sent = pushSender.sendPush(token, PushEventKeys.TRANSFER_SUCCESS, title, msg, data);
+        boolean sent = pushSender.sendPush(token, PushEventKeys.TRANSFER_SUCCESS, title, msg, convertRequest2Map(request));
         if (!sent)
             logger.warning("Failed to inform user " + sourceId + " of transfer success to user: " + destId);
     }
@@ -155,10 +156,10 @@ public class DownloadController extends AbstractController {
 
         String title = strings.media_undelivered_title();
 
-        String dest = (!destContact.equals("") ? destContact : destId);
+        String dest = (!destContactName.equals("") ? destContactName : destId);
         String msgTransferFailed = String.format(strings.media_undelivered_body(), dest);
 
-        String destHtml = "<b><font color=\"#00FFFF\">" + (!destContact.equals("") ? destContact : destId) + "</font></b>";
+        String destHtml = "<b><font color=\"#00FFFF\">" + (!destContactName.equals("") ? destContactName : destId) + "</font></b>";
         String msgTransferFailedHtml = String.format(strings.media_undelivered_body(), destHtml);
 
         HashMap<DataKeys, Object> data = new HashMap<>();
@@ -181,5 +182,14 @@ public class DownloadController extends AbstractController {
         }
 
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    private Map<DataKeys,Object> convertRequest2Map(DownloadFileRequest request) {
+        Map<DataKeys,Object> map = new HashMap<>();
+        map.put(DataKeys.DESTINATION_ID, request.getDestinationId());
+        map.put(DataKeys.SPECIAL_MEDIA_TYPE, request.getSpecialMediaType());
+        map.put(DataKeys.FILE_TYPE, request.getFileType());
+        map.put(DataKeys.FILE_PATH_ON_SRC_SD, request.getFilePathOnSrcSd());
+        return map;
     }
 }

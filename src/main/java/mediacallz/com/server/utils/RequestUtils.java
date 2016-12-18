@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by Mor on 13/09/2016.
  */
-public interface ServletRequestUtils {
+public interface RequestUtils {
     Map<DataKeys, Object> extractParametersMap(HttpServletRequest httpServletRequest);
 
     String getClientIpAddr(HttpServletRequest request);

@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by Mor on 13/09/2016.
  */
 @Component
-public class ServletRequestUtilsImpl implements ServletRequestUtils {
+public class RequestUtilsImpl implements RequestUtils {
 
     @Override
     public Map<DataKeys, Object> extractParametersMap(HttpServletRequest httpServletRequest) {

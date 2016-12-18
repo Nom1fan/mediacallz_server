@@ -21,6 +21,8 @@ public class UserDboRowMapper implements org.springframework.jdbc.core.RowMapper
                             resultSet.getDate(COL_UNREGISTERED_DATE),
                             resultSet.getInt(COL_UNREGISTERED_COUNT),
                             resultSet.getString(COL_DEVICE_MODEL),
-                            resultSet.getString(COL_ANDROID_VERSION));
+                            resultSet.getString(COL_ANDROID_VERSION),
+                            resultSet.getString(COL_IOS_VERSION),
+                            resultSet.getString(COL_APP_VERSION));
     }
 }

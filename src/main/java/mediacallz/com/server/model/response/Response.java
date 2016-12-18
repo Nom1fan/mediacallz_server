@@ -1,4 +1,6 @@
-package mediacallz.com.server.model;
+package mediacallz.com.server.model.response;
+
+import mediacallz.com.server.model.ClientActionType;
 
 import java.io.Serializable;
 
@@ -6,17 +8,17 @@ import java.io.Serializable;
         * @author Mor
         *
         */
-public class MessageToClient<T> implements Serializable {
+public class Response<T> implements Serializable {
 
     protected T result;
     protected ClientActionType actionType;
 
-    public MessageToClient(ClientActionType actionType) {
+    public Response(ClientActionType actionType) {
 
         this.actionType = actionType;
     }
 
-    public MessageToClient(ClientActionType actionType, T result) {
+    public Response(ClientActionType actionType, T result) {
 
         this.result = result;
         this.actionType = actionType;
@@ -32,7 +34,7 @@ public class MessageToClient<T> implements Serializable {
 
     @Override
     public String toString() {
-        return "MessageToClient{" +
+        return "Response{" +
                 "result=" + result +
                 ", actionType=" + actionType +
                 '}';

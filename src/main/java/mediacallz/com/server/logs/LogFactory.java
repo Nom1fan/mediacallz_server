@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Manages all the server side com.mediacallz.server.logs
+ * Manages all the server side logs
  * @author Mor
  *
  */
@@ -121,7 +121,7 @@ public abstract class LogFactory {
 			FileUtils.cleanDirectory(new File(LOG_DIR));
 		}
 		catch(IOException e) {
-			System.out.println("Did not clean com.mediacallz.server.logs dir:"+e.getMessage());
+			System.out.println("Did not clean server.logs dir:"+e.getMessage());
 		}
 	}
 	
@@ -134,7 +134,7 @@ public abstract class LogFactory {
 			FileUtils.cleanDirectory(new File(logPath));
 		}
 		catch(IOException e) {
-			System.out.println("Did not clean com.mediacallz.server.logs dir:"+e.getMessage());
+			System.out.println("Did not clean logs dir:"+e.getMessage());
 		}
 	}
 

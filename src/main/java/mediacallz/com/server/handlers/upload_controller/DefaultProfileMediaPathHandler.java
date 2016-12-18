@@ -1,11 +1,9 @@
 package mediacallz.com.server.handlers.upload_controller;
 
 import mediacallz.com.server.lang.ServerConstants;
-import mediacallz.com.server.model.DataKeys;
 import mediacallz.com.server.model.SpecialMediaType;
+import mediacallz.com.server.model.request.UploadFileRequest;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * Created by Mor on 25/07/2016.
@@ -14,9 +12,9 @@ import java.util.Map;
 public class DefaultProfileMediaPathHandler implements SpMediaPathHandler {
 
     @Override
-    public StringBuilder appendPathForMedia(Map<DataKeys,Object> data, StringBuilder filePathBuilder) {
-        String messageInitiaterId = data.get(DataKeys.DESTINATION_ID).toString();
-        String extension = data.get(DataKeys.EXTENSION).toString();
+    public StringBuilder appendPathForMedia(UploadFileRequest request, StringBuilder filePathBuilder) {
+        String messageInitiaterId = request.getMessageInitiaterId();
+        String extension = request.getMediaFile().getExtension();
 
         filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(messageInitiaterId).append("/").
                 append(ServerConstants.MY_DEFAULT_PROFILE_MEDIA_FOLDER).

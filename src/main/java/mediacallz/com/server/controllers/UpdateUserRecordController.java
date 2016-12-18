@@ -4,13 +4,14 @@ import mediacallz.com.server.database.Dao;
 import mediacallz.com.server.database.dbos.UserDBO;
 import mediacallz.com.server.model.ClientActionType;
 import mediacallz.com.server.model.DataKeys;
-import mediacallz.com.server.model.MessageToClient;
+import mediacallz.com.server.model.request.UpdateUserRecordRequest;
+import mediacallz.com.server.model.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -26,14 +27,18 @@ public class UpdateUserRecordController  extends AbstractController {
 
     @ResponseBody
     @RequestMapping("/v1/UpdateUserRecord")
-    public MessageToClient updateUserRecord(HttpServletRequest request, HttpServletResponse response) {
+    public Response updateUserRecord(@RequestBody UpdateUserRecordRequest request, HttpServletResponse response) {
 
-        String messageInitiaterId = request.getParameter(DataKeys.MESSAGE_INITIATER_ID.toString());
+        String messageInitiaterId = request.getMessageInitiaterId();
         logger.info(messageInitiaterId + " is updating its record...");
 
-        String androidVersion = request.getParameter(DataKeys.ANDROID_VERSION.toString());
+        String androidVersion = request.getAndroidVersion();
+        String iosVersion = request.getIosVersion();
+        String appVersion = request.getAppVersion();
         UserDBO userRecord = new UserDBO();
         userRecord.setAndroidVersion(androidVersion);
+        userRecord.setIOSVersion(iosVersion);
+        userRecord.setAppVersion(appVersion);
 
         HashMap<DataKeys,Object> replyData = new HashMap<>();
         try {
@@ -46,6 +51,6 @@ public class UpdateUserRecordController  extends AbstractController {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
-        return new MessageToClient<>(ClientActionType.UPDATE_RES, replyData);
+        return new Response<>(ClientActionType.UPDATE_RES, replyData);
     }
 }

@@ -22,6 +22,8 @@ public interface Dao {
     String COL_UNREGISTERED_COUNT   =   "unregistered_count";
     String COL_DEVICE_MODEL         =   "device_model";
     String COL_ANDROID_VERSION      =   "android_version";
+    String COL_IOS_VERSION          =   "ios_version";
+    String COL_APP_VERSION          =   "app_version";
     //endregion
     //endregion
 
@@ -77,7 +79,7 @@ public interface Dao {
 
     void registerUser(String uid, String token) throws SQLException;
 
-    void registerUser(String uid, String token, String deviceModel, String androidVersion) throws SQLException;
+    void registerUser(String uid, String token, String deviceModel, String androidVersion, String iOSVersion, String appVersion) throws SQLException;
 
     void unregisterUser(String uid, String token) throws SQLException;
 

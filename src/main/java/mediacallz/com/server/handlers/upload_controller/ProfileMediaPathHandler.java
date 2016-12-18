@@ -1,11 +1,9 @@
 package mediacallz.com.server.handlers.upload_controller;
 
 import mediacallz.com.server.lang.ServerConstants;
-import mediacallz.com.server.model.DataKeys;
 import mediacallz.com.server.model.SpecialMediaType;
+import mediacallz.com.server.model.request.UploadFileRequest;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 
 /**
@@ -15,9 +13,9 @@ import java.util.Map;
 public class ProfileMediaPathHandler implements SpMediaPathHandler {
 
     @Override
-    public StringBuilder appendPathForMedia(Map<DataKeys,Object> data, StringBuilder filePathBuilder) {
-        String destId = data.get(DataKeys.DESTINATION_ID).toString();
-        String extension = data.get(DataKeys.EXTENSION).toString();
+    public StringBuilder appendPathForMedia(UploadFileRequest request, StringBuilder filePathBuilder) {
+        String destId = request.getDestinationId();
+        String extension = request.getMediaFile().getExtension();
         String srcWithExtension = destId + "." + extension;
 
         filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(destId).append("/").
