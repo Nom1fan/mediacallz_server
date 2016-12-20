@@ -29,7 +29,7 @@ public class ServletRequestWrapper
             throws ServletException {
 
         super(request);
-        if(request.getContentType().contains("multipart"))
+        if(request.getContentType()!=null && request.getContentType().contains("multipart"))
             readJsonPayloadFromMultiPartHttpServletRequest(request);
         else
             readJsonPayloadFromHttpServletRequest(request);

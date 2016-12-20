@@ -40,39 +40,36 @@ public class RegisterController extends PreRegistrationController {
         String messageInitiaterId = request.getMessageInitiaterId();
         logger.info("[User]:" + messageInitiaterId + " is attempting to register.");
 
-        Map<DataKeys, Object> replyData = new HashMap<>();
         int smsCode = request.getSmsCode();
         int expectedSmsCode = smsVerificationAccess.getSmsVerificationCode(messageInitiaterId);
 
         if (smsCode != SmsVerificationAccess.NO_SMS_CODE && smsCode == expectedSmsCode) {
             try {
-                replyData = registerUser(request);
+                registerUser(request);
             } catch (SQLException e) {
-                handleException(messageInitiaterId, replyData, e);
+                handleException(messageInitiaterId, response, e);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             } catch(DuplicateKeyException e) {
-                handleException(messageInitiaterId, replyData, e);
+                handleException(messageInitiaterId, response, e);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         } else {
-            registrationRejected(messageInitiaterId, replyData, smsCode, expectedSmsCode);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            registrationRejected(messageInitiaterId, response, smsCode, expectedSmsCode);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
-        return new Response<>(ClientActionType.REGISTER_RES, replyData);
+        return new Response<>(ClientActionType.REGISTER_RES);
     }
 
     //region Assisting methods
-    private void registrationRejected(String messageInitiaterId, Map<DataKeys, Object> replyData, int smsCode, int expectedSmsCode) {
+    private void registrationRejected(String messageInitiaterId, HttpServletResponse response, int smsCode, int expectedSmsCode) throws IOException {
         logger.warning("Rejecting registration for [User]:" + messageInitiaterId +
                 ". [Expected smsCode]:" + expectedSmsCode + " [Received smsCode]:" + smsCode);
-        replyData.put(DataKeys.IS_REGISTER_SUCCESS, false);
     }
 
-    private void handleException(String messageInitiaterId, Map<DataKeys, Object> replyData, Exception e) {
+    private void handleException(String messageInitiaterId, HttpServletResponse response, Exception e) throws IOException {
         logger.severe("Failed registration for [User]:" + messageInitiaterId +
                 ". [Exception]:" + (e.getMessage() != null ? e.getMessage() : e));
-        replyData.put(DataKeys.IS_REGISTER_SUCCESS, false);
     }
 
     private Map<DataKeys,Object> registerUser(RegisterRequest request) throws SQLException {
@@ -84,7 +81,6 @@ public class RegisterController extends PreRegistrationController {
         String appVersion = request.getAppVersion();
         dao.registerUser(messageInitiaterId, pushToken, deviceModel, androidVersion, iOSVersion, appVersion);
         Map<DataKeys,Object> replyData = new HashMap<>();
-        replyData.put(DataKeys.IS_REGISTER_SUCCESS, true);
         logger.info("[User]:" + messageInitiaterId + " registered successfully.");
         return replyData;
     }

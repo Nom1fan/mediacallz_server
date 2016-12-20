@@ -1,9 +1,9 @@
 package mediacallz.com.server.controllers;
 
-import com.google.gson.Gson;
 import mediacallz.com.server.database.Dao;
-import mediacallz.com.server.database.dbos.MediaCallDBO;
+import mediacallz.com.server.database.dbo.MediaCallDBO;
 import mediacallz.com.server.model.*;
+import mediacallz.com.server.model.dto.MediaCallDTO;
 import mediacallz.com.server.model.request.InsertMediaCallRecordRequest;
 import mediacallz.com.server.model.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +28,6 @@ public class InsertMediaCallRecordController extends AbstractController {
     @Autowired
     private Dao dao;
 
-    @Autowired
-    private Gson gson;
-
     @ResponseBody
     @RequestMapping("/v1/InsertMediaCallRecord")
     public Response insertMediaCallRecord(@RequestBody InsertMediaCallRecordRequest request, HttpServletResponse response) {
@@ -39,9 +36,9 @@ public class InsertMediaCallRecordController extends AbstractController {
         try {
             boolean isValid = validateRequest(request, response);
             if (isValid) {
-                CallRecord callRecord = request.getCallRecord();
-                MediaCallDBO mediaCallDBO = prepareMediaCallDBO(callRecord);
-                List<MediaFile> mediaFiles = prepareMediaFiles(callRecord);
+                MediaCallDTO mediaCallDTO = request.getMediaCallDTO();
+                MediaCallDBO mediaCallDBO = prepareMediaCallDBO(mediaCallDTO);
+                List<MediaFile> mediaFiles = prepareMediaFiles(mediaCallDTO);
                 callId = dao.insertMediaCallRecord(mediaCallDBO, mediaFiles);
                 logger.info("Insert call record was successful. Call Id returned:[" + callId + "]");
             }
@@ -58,15 +55,15 @@ public class InsertMediaCallRecordController extends AbstractController {
         boolean isVisualMediaFileValid;
         boolean isAudioMediaFileValid;
 
-        CallRecord callRecord = request.getCallRecord();
-        MediaFile visualMediaFile = callRecord.getVisualMediaFile();
-        MediaFile audioMediaFile = callRecord.getAudioMediaFile();
+        MediaCallDTO mediaCallDTO = request.getMediaCallDTO();
+        MediaFile visualMediaFile = mediaCallDTO.getVisualMediaFile();
+        MediaFile audioMediaFile = mediaCallDTO.getAudioMediaFile();
 
         if (sendErrIfNecessary(response, (visualMediaFile == null && audioMediaFile == null))) return false;
         isVisualMediaFileValid = visualMediaFile == null || isMediaFileValid(visualMediaFile);
         isAudioMediaFileValid = audioMediaFile == null || isMediaFileValid(audioMediaFile);
         if (sendErrIfNecessary(response, (!isVisualMediaFileValid || !isAudioMediaFileValid))) return false;
-        boolean areOtherParamsValid = callRecord.getDestinationId() != null && callRecord.getSourceId() != null && callRecord.getSpecialMediaType() != null;
+        boolean areOtherParamsValid = mediaCallDTO.getDestinationId() != null && mediaCallDTO.getSourceId() != null && mediaCallDTO.getSpecialMediaType() != null;
         return !sendErrIfNecessary(response, !areOtherParamsValid);
     }
 
@@ -83,27 +80,27 @@ public class InsertMediaCallRecordController extends AbstractController {
 
     }
 
-    private List<MediaFile> prepareMediaFiles(final CallRecord callRecord) {
+    private List<MediaFile> prepareMediaFiles(final MediaCallDTO mediaCallDTO) {
         LinkedList<MediaFile> mediaFiles = new LinkedList<>();
-        if (callRecord.getVisualMediaFile() != null)
-            mediaFiles.add(callRecord.getVisualMediaFile());
-        if (callRecord.getAudioMediaFile() != null)
-            mediaFiles.add(callRecord.getAudioMediaFile());
+        if (mediaCallDTO.getVisualMediaFile() != null)
+            mediaFiles.add(mediaCallDTO.getVisualMediaFile());
+        if (mediaCallDTO.getAudioMediaFile() != null)
+            mediaFiles.add(mediaCallDTO.getAudioMediaFile());
         return mediaFiles;
     }
 
-    private MediaCallDBO prepareMediaCallDBO(CallRecord callRecord) {
-        MediaFile visualMediaFile = callRecord.getVisualMediaFile();
-        MediaFile audioMediaFile = callRecord.getAudioMediaFile();
+    private MediaCallDBO prepareMediaCallDBO(MediaCallDTO mediaCallDTO) {
+        MediaFile visualMediaFile = mediaCallDTO.getVisualMediaFile();
+        MediaFile audioMediaFile = mediaCallDTO.getAudioMediaFile();
         String visualMediaFileMd5 = visualMediaFile == null ? null : visualMediaFile.getMd5();
         String audioMediaFileMd5 = audioMediaFile == null ? null : audioMediaFile.getMd5();
 
         return new MediaCallDBO(
-                callRecord.getSpecialMediaType(),
+                mediaCallDTO.getSpecialMediaType(),
                 visualMediaFileMd5,
                 audioMediaFileMd5,
-                callRecord.getSourceId(),
-                callRecord.getDestinationId(),
+                mediaCallDTO.getSourceId(),
+                mediaCallDTO.getDestinationId(),
                 new Date());
     }
 

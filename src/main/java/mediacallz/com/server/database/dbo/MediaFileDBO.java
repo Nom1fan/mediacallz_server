@@ -1,4 +1,4 @@
-package mediacallz.com.server.database.dbos;
+package mediacallz.com.server.database.dbo;
 
 import lombok.Data;
 

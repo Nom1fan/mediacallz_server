@@ -1,23 +1,26 @@
-package mediacallz.com.server.database.dbos;
+package mediacallz.com.server.database.dbo;
 
 import mediacallz.com.server.model.SpecialMediaType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
 
 /**
- * Created by Mor on 27/09/2016.
+ * Created by Mor on 31/03/2016.
  */
 @Data
+@AllArgsConstructor
 @RequiredArgsConstructor
-public class MediaCallDBO {
+public class MediaTransferDBO {
 
-    int call_id;
+    int transfer_id;
     final SpecialMediaType type;
-    final String md5_visual;
-    final String md5_audio;
+    final String md5;
     final String uid_src;
     final String uid_dest;
     final Date datetime;
+    boolean transfer_success;
+    Date transfer_datetime;
 }

@@ -1,7 +1,7 @@
 package mediacallz.com.server.database;
 
-import mediacallz.com.server.database.dbos.MediaTransferDBO;
-import mediacallz.com.server.database.dbos.UserDBO;
+import mediacallz.com.server.database.dbo.MediaTransferDBO;
+import mediacallz.com.server.database.dbo.UserDBO;
 import mediacallz.com.server.model.DataKeys;
 import mediacallz.com.server.model.PushEventKeys;
 import mediacallz.com.server.model.SpecialMediaType;

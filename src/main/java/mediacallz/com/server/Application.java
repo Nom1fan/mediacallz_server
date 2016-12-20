@@ -84,7 +84,7 @@ public class Application {
     }
 
     @Bean
-    ComboPooledDataSource getDataSource() {
+    public ComboPooledDataSource getDataSource() {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
         String jdbcUrl = "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName;
         dataSource.setJdbcUrl(jdbcUrl);
@@ -110,6 +110,10 @@ public class Application {
         return logger;
     }
 
+//    @Bean
+//    public MapperFactory getMapperFactory() {
+//        return new DefaultMapperFactory.Builder().build();
+//    }
 
     private static void setLogLevel(String logLevel) {
         if(logLevel !=null)

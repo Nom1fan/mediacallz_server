@@ -1,6 +1,7 @@
 package mediacallz.com.server.filters;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.MalformedJsonException;
 import mediacallz.com.server.controllers.PreRegistrationController;
 import mediacallz.com.server.database.UsersDataAccess;
 import mediacallz.com.server.model.request.Request;
@@ -49,14 +50,19 @@ public class VerifyUserRegisteredFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
          if (servletRequest instanceof HttpServletRequest) {
-            try {
+            String url = ((HttpServletRequest) servletRequest).getRequestURI();
+             try {
                 boolean verificationOK = true;
                 ServletRequestWrapper requestWrapper = new ServletRequestWrapper((HttpServletRequest) servletRequest);
                 String jsonPayload = requestWrapper.getJsonPayload();
                 Request request = gson.fromJson(jsonPayload, Request.class);
+
+                if(request == null) {
+                    throw new MalformedJsonException("Request cannot be null");
+                }
+
                 String messageInitiaterId = request.getMessageInitiaterId();
                 String token = request.getPushToken();
-                String url = requestWrapper.getRequestURI();
 
                 // Verify user credentials
                 if (messageInitiaterId == null || token == null) {
@@ -79,7 +85,7 @@ public class VerifyUserRegisteredFilter implements Filter {
                     filterChain.doFilter(requestWrapper, servletResponse);
             } catch(Exception malformedJsonException) {
                 malformedJsonException.printStackTrace();
-                logger.warning("Failed to process request, responding with bad request (403). [Exception]:" + malformedJsonException.getMessage());
+                logger.warning("Failed to process request for url:" + url +". Responding with bad request (400). [Exception]:" + malformedJsonException.getMessage());
                 ((HttpServletResponse)servletResponse).sendError(HttpServletResponse.SC_BAD_REQUEST);
             }
         }

@@ -1,10 +1,12 @@
-package mediacallz.com.server.database.dbos;
+package mediacallz.com.server.database.dbo;
 
-import mediacallz.com.server.model.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import ma.glasnost.orika.MapperFacade;
+import mediacallz.com.server.model.UserStatus;
+import mediacallz.com.server.model.dto.UserDTO;
 
 import java.util.Date;
 
@@ -15,7 +17,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserDBO {
+public class UserDBO implements DBO<UserDTO> {
 
     private String uid;
     private String token;
@@ -27,4 +29,9 @@ public class UserDBO {
     private String androidVersion;
     private String iOSVersion;
     private String appVersion;
+
+    @Override
+    public UserDTO toDTO(MapperFacade mapperFacade) {
+        return mapperFacade.map(this, UserDTO.class);
+    }
 }

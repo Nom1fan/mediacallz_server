@@ -1,7 +1,7 @@
 package mediacallz.com.server.controllers;
 
 import mediacallz.com.server.database.UsersDataAccess;
-import mediacallz.com.server.database.dbos.UserDBO;
+import mediacallz.com.server.database.dbo.UserDBO;
 import mediacallz.com.server.model.*;
 import mediacallz.com.server.model.request.ClearMediaRequest;
 import mediacallz.com.server.model.response.Response;

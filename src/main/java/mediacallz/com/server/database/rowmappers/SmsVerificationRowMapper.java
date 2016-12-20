@@ -1,6 +1,6 @@
 package mediacallz.com.server.database.rowmappers;
 
-import mediacallz.com.server.database.dbos.SmsVerificationDBO;
+import mediacallz.com.server.database.dbo.SmsVerificationDBO;
 import mediacallz.com.server.database.Dao;
 import org.springframework.jdbc.core.RowMapper;
 

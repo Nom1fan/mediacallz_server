@@ -3,7 +3,7 @@ package mediacallz.com.server.model.request;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import mediacallz.com.server.model.CallRecord;
+import mediacallz.com.server.model.dto.MediaCallDTO;
 
 /**
  * Created by Mor on 17/12/2016.
@@ -13,7 +13,7 @@ import mediacallz.com.server.model.CallRecord;
 @ToString
 public class InsertMediaCallRecordRequest extends Request {
 
-    private CallRecord callRecord;
+    private MediaCallDTO mediaCallDTO;
 }
 
 

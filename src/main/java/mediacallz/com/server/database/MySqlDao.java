@@ -1,7 +1,7 @@
 package mediacallz.com.server.database;
 
 import com.mchange.v2.c3p0.PooledDataSource;
-import mediacallz.com.server.database.dbos.*;
+import mediacallz.com.server.database.dbo.*;
 import mediacallz.com.server.database.rowmappers.*;
 import mediacallz.com.server.model.MediaFile;
 import mediacallz.com.server.model.UserStatus;

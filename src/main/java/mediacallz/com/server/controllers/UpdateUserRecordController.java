@@ -1,7 +1,7 @@
 package mediacallz.com.server.controllers;
 
 import mediacallz.com.server.database.Dao;
-import mediacallz.com.server.database.dbos.UserDBO;
+import mediacallz.com.server.database.dbo.UserDBO;
 import mediacallz.com.server.model.ClientActionType;
 import mediacallz.com.server.model.DataKeys;
 import mediacallz.com.server.model.request.UpdateUserRecordRequest;

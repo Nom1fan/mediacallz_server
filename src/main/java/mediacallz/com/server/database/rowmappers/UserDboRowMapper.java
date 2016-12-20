@@ -1,6 +1,6 @@
 package mediacallz.com.server.database.rowmappers;
 
-import mediacallz.com.server.database.dbos.UserDBO;
+import mediacallz.com.server.database.dbo.UserDBO;
 import mediacallz.com.server.model.UserStatus;
 
 import java.sql.ResultSet;

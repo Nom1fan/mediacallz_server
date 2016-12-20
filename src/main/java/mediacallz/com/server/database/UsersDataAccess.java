@@ -1,7 +1,7 @@
 package mediacallz.com.server.database;
 
 
-import mediacallz.com.server.database.dbos.UserDBO;
+import mediacallz.com.server.database.dbo.UserDBO;
 
 /**
  * Created by Mor on 25/07/2016.

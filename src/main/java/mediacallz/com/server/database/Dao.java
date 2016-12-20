@@ -1,6 +1,6 @@
 package mediacallz.com.server.database;
 
-import mediacallz.com.server.database.dbos.*;
+import mediacallz.com.server.database.dbo.*;
 import mediacallz.com.server.model.MediaFile;
 
 import java.sql.SQLException;
@@ -91,7 +91,7 @@ public interface Dao {
 
     int insertMediaTransferRecord(MediaTransferDBO mediaTransferDBO, MediaFileDBO mediaFileDBO) throws SQLException;
 
-    UserDBO  getUserRecord(String uid) throws SQLException;
+    UserDBO getUserRecord(String uid) throws SQLException;
 
     void updateMediaTransferRecord(int commId, String column, Object value) throws SQLException;
 

@@ -1,6 +1,6 @@
 package mediacallz.com.server.database.rowmappers;
 
-import mediacallz.com.server.database.dbos.AppMetaDBO;
+import mediacallz.com.server.database.dbo.AppMetaDBO;
 import mediacallz.com.server.database.Dao;
 
 import java.sql.ResultSet;

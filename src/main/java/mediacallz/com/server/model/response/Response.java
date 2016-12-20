@@ -1,5 +1,7 @@
 package mediacallz.com.server.model.response;
 
+import lombok.Data;
+import lombok.ToString;
 import mediacallz.com.server.model.ClientActionType;
 
 import java.io.Serializable;
@@ -8,6 +10,8 @@ import java.io.Serializable;
         * @author Mor
         *
         */
+@Data
+@ToString
 public class Response<T> implements Serializable {
 
     protected T result;
@@ -22,21 +26,5 @@ public class Response<T> implements Serializable {
 
         this.result = result;
         this.actionType = actionType;
-    }
-
-    public T getResult() {
-        return result;
-    }
-
-    public ClientActionType getActionType() {
-        return actionType;
-    }
-
-    @Override
-    public String toString() {
-        return "Response{" +
-                "result=" + result +
-                ", actionType=" + actionType +
-                '}';
     }
 }

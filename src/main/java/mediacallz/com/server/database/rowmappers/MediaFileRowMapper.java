@@ -1,6 +1,6 @@
 package mediacallz.com.server.database.rowmappers;
 
-import mediacallz.com.server.database.dbos.MediaFileDBO;
+import mediacallz.com.server.database.dbo.MediaFileDBO;
 import mediacallz.com.server.database.Dao;
 import org.springframework.jdbc.core.RowMapper;
 
