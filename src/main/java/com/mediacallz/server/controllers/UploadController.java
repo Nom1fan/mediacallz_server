@@ -39,19 +39,23 @@ import java.util.Map;
 @Controller
 public class UploadController extends AbstractController {
 
-    @Autowired
-    private UsersDataAccess usersDataAccess;
+    private final UsersDataAccess usersDataAccess;
 
-    @Autowired
-    private PushSender pushSender;
+    private final PushSender pushSender;
 
-    @Autowired
-    private Dao dao;
+    private final Dao dao;
 
-    @Autowired
-    private Gson gson;
+    private final Gson gson;
 
     private final Map<SpecialMediaType, SpMediaPathHandler> spMedia2PathHandlerMap = new HashMap<>();
+
+    @Autowired
+    public UploadController(UsersDataAccess usersDataAccess, PushSender pushSender, Dao dao, Gson gson) {
+        this.usersDataAccess = usersDataAccess;
+        this.pushSender = pushSender;
+        this.dao = dao;
+        this.gson = gson;
+    }
 
     @Autowired
     public void initMap(List<SpMediaPathHandler> spMediaPathHandlerList) {
