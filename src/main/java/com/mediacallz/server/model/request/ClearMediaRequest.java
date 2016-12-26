@@ -18,4 +18,6 @@ public class ClearMediaRequest extends Request {
     private SpecialMediaType specialMediaType;
 
     private String sourceId;
+
+    private String destinationContactName;
 }

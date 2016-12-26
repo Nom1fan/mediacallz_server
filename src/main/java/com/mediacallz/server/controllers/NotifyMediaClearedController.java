@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,18 +24,19 @@ import java.util.Map;
 @Controller
 public class NotifyMediaClearedController extends AbstractController {
 
-    @Autowired
-    private RequestUtils requestUtils;
+    private final Dao dao;
+
+    private final PushSender pushSender;
 
     @Autowired
-    private Dao dao;
-
-    @Autowired
-    private PushSender pushSender;
+    public NotifyMediaClearedController(PushSender pushSender, Dao dao) {
+        this.pushSender = pushSender;
+        this.dao = dao;
+    }
 
     @ResponseBody
     @RequestMapping("/v1/NotifyMediaCleared")
-    public Response notifyMediaCleared(@RequestBody NotifyMediaClearedRequest request) {
+    public void notifyMediaCleared(@RequestBody NotifyMediaClearedRequest request, HttpServletResponse response) {
 
         String clearerId = request.getMessageInitiaterId();
         String clearRequesterId = request.getSourceId();
@@ -59,6 +61,7 @@ public class NotifyMediaClearedController extends AbstractController {
                         clearRequesterId + "that [User]:" + clearerId +
                         " cleared his media of [SpecialMediaType]:" +
                         specialMediaType + ". Push not sent");
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
 
         } catch (SQLException e) {
@@ -67,9 +70,8 @@ public class NotifyMediaClearedController extends AbstractController {
                     clearRequesterId + " that [User]:" + clearerId +
                     " cleared his media of [SpecialMediaType]: " +
                     specialMediaType + ". Exception:[" + e.getMessage() + "]");
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-
-        return new Response<>(ClientActionType.TRIGGER_EVENT, new EventReport(EventType.NO_ACTION_REQUIRED));
     }
 
     private Map<DataKeys, Object> convertRequest2Map(NotifyMediaClearedRequest request) {

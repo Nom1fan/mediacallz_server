@@ -34,7 +34,7 @@ public class ClearMediaController extends AbstractController {
 
     @ResponseBody
     @RequestMapping("/v1/ClearMedia")
-    public Response clearMedia(@RequestBody ClearMediaRequest request, HttpServletResponse response) {
+    public void clearMedia(@RequestBody ClearMediaRequest request, HttpServletResponse response) {
 
         String destId = request.getDestinationId();
         UserDBO userRecord = usersDataAccess.getUserRecord(destId);
@@ -45,11 +45,8 @@ public class ClearMediaController extends AbstractController {
             sentOK = pushSender.sendPush(destToken, pushEventAction, convertRequest2Map(request));
         }
 
-        if (sentOK) {
-            return new Response<>(ClientActionType.TRIGGER_EVENT, new EventReport(EventType.CLEAR_SENT));
-        } else {
+        if (!sentOK) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return new Response<>(ClientActionType.TRIGGER_EVENT, new EventReport(EventType.CLEAR_FAILURE));
         }
     }
 
@@ -58,6 +55,7 @@ public class ClearMediaController extends AbstractController {
             resultMap.put(DataKeys.SPECIAL_MEDIA_TYPE, request.getSpecialMediaType());
             resultMap.put(DataKeys.SOURCE_ID, request.getSourceId());
             resultMap.put(DataKeys.DESTINATION_ID, request.getDestinationId());
+            resultMap.put(DataKeys.DESTINATION_CONTACT_NAME, request.getDestinationContactName());
         return resultMap;
     }
 }

@@ -110,11 +110,6 @@ public class Application {
         return logger;
     }
 
-//    @Bean
-//    public MapperFactory getMapperFactory() {
-//        return new DefaultMapperFactory.Builder().build();
-//    }
-
     private static void setLogLevel(String logLevel) {
         if(logLevel !=null)
             Application.logLevel = logLevelsMap.get(logLevel.toUpperCase());
