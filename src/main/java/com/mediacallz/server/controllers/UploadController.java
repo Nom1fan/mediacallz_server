@@ -132,9 +132,7 @@ public class UploadController extends AbstractController {
             Integer commId = insertFileUploadRecord(request);
 
             // Sending file to destination
-            Map<DataKeys, Object> data = new HashMap<>();
-            data.put(DataKeys.COMM_ID, commId.toString());
-            data.put(DataKeys.FILE_PATH_ON_SERVER, filePathBuilder.toString());
+            Map<DataKeys, Object> data = convertRequest2Map(request, filePathBuilder, commId);
             String destToken = dao.getUserRecord(request.getDestinationId()).getToken();
             String pushEventAction = PushEventKeys.PENDING_DOWNLOAD;
             return pushSender.sendPush(destToken, pushEventAction, data);
@@ -143,6 +141,23 @@ public class UploadController extends AbstractController {
                 bos.close();
             }
         }
+    }
+
+    private Map<DataKeys, Object> convertRequest2Map(UploadFileRequest request, StringBuilder filePathBuilder, Integer commId) {
+        Map<DataKeys, Object> data = new HashMap<>();
+        data.put(DataKeys.COMM_ID, commId.toString());
+        data.put(DataKeys.FILE_PATH_ON_SERVER, filePathBuilder.toString());
+        data.put(DataKeys.SOURCE_ID, request.getSourceId());
+        data.put(DataKeys.SOURCE_WITH_EXTENSION, request.getSourceId() + "." + request.getMediaFile().getExtension());
+        data.put(DataKeys.FILE_SIZE, request.getMediaFile().getSize());
+        data.put(DataKeys.SPECIAL_MEDIA_TYPE, request.getSpecialMediaType());
+        data.put(DataKeys.DESTINATION_CONTACT_NAME, request.getDestinationContactName());
+        data.put(DataKeys.FILE_TYPE, request.getMediaFile().getFileType());
+        data.put(DataKeys.SOURCE_LOCALE, request.getSourceLocale());
+        data.put(DataKeys.FILE_PATH_ON_SRC_SD, request.getFilePathOnSrcSd());
+        data.put(DataKeys.EXTENSION, request.getMediaFile().getExtension());
+        data.put(DataKeys.MD5, request.getMediaFile().getMd5());
+        return data;
     }
 
     private Integer insertFileUploadRecord(UploadFileRequest request) throws SQLException {

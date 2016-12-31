@@ -16,5 +16,4 @@ public class NotifyMediaClearedRequest extends Request {
     private String sourceId;
     private String destinationContactName;
     private SpecialMediaType specialMediaType;
-    private String sourceLocale;
 }

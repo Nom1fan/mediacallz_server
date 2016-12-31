@@ -15,7 +15,6 @@ import lombok.ToString;
 public class UploadFileRequest extends Request {
 
     private String sourceId;
-    private String sourceLocale;
     private String destinationId;
     private String destinationContactName;
     private MediaFile mediaFile;

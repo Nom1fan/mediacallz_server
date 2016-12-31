@@ -13,12 +13,10 @@ import lombok.ToString;
 public class Request {
 
     private String messageInitiaterId;
-
     private String pushToken;
-
+    private String deviceModel;
     private String androidVersion;
-
     private String iosVersion;
-
     private String appVersion;
+    private String sourceLocale;
 }

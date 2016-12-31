@@ -12,7 +12,6 @@ import lombok.ToString;
 @ToString
 public class UnRegisterRequest extends Request {
 
-    private String pushToken;
 }
 
 

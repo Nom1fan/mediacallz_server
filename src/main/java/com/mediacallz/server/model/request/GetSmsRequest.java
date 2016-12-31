@@ -13,9 +13,6 @@ import lombok.ToString;
 public class GetSmsRequest extends Request {
 
     private String internationalPhoneNumber;
-
-    private String sourceLocale;
-
 }
 
 

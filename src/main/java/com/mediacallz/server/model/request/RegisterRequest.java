@@ -13,14 +13,6 @@ import lombok.ToString;
 public class RegisterRequest extends Request {
 
     private int smsCode;
-
-    private String deviceModel;
-
-    private String androidVersion;
-
-    private String iosVersion;
-
-    private String appVersion;
 }
 
 

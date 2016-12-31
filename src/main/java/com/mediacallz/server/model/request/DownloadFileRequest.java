@@ -18,7 +18,6 @@ public class DownloadFileRequest extends Request {
     private String sourceId;
     private String destinationId;
     private String destinationContactName;
-    private String sourceLocale;
     private String filePathOnServer;
     private SpecialMediaType specialMediaType;
     private MediaFile.FileType fileType;

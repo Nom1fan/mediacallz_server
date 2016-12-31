@@ -57,9 +57,7 @@ public class DownloadController extends AbstractController {
         this.servletRequest = servletRequest;
 
         messageInitiaterId = request.getMessageInitiaterId();
-        try {
-            commId = Integer.valueOf(String.valueOf(request.getCommId())); }
-        catch(Exception e) { commId = Double.valueOf(String.valueOf(request.getCommId())).intValue(); }
+        commId = request.getCommId();
         sourceId = request.getSourceId();
         destId = request.getDestinationId();
         destContactName = request.getDestinationContactName();
