@@ -23,23 +23,27 @@ import java.util.logging.Logger;
 @Service
 public class BatchPushSender implements PushSender {
 
-    @Value(value = "${push.url}")
+    @Value("${push.url}")
     private String pushUrl;
 
-    @Value(value = "${push.rest.api.key}")
+    @Value("${push.rest.api.key}")
     private String restApiKey;
 
-    @Autowired
-    Logger logger;
+    private final Logger logger;
 
-    @Autowired
-    Gson gson;
+    private final Gson gson;
 
     static
     {
         System.setProperty("org.apache.commons.logging.Log","org.apache.commons.logging.impl.SimpleLog");
         System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
         System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.wire", "DEBUG");
+    }
+
+    @Autowired
+    public BatchPushSender(Logger logger, Gson gson) {
+        this.logger = logger;
+        this.gson = gson;
     }
 
     @Override
