@@ -3,9 +3,7 @@ package com.mediacallz.server.controllers;
 import com.mediacallz.server.database.UsersDataAccess;
 import com.mediacallz.server.model.*;
 import com.mediacallz.server.model.push.ClearMediaData;
-import com.mediacallz.server.model.response.Response;
 import com.mediacallz.server.services.PushSender;
-import com.mediacallz.server.utils.RequestUtils;
 import com.mediacallz.server.database.dbo.UserDBO;
 import com.mediacallz.server.model.request.ClearMediaRequest;
 import ma.glasnost.orika.MapperFacade;
@@ -17,8 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Mor on 03/10/2016.

@@ -2,15 +2,18 @@ package com.mediacallz.server.controllers;
 
 import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.model.dto.AppMetaDTO;
+import com.mediacallz.server.model.request.Request;
 import com.mediacallz.server.model.response.Response;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 
 /**
@@ -31,7 +34,7 @@ public class GetAppRecordController extends AbstractController {
 
     @ResponseBody
     @RequestMapping(value = "/v1/GetAppMeta", method = RequestMethod.POST)
-    public Response getAppMeta(HttpServletResponse response) throws IOException {
+    public Response getAppMeta(@Valid @RequestBody Request request, HttpServletResponse response) throws IOException {
 
         try {
             AppMetaDTO appMetaDTO = new AppMetaDTO();

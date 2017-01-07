@@ -17,15 +17,11 @@ import java.util.logging.Logger;
 @NoArgsConstructor
 public abstract class AbstractController {
 
+    @Autowired
     protected Logger logger;
 
-    protected StringsFactory stringsFactory;
-
     @Autowired
-    public AbstractController(Logger logger, StringsFactory stringsFactory) {
-        this.logger = logger;
-        this.stringsFactory = stringsFactory;
-    }
+    protected StringsFactory stringsFactory;
 
     protected void sendResponse(HttpServletResponse servletResponse, Response response, int status) throws IOException {
         PrintWriter responseWriter = servletResponse.getWriter();

@@ -1,6 +1,7 @@
 package com.mediacallz.server.model.request;
 
 import com.mediacallz.server.model.SpecialMediaType;
+import com.mediacallz.server.validators.Uid;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -16,10 +17,10 @@ import javax.validation.constraints.NotNull;
 @ToString
 public class ClearMediaRequest extends Request {
 
-    @NotBlank
+    @Uid
     private String destinationId;
 
-    @NotBlank
+    @Uid
     private String sourceId;
 
     @NotNull

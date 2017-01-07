@@ -1,6 +1,7 @@
 package com.mediacallz.server.model.request;
 
 import com.mediacallz.server.model.SpecialMediaType;
+import com.mediacallz.server.validators.Uid;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -20,10 +21,10 @@ public class DownloadFileRequest extends Request {
     @Min(1)
     private int commId;
 
-    @NotBlank
+    @Uid
     private String sourceId;
 
-    @NotBlank
+    @Uid
     private String destinationId;
 
     private String destinationContactName;

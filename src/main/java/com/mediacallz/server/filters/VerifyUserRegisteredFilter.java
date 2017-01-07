@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.stream.MalformedJsonException;
 import com.mediacallz.server.controllers.PreRegistrationController;
 import com.mediacallz.server.database.UsersDataAccess;
+import com.mediacallz.server.database.dbo.UserDBO;
 import com.mediacallz.server.model.request.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -74,10 +75,17 @@ public class VerifyUserRegisteredFilter implements Filter {
                         verificationOK = false;
                         sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest)servletRequest, request);
                     }
-                    String expectedToken = usersDataAccess.getUserRecord(messageInitiaterId).getToken();
-                    if(!expectedToken.equals(token)) {
+                    UserDBO userRecord = usersDataAccess.getUserRecord(messageInitiaterId);
+                    if(userRecord == null) {
                         verificationOK = false;
                         sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest)servletRequest, request);
+                    }
+                    else {
+                        String expectedToken = userRecord.getToken();
+                        if (expectedToken == null || !expectedToken.equals(token)) {
+                            verificationOK = false;
+                            sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest) servletRequest, request);
+                        }
                     }
                 }
 
@@ -86,7 +94,7 @@ public class VerifyUserRegisteredFilter implements Filter {
             } catch(Exception malformedJsonException) {
                 malformedJsonException.printStackTrace();
                 logger.warning("Failed to process request for url:" + url +". Responding with bad request (400). [Exception]:" + malformedJsonException.getMessage());
-                ((HttpServletResponse)servletResponse).sendError(HttpServletResponse.SC_BAD_REQUEST);
+                ((HttpServletResponse)servletResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
     }
@@ -95,7 +103,7 @@ public class VerifyUserRegisteredFilter implements Filter {
         String userId = getUserId(servletRequest, request);
         userId = (userId !=null ? userId : "anonymous");
         logger.warning("User " + userId + " attempted a request in url:" + url + " but is unregistered. Request was blocked.");
-        servletResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
+        servletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 
     private String getUserId(HttpServletRequest servletRequest, Request request) {

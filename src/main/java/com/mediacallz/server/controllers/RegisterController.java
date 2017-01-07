@@ -4,7 +4,6 @@ import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.database.SmsVerificationAccess;
 import com.mediacallz.server.model.request.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,13 +48,10 @@ public class RegisterController extends PreRegistrationController {
             } catch (SQLException e) {
                 handleException(messageInitiaterId, e);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            } catch (DuplicateKeyException e) {
-                handleException(messageInitiaterId, e);
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         } else {
             registrationRejected(messageInitiaterId, smsCode, expectedSmsCode);
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 

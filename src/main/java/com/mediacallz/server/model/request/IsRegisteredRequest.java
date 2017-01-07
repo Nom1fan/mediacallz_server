@@ -1,5 +1,6 @@
 package com.mediacallz.server.model.request;
 
+import com.mediacallz.server.validators.Uid;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -13,7 +14,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @ToString
 public class IsRegisteredRequest extends Request {
 
-    @NotBlank
+    @Uid
     private String destinationId;
 
 }
