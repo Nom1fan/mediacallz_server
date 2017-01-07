@@ -1,12 +1,9 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.database.dbo.AppMetaDBO;
-import com.mediacallz.server.model.ClientActionType;
+import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.model.dto.AppMetaDTO;
 import com.mediacallz.server.model.response.Response;
 import ma.glasnost.orika.MapperFacade;
-import com.mediacallz.server.database.Dao;
-import ma.glasnost.orika.impl.MapperFacadeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +36,7 @@ public class GetAppRecordController extends AbstractController {
         try {
             AppMetaDTO appMetaDTO = new AppMetaDTO();
             appMetaDTO.fromInternal(dao.getAppMetaRecord(), mapperFacade);
-            return new Response<>(ClientActionType.GET_APP_RECORD_RES, appMetaDTO);
+            return new Response<>(appMetaDTO);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             String errMsg = "Failed to retrieve app meta from DB. " + (e.getMessage() != null ? "Exception:" + e.getMessage() : "");

@@ -3,7 +3,6 @@ package com.mediacallz.server.database;
 import com.mchange.v2.c3p0.PooledDataSource;
 import com.mediacallz.server.database.dbo.*;
 import com.mediacallz.server.database.rowmappers.*;
-import com.mediacallz.server.model.MediaFile;
 import com.mediacallz.server.model.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -321,15 +320,16 @@ public class MySqlDao implements Dao {
     }
 
     @Override
-    public int insertMediaCallRecord(MediaCallDBO mediaCallDBO, List<MediaFile> mediaFiles) throws SQLException {
+    public int insertMediaCallRecord(MediaCallDBO mediaCallDBO, List<MediaFileDBO> mediaFileDBOS) throws SQLException {
 
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(dataSource).
                 withTableName(TABLE_MEDIA_CALLS).
                 usingGeneratedKeyColumns(COL_CALL_ID);
 
-        for (MediaFile mediaFile : mediaFiles) {
-            if (mediaFile != null)
-                insertMediaFileRecord(new MediaFileDBO(mediaFile.getMd5(), mediaFile.getExtension(), mediaFile.getSize()), COL_TRANSFER_COUNT);
+        for (MediaFileDBO mediaFileDBO : mediaFileDBOS) {
+            if (mediaFileDBO != null) {
+                insertMediaFileRecord(mediaFileDBO, COL_TRANSFER_COUNT);
+            }
         }
 
         SqlParameterSource parameters = new BeanPropertySqlParameterSource(mediaCallDBO);

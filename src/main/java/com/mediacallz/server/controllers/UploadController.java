@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.mediacallz.server.database.UsersDataAccess;
 import com.mediacallz.server.lang.LangStrings;
 import com.mediacallz.server.model.*;
+import com.mediacallz.server.model.push.PendingDownloadData;
 import com.mediacallz.server.services.PushSender;
 import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.database.dbo.MediaFileDBO;
@@ -12,6 +13,7 @@ import com.mediacallz.server.handlers.upload_controller.SpMediaPathHandler;
 import com.mediacallz.server.model.request.UploadFileRequest;
 import com.mediacallz.server.model.response.Response;
 import com.mediacallz.server.utils.MediaFilesUtils;
+import ma.glasnost.orika.MapperFacade;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,14 +49,17 @@ public class UploadController extends AbstractController {
 
     private final Gson gson;
 
+    private final MapperFacade mapperFacade;
+
     private final Map<SpecialMediaType, SpMediaPathHandler> spMedia2PathHandlerMap = new HashMap<>();
 
     @Autowired
-    public UploadController(UsersDataAccess usersDataAccess, PushSender pushSender, Dao dao, Gson gson) {
+    public UploadController(UsersDataAccess usersDataAccess, PushSender pushSender, Dao dao, Gson gson, MapperFacade mapperFacade) {
         this.usersDataAccess = usersDataAccess;
         this.pushSender = pushSender;
         this.dao = dao;
         this.gson = gson;
+        this.mapperFacade = mapperFacade;
     }
 
     @Autowired
@@ -67,8 +72,8 @@ public class UploadController extends AbstractController {
 
     @RequestMapping(value = "/v1/UploadFile", method = RequestMethod.POST)
     public void uploadFile(
-            @RequestParam("fileForUpload") @Valid @NotNull MultipartFile fileForUpload,
-            @RequestParam("jsonPart") @Valid @NotNull @NotBlank String requestString,
+            @NotNull @RequestParam("fileForUpload") MultipartFile fileForUpload,
+            @NotBlank @RequestParam("jsonPart") String requestString,
             HttpServletResponse response) throws IOException, ServletException {
 
         UploadFileRequest request = gson.fromJson(requestString, UploadFileRequest.class);
@@ -94,9 +99,7 @@ public class UploadController extends AbstractController {
     }
 
     private boolean initUploadFileFlow(UploadFileRequest request, HttpServletResponse servletResponse, MultipartFile fileForUpload, StringBuilder filePathBuilder) throws Exception {
-        //data.put(DataKeys.FILE_SIZE, String.valueOf(bytesLeft)); //TODO make sure we really don't need this
-        String infoMsg = prepareFileUploadInfoMsg(request.getSpecialMediaType(), request.getMessageInitiaterId(), request.getDestinationId(), fileForUpload.getSize());
-        logger.info(infoMsg);
+        logFileUploadInfoMsg(request);
 
         long bytesLeft = fileForUpload.getSize();
         // Preparing file placeholder
@@ -125,17 +128,17 @@ public class UploadController extends AbstractController {
 
 
             // Informing source (uploader) that the file is on the way
-            Response response = new Response<>(ClientActionType.TRIGGER_EVENT, new EventReport(EventType.UPLOAD_SUCCESS));
-            sendResponse(servletResponse, response, HttpServletResponse.SC_OK);
+            servletResponse.setStatus(HttpServletResponse.SC_OK);
 
             // Inserting the record of the file upload, retrieving back the commId
             Integer commId = insertFileUploadRecord(request);
 
             // Sending file to destination
-            Map<DataKeys, Object> data = convertRequest2Map(request, filePathBuilder, commId);
+            PendingDownloadData pushData = mapperFacade.map(request, PendingDownloadData.class);
+            pushData.setCommId(commId);
+            pushData.setFilePathOnServer(filePathBuilder.toString());
             String destToken = dao.getUserRecord(request.getDestinationId()).getToken();
-            String pushEventAction = PushEventKeys.PENDING_DOWNLOAD;
-            return pushSender.sendPush(destToken, pushEventAction, data);
+            return pushSender.sendPush(destToken, PushEventKeys.PENDING_DOWNLOAD, pushData);
         } finally {
             if (bos != null) {
                 bos.close();
@@ -143,44 +146,22 @@ public class UploadController extends AbstractController {
         }
     }
 
-    private Map<DataKeys, Object> convertRequest2Map(UploadFileRequest request, StringBuilder filePathBuilder, Integer commId) {
-        Map<DataKeys, Object> data = new HashMap<>();
-        data.put(DataKeys.COMM_ID, commId.toString());
-        data.put(DataKeys.FILE_PATH_ON_SERVER, filePathBuilder.toString());
-        data.put(DataKeys.SOURCE_ID, request.getSourceId());
-        data.put(DataKeys.SOURCE_WITH_EXTENSION, request.getSourceId() + "." + request.getMediaFile().getExtension());
-        data.put(DataKeys.FILE_SIZE, request.getMediaFile().getSize());
-        data.put(DataKeys.SPECIAL_MEDIA_TYPE, request.getSpecialMediaType());
-        data.put(DataKeys.DESTINATION_CONTACT_NAME, request.getDestinationContactName());
-        data.put(DataKeys.FILE_TYPE, request.getMediaFile().getFileType());
-        data.put(DataKeys.SOURCE_LOCALE, request.getSourceLocale());
-        data.put(DataKeys.FILE_PATH_ON_SRC_SD, request.getFilePathOnSrcSd());
-        data.put(DataKeys.EXTENSION, request.getMediaFile().getExtension());
-        data.put(DataKeys.MD5, request.getMediaFile().getMd5());
-        return data;
-    }
-
     private Integer insertFileUploadRecord(UploadFileRequest request) throws SQLException {
-        String md5 = request.getMediaFile().getMd5();
-        String extension = request.getMediaFile().getExtension();
-        MediaTransferDBO mediaTransferDBO = new MediaTransferDBO(
-                request.getSpecialMediaType(),
-                md5,
-                request.getSourceId(),
-                request.getDestinationId()
-                ,new Date());
-
-        Integer commId = dao.insertMediaTransferRecord(mediaTransferDBO, new MediaFileDBO(md5, extension, request.getMediaFile().getSize()));
+        MediaTransferDBO mediaTransferDBO = mapperFacade.map(request, MediaTransferDBO.class);
+        mediaTransferDBO.setDatetime(new Date());
+        MediaFileDBO mediaFileDBO = request.getMediaFileDTO().toInternal(mapperFacade);
+        Integer commId = dao.insertMediaTransferRecord(mediaTransferDBO, mediaFileDBO);
         logger.info("commId returned:" + commId);
         return commId;
     }
 
-    private String prepareFileUploadInfoMsg(SpecialMediaType specialMediaType, String messageInitiaterId, String destId, long fileSize) {
-        return "Initiating file upload. [Source]:" + messageInitiaterId +
-                ". [Destination]:" + destId + "." +
-                " [Special Media Type]:" + specialMediaType +
+    private void logFileUploadInfoMsg(UploadFileRequest request) {
+        String infoMsg = "Initiating file upload. [Source]:" + request.getMessageInitiaterId() +
+                ". [Destination]:" + request.getDestinationId() + "." +
+                " [Special Media Type]:" + request.getSpecialMediaType() +
                 " [File size]:" +
-                MediaFilesUtils.getFileSizeFormat(fileSize);
+                MediaFilesUtils.getFileSizeFormat(request.getMediaFileDTO().getSize());
+        logger.info(infoMsg);
     }
 
     private void sendMediaUndeliveredMsgToUploader(UploadFileRequest request) {
@@ -196,16 +177,10 @@ public class UploadController extends AbstractController {
         String dest = (!destContact.equals("") ? destContact : destId);
         String errMsg = String.format(strings.media_undelivered_body(), dest);
 
-        String destHtml = "<b><font color=\"#00FFFF\">" + (!destContact.equals("") ? destContact : destId) + "</font></b>";
-        String errMsgHtml = String.format(strings.media_undelivered_body(), destHtml);
-
-        // Packing HTML string as push data
-        HashMap<DataKeys, Object> replyData = new HashMap<>();
-        replyData.put(DataKeys.HTML_STRING, errMsgHtml);
-
-        String initiaterToken = usersDataAccess.getUserRecord(messageInitiaterId).getToken();
+        String uploaderToken = usersDataAccess.getUserRecord(messageInitiaterId).getToken();
 
         // Informing source (uploader) that the file was not sent to destination
-        pushSender.sendPush(initiaterToken, PushEventKeys.SHOW_ERROR, title, errMsg, replyData);
+        PendingDownloadData pendingDownloadData = mapperFacade.map(request, PendingDownloadData.class);
+        pushSender.sendPush(uploaderToken, PushEventKeys.TRANSFER_FAILURE, title, errMsg, pendingDownloadData);
     }
 }

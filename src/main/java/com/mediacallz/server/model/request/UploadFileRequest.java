@@ -1,6 +1,6 @@
 package com.mediacallz.server.model.request;
 
-import com.mediacallz.server.model.MediaFile;
+import com.mediacallz.server.model.dto.MediaFileDTO;
 import com.mediacallz.server.model.SpecialMediaType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,8 +17,7 @@ public class UploadFileRequest extends Request {
     private String sourceId;
     private String destinationId;
     private String destinationContactName;
-    private MediaFile mediaFile;
+    private MediaFileDTO mediaFileDTO;
     private String filePathOnSrcSd;
     private SpecialMediaType specialMediaType;
-    private String sourceWithExtension;
 }

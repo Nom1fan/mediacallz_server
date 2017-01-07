@@ -1,7 +1,6 @@
 package com.mediacallz.server.database;
 
 import com.mediacallz.server.database.dbo.*;
-import com.mediacallz.server.model.MediaFile;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -103,7 +102,7 @@ public interface Dao {
 
     AppMetaDBO getAppMetaRecord() throws SQLException;
 
-    int insertMediaCallRecord(MediaCallDBO mediaCallDBO, List<MediaFile> mediaFiles) throws SQLException;
+    int insertMediaCallRecord(MediaCallDBO mediaCallDBO, List<MediaFileDBO> mediaFileDBOS) throws SQLException;
 
     void insertMediaFileRecord(MediaFileDBO mediaFileDBO, String countColToInc) throws SQLException;
 

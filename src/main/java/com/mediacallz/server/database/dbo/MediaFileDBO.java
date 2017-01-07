@@ -1,24 +1,18 @@
 package com.mediacallz.server.database.dbo;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Created by Mor on 27/09/2016.
  */
 @Data
-public class MediaFileDBO {
+@RequiredArgsConstructor
+public class MediaFileDBO extends DBOEntity {
 
-    String md5;
-    String content_ext;
-    long content_size;
-    int transfer_count;
+    final String md5;
+    final String content_ext;
+    final long content_size;
+    int transfer_count = 0;
     int call_count;
-
-
-    public MediaFileDBO(String md5, String fileExtension, long fileSize) {
-        this.md5 = md5;
-        content_ext = fileExtension;
-        content_size = fileSize;
-        transfer_count = 0;
-    }
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Random;
 
@@ -24,14 +25,11 @@ public class GetSmsAuthController extends PreRegistrationController {
 
     private final String url = "/v1/GetSmsAuthCode";
 
-    @Autowired
-    private StringsFactory stringsFactory;
+    private final StringsFactory stringsFactory;
 
-    @Autowired
-    private SmsVerificationAccess smsVerificationAccess;
+    private final SmsVerificationAccess smsVerificationAccess;
 
-    @Autowired
-    private SmsSender smsSender;
+    private final SmsSender smsSender;
 
     @Value("${sms.maxcode}")
     private int maxCode;
@@ -39,8 +37,15 @@ public class GetSmsAuthController extends PreRegistrationController {
     @Value("${sms.mincode}")
     private int minCode;
 
+    @Autowired
+    public GetSmsAuthController(StringsFactory stringsFactory, SmsVerificationAccess smsVerificationAccess, SmsSender smsSender) {
+        this.stringsFactory = stringsFactory;
+        this.smsVerificationAccess = smsVerificationAccess;
+        this.smsSender = smsSender;
+    }
+
     @RequestMapping(value = url, method = RequestMethod.POST)
-    public void getSmsAuthCode(@RequestBody GetSmsRequest request, HttpServletResponse response) throws IOException {
+    public void getSmsAuthCode(@Valid @RequestBody GetSmsRequest request, HttpServletResponse response) throws IOException {
 
         int code = generateSmsVerificationCode();
 

@@ -1,10 +1,13 @@
 package com.mediacallz.server.model.request;
 
-import com.mediacallz.server.model.MediaFile;
 import com.mediacallz.server.model.SpecialMediaType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by Mor on 17/12/2016.
@@ -14,12 +17,23 @@ import lombok.ToString;
 @ToString
 public class DownloadFileRequest extends Request {
 
+    @Min(1)
     private int commId;
+
+    @NotBlank
     private String sourceId;
+
+    @NotBlank
     private String destinationId;
+
     private String destinationContactName;
+
+    @NotBlank
     private String filePathOnServer;
+
+    @NotNull
     private SpecialMediaType specialMediaType;
-    private MediaFile.FileType fileType;
+
+    @NotBlank
     private String filePathOnSrcSd;
 }

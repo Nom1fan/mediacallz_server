@@ -11,16 +11,14 @@ import java.util.Date;
  * Created by Mor on 31/03/2016.
  */
 @Data
-@AllArgsConstructor
-@RequiredArgsConstructor
-public class MediaTransferDBO {
+public class MediaTransferDBO extends DBOEntity {
 
-    int transfer_id;
-    final SpecialMediaType type;
-    final String md5;
-    final String uid_src;
-    final String uid_dest;
-    final Date datetime;
-    boolean transfer_success;
-    Date transfer_datetime;
+    private int transfer_id;
+    private SpecialMediaType type;
+    private String md5;
+    private String uid_src;
+    private String uid_dest;
+    private Date datetime;
+    private boolean transfer_success;
+    private Date transfer_datetime;
 }

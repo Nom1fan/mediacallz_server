@@ -1,17 +1,16 @@
 package com.mediacallz.server.database;
 
+import com.mediacallz.server.database.dbo.MediaTransferDBO;
 import com.mediacallz.server.database.dbo.UserDBO;
-import com.mediacallz.server.model.DataKeys;
 import com.mediacallz.server.model.PushEventKeys;
 import com.mediacallz.server.model.SpecialMediaType;
 import com.mediacallz.server.model.UserStatus;
+import com.mediacallz.server.model.push.ClearMediaData;
 import com.mediacallz.server.services.PushSender;
-import com.mediacallz.server.database.dbo.MediaTransferDBO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,10 +60,11 @@ public class UsersDataAccessImpl implements UsersDataAccess {
                 // Clearing all types of special media
                 for(SpecialMediaType specialMediaType : specialMediaTypes) {
 
-                    HashMap<DataKeys,Object> data = new HashMap();
-                    data.put(DataKeys.SPECIAL_MEDIA_TYPE, specialMediaType);
-                    data.put(DataKeys.SOURCE_ID, userId);
-                    boolean sent = pushSender.sendPush(destToken, pushEventAction, data);
+
+                    ClearMediaData clearMediaData = new ClearMediaData();
+                    clearMediaData.setSpecialMediaType(specialMediaType);
+                    clearMediaData.setSourceId(userId);
+                    boolean sent = pushSender.sendPush(destToken, pushEventAction, clearMediaData);
                     if (!sent)
                         logger.warning("Failed to send push to clear media. [User]:" + destination + " [SpecialMediaType]:" + specialMediaType);
                 }

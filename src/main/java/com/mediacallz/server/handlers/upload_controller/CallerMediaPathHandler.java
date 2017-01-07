@@ -15,7 +15,8 @@ public class CallerMediaPathHandler implements SpMediaPathHandler {
     @Override
     public StringBuilder appendPathForMedia(UploadFileRequest request, StringBuilder filePathBuilder) {
         String destId = request.getDestinationId();
-        String srcWithExtension = request.getSourceWithExtension();
+        String extension = request.getMediaFileDTO().getExtension();
+        String srcWithExtension = destId + "." + extension;
 
         // Caller Media is saved in the destination's caller media folder,
         filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(destId).append("/").

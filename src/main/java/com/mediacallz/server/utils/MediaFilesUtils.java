@@ -1,6 +1,6 @@
 package com.mediacallz.server.utils;
 
-import com.mediacallz.server.model.MediaFile;
+import com.mediacallz.server.model.dto.MediaFileDTO;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.FileInputStream;
@@ -106,14 +106,14 @@ public abstract class MediaFilesUtils {
         }
     }
 
-    public static MediaFile.FileType getFileType(String extension) {
+    public static MediaFileDTO.FileType getFileType(String extension) {
 
         if (Arrays.asList(imageFormats).contains(extension))
-            return MediaFile.FileType.IMAGE;
+            return MediaFileDTO.FileType.IMAGE;
         else if (Arrays.asList(audioFormats).contains(extension))
-            return MediaFile.FileType.AUDIO;
+            return MediaFileDTO.FileType.AUDIO;
         else if (Arrays.asList(videoFormats).contains(extension))
-            return MediaFile.FileType.VIDEO;
+            return MediaFileDTO.FileType.VIDEO;
 
         return null;
     }

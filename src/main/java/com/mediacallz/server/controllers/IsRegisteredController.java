@@ -1,11 +1,10 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.model.ClientActionType;
+import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.model.dto.UserDTO;
+import com.mediacallz.server.model.request.IsRegisteredRequest;
 import com.mediacallz.server.model.response.Response;
 import ma.glasnost.orika.MapperFacade;
-import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.model.request.IsRegisteredRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.sql.SQLException;
 
 /**
@@ -34,7 +34,7 @@ public class IsRegisteredController extends AbstractController {
 
     @ResponseBody
     @RequestMapping(value = "/v1/IsRegistered", method = RequestMethod.POST)
-    public Response isRegistered(@RequestBody IsRegisteredRequest request, HttpServletResponse response) {
+    public Response isRegistered(@Valid @RequestBody IsRegisteredRequest request, HttpServletResponse response) {
 
         String messageInitiaterId = request.getMessageInitiaterId();
         String destId = request.getDestinationId();
@@ -42,7 +42,7 @@ public class IsRegisteredController extends AbstractController {
         try {
             UserDTO userDTO = new UserDTO();
             userDTO.fromInternal(dao.getUserRecord(destId), mapperFacade);
-            return new Response<>(ClientActionType.IS_REGISTERED_RES, userDTO);
+            return new Response<>(userDTO);
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return null;

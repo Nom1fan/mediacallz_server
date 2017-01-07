@@ -1,14 +1,14 @@
 package com.mediacallz.server.controllers;
 
+import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.database.UsersDataAccess;
 import com.mediacallz.server.exceptions.DownloadRequestFailedException;
 import com.mediacallz.server.lang.LangStrings;
-import com.mediacallz.server.model.DataKeys;
 import com.mediacallz.server.model.PushEventKeys;
+import com.mediacallz.server.model.push.PendingDownloadData;
 import com.mediacallz.server.model.request.DownloadFileRequest;
 import com.mediacallz.server.services.PushSender;
-import com.mediacallz.server.utils.RequestUtils;
-import com.mediacallz.server.database.Dao;
+import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.*;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Mor on 20/09/2016.
@@ -35,24 +34,28 @@ public class DownloadController extends AbstractController {
     private String destContactName;
     private int commId;
 
-    @Autowired
-    private Dao dao;
+    private final Dao dao;
 
-    @Autowired
-    private PushSender pushSender;
+    private final PushSender pushSender;
 
-    @Autowired
-    private UsersDataAccess usersDataAccess;
+    private final UsersDataAccess usersDataAccess;
 
-    @Autowired
-    private RequestUtils requestUtils;
+    private final MapperFacade mapperFacade;
 
     private HttpServletResponse response;
 
     private HttpServletRequest servletRequest;
 
+    @Autowired
+    public DownloadController(Dao dao, PushSender pushSender, UsersDataAccess usersDataAccess, MapperFacade mapperFacade) {
+        this.dao = dao;
+        this.pushSender = pushSender;
+        this.usersDataAccess = usersDataAccess;
+        this.mapperFacade = mapperFacade;
+    }
+
     @RequestMapping(value = "/v1/DownloadFile", method = RequestMethod.POST)
-    public void downloadFile(@RequestBody DownloadFileRequest request, HttpServletResponse response, HttpServletRequest servletRequest) {
+    public void downloadFile(@Valid @RequestBody DownloadFileRequest request, HttpServletResponse response, HttpServletRequest servletRequest) {
         this.response = response;
         this.servletRequest = servletRequest;
 
@@ -73,17 +76,18 @@ public class DownloadController extends AbstractController {
     }
 
     private void initiateDownloadFlow(DownloadFileRequest request) {
+        PendingDownloadData pendingDownloadData = mapperFacade.map(request, PendingDownloadData.class);
         try {
             initiateDownload(request.getFilePathOnServer());
 
-            informSrcOfSuccess(request);
+            informSrcOfSuccess(pendingDownloadData);
 
             // Marking in communication history record that the transfer was successful
             char TRUE = '1';
             dao.updateMediaTransferRecord(commId, Dao.COL_TRANSFER_SUCCESS, TRUE);
 
         } catch (DownloadRequestFailedException | SQLException | IOException e) {
-            handleDownloadFailure(e);
+            handleDownloadFailure(e, pendingDownloadData);
         }
     }
 
@@ -126,7 +130,7 @@ public class DownloadController extends AbstractController {
                 bytesToRead -= bytesRead;
             }
 
-            if(bytesToRead > 0)
+            if (bytesToRead > 0)
                 throw new IOException("download was stopped abruptly. " + bytesToRead + " out of " + fileSize + " bytes left.");
 
         } finally {
@@ -139,16 +143,16 @@ public class DownloadController extends AbstractController {
     }
 
     // Informing source (uploader) that file received by user (downloader)
-    private void informSrcOfSuccess(DownloadFileRequest request) {
+    private void informSrcOfSuccess(PendingDownloadData pendingDownloadData) {
         String title = strings.media_ready_title();
         String msg = String.format(strings.media_ready_body(), !destContactName.equals("") ? destContactName : destId);
         String token = usersDataAccess.getUserRecord(sourceId).getToken();
-        boolean sent = pushSender.sendPush(token, PushEventKeys.TRANSFER_SUCCESS, title, msg, convertRequest2Map(request));
+        boolean sent = pushSender.sendPush(token, PushEventKeys.TRANSFER_SUCCESS, title, msg, pendingDownloadData);
         if (!sent)
             logger.warning("Failed to inform user " + sourceId + " of transfer success to user: " + destId);
     }
 
-    private void handleDownloadFailure(Exception e) {
+    private void handleDownloadFailure(Exception e, PendingDownloadData pendingDownloadData) {
 
         logger.severe("User " + messageInitiaterId + " download request failed. Exception:" + e.getMessage());
 
@@ -157,16 +161,10 @@ public class DownloadController extends AbstractController {
         String dest = (!destContactName.equals("") ? destContactName : destId);
         String msgTransferFailed = String.format(strings.media_undelivered_body(), dest);
 
-        String destHtml = "<b><font color=\"#00FFFF\">" + (!destContactName.equals("") ? destContactName : destId) + "</font></b>";
-        String msgTransferFailedHtml = String.format(strings.media_undelivered_body(), destHtml);
-
-        HashMap<DataKeys, Object> data = new HashMap<>();
-        data.put(DataKeys.HTML_STRING, msgTransferFailedHtml);
-
         // Informing sender that file did not reach destination
         logger.severe("Informing sender:" + sourceId + " that file did not reach destination:" + destId);
         String senderToken = usersDataAccess.getUserRecord(sourceId).getToken();
-        boolean sent = pushSender.sendPush(senderToken, PushEventKeys.SHOW_ERROR, title, msgTransferFailed, data);
+        boolean sent = pushSender.sendPush(senderToken, PushEventKeys.TRANSFER_FAILURE, title, msgTransferFailed, pendingDownloadData);
 
         if (!sent)
             logger.severe("Failed trying to Inform sender:" + sourceId + " that file did not reach destination:" + destId + ". Empty token");
@@ -180,14 +178,5 @@ public class DownloadController extends AbstractController {
         }
 
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
-
-    private Map<DataKeys,Object> convertRequest2Map(DownloadFileRequest request) {
-        Map<DataKeys,Object> map = new HashMap<>();
-        map.put(DataKeys.DESTINATION_ID, request.getDestinationId());
-        map.put(DataKeys.SPECIAL_MEDIA_TYPE, request.getSpecialMediaType());
-        map.put(DataKeys.FILE_TYPE, request.getFileType());
-        map.put(DataKeys.FILE_PATH_ON_SRC_SD, request.getFilePathOnSrcSd());
-        return map;
     }
 }

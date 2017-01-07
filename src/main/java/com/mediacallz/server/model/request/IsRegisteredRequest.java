@@ -3,6 +3,7 @@ package com.mediacallz.server.model.request;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Created by Mor on 17/12/2016.
@@ -12,6 +13,7 @@ import lombok.ToString;
 @ToString
 public class IsRegisteredRequest extends Request {
 
+    @NotBlank
     private String destinationId;
 
 }

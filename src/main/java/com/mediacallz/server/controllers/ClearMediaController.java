@@ -2,11 +2,13 @@ package com.mediacallz.server.controllers;
 
 import com.mediacallz.server.database.UsersDataAccess;
 import com.mediacallz.server.model.*;
+import com.mediacallz.server.model.push.ClearMediaData;
 import com.mediacallz.server.model.response.Response;
 import com.mediacallz.server.services.PushSender;
 import com.mediacallz.server.utils.RequestUtils;
 import com.mediacallz.server.database.dbo.UserDBO;
 import com.mediacallz.server.model.request.ClearMediaRequest;
+import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,18 +26,22 @@ import java.util.Map;
 @Controller
 public class ClearMediaController extends AbstractController {
 
-    @Autowired
-    private UsersDataAccess usersDataAccess;
+    private final UsersDataAccess usersDataAccess;
+
+    private final PushSender pushSender;
+
+    private final MapperFacade mapperFacade;
 
     @Autowired
-    private PushSender pushSender;
-
-    @Autowired
-    private RequestUtils requestUtils;
+    public ClearMediaController(UsersDataAccess usersDataAccess, PushSender pushSender, MapperFacade mapperFacade) {
+        this.usersDataAccess = usersDataAccess;
+        this.pushSender = pushSender;
+        this.mapperFacade = mapperFacade;
+    }
 
     @ResponseBody
     @RequestMapping("/v1/ClearMedia")
-    public void clearMedia(@RequestBody ClearMediaRequest request, HttpServletResponse response) {
+    public void clearMedia(@Valid @RequestBody ClearMediaRequest request, HttpServletResponse response) {
 
         String destId = request.getDestinationId();
         UserDBO userRecord = usersDataAccess.getUserRecord(destId);
@@ -42,20 +49,12 @@ public class ClearMediaController extends AbstractController {
         if(userRecord!=null) {
             String destToken = userRecord.getToken();
             String pushEventAction = PushEventKeys.CLEAR_MEDIA;
-            sentOK = pushSender.sendPush(destToken, pushEventAction, convertRequest2Map(request));
+            ClearMediaData clearMediaData = mapperFacade.map(request, ClearMediaData.class);
+            sentOK = pushSender.sendPush(destToken, pushEventAction, clearMediaData);
         }
 
         if (!sentOK) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    private static Map<DataKeys,Object> convertRequest2Map(ClearMediaRequest request) {
-        HashMap<DataKeys,Object> resultMap = new HashMap<>();
-            resultMap.put(DataKeys.SPECIAL_MEDIA_TYPE, request.getSpecialMediaType());
-            resultMap.put(DataKeys.SOURCE_ID, request.getSourceId());
-            resultMap.put(DataKeys.DESTINATION_ID, request.getDestinationId());
-            resultMap.put(DataKeys.DESTINATION_CONTACT_NAME, request.getDestinationContactName());
-        return resultMap;
     }
 }

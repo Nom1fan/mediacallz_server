@@ -1,20 +1,19 @@
 package com.mediacallz.server.database.dbo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Created by Mor on 27/09/2016.
  */
 @Data
-public class SmsVerificationDBO {
+@NoArgsConstructor
+@AllArgsConstructor
+public class SmsVerificationDBO extends DBOEntity {
 
-    String uid;
-    int code;
+    private String uid;
+    private int code;
 
-    public SmsVerificationDBO() {}
-
-    public SmsVerificationDBO(String uid, int code) {
-        this.uid = uid;
-        this.code = code;
-    }
 }
