@@ -1,6 +1,7 @@
 package com.mediacallz.server.controllers;
 
 import com.mediacallz.server.database.UsersDataAccess;
+import com.mediacallz.server.logic.UnregisterLogic;
 import com.mediacallz.server.model.request.UnRegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,17 +17,15 @@ import javax.validation.Valid;
 @Controller
 public class UnregisterController extends AbstractController {
 
-    private final UsersDataAccess usersDataAccess;
+    private final UnregisterLogic logic;
 
     @Autowired
-    public UnregisterController(UsersDataAccess usersDataAccess) {
-        this.usersDataAccess = usersDataAccess;
+    public UnregisterController(UnregisterLogic logic) {
+        this.logic = logic;
     }
 
     @RequestMapping("/v1/UnRegister")
     public void unregister(@Valid @RequestBody UnRegisterRequest request) {
-        String messageInitiaterId = request.getMessageInitiaterId();
-        String token = request.getPushToken();
-        usersDataAccess.unregisterUser(messageInitiaterId, token);
+        logic.execute(request);
     }
 }

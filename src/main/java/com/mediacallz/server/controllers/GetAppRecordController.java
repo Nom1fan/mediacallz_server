@@ -1,6 +1,7 @@
 package com.mediacallz.server.controllers;
 
 import com.mediacallz.server.database.Dao;
+import com.mediacallz.server.logic.GetAppMetaLogic;
 import com.mediacallz.server.model.dto.AppMetaDTO;
 import com.mediacallz.server.model.request.Request;
 import com.mediacallz.server.model.response.Response;
@@ -22,29 +23,16 @@ import java.io.IOException;
 @Controller
 public class GetAppRecordController extends AbstractController {
 
-    private final Dao dao;
-
-    private final MapperFacade mapperFacade;
+    private final GetAppMetaLogic getAppMetaLogic;
 
     @Autowired
-    public GetAppRecordController(MapperFacade mapperFacade, Dao dao) {
-        this.mapperFacade = mapperFacade;
-        this.dao = dao;
+    public GetAppRecordController(GetAppMetaLogic getAppMetaLogic) {
+        this.getAppMetaLogic = getAppMetaLogic;
     }
 
     @ResponseBody
     @RequestMapping(value = "/v1/GetAppMeta", method = RequestMethod.POST)
     public Response getAppMeta(@Valid @RequestBody Request request, HttpServletResponse response) throws IOException {
-
-        try {
-            AppMetaDTO appMetaDTO = new AppMetaDTO();
-            appMetaDTO.fromInternal(dao.getAppMetaRecord(), mapperFacade);
-            return new Response<>(appMetaDTO);
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            String errMsg = "Failed to retrieve app meta from DB. " + (e.getMessage() != null ? "Exception:" + e.getMessage() : "");
-            logger.severe(errMsg);
-            return null;
-        }
+        return getAppMetaLogic.execute(request, response);
     }
 }
