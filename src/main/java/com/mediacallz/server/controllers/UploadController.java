@@ -1,7 +1,6 @@
 package com.mediacallz.server.controllers;
 
 import com.google.gson.Gson;
-import com.mediacallz.server.handlers.upload_controller.SpMediaPathHandler;
 import com.mediacallz.server.logic.UploadLogic;
 import com.mediacallz.server.model.request.UploadFileRequest;
 import org.hibernate.validator.constraints.NotBlank;
@@ -16,7 +15,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.*;
-import java.util.List;
 
 /**
  * Created by Mor on 12/09/2016.

@@ -1,4 +1,4 @@
-package com.mediacallz.server.handlers.upload_controller;
+package com.mediacallz.server.controllers.upload.controller;
 
 import com.mediacallz.server.lang.ServerConstants;
 import com.mediacallz.server.model.SpecialMediaType;
