@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Logger;
 
 /**
@@ -20,7 +23,7 @@ import java.util.logging.Logger;
  * Created by Mor on 28/03/2016.
  */
 @Service
-public class TeleMessageSmsSender implements SmsSender {
+public class TeleMessageSmsSender extends Observable implements SmsSender, Runnable {
 
     @Value(value = "${sms.username}")
     private String smsUser;
@@ -31,29 +34,40 @@ public class TeleMessageSmsSender implements SmsSender {
     @Value(value = "${sms.url}")
     private String smsUrl;
 
+    private final Logger logger;
+
+    private String dest;
+
+    private String msg;
+
     @Autowired
-    private Logger logger;
+    public TeleMessageSmsSender(Logger logger) {
+        this.logger = logger;
+    }
 
     @Override
     public void sendSms(final String dest, final String msg) {
-
-        new Thread() {
-
-            @Override
-            public void run() {
-
-                try {
-                    sendSmsGET(smsUrl, smsUser, smsPassword, dest, msg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.severe("Failed to send SMS to [User]:" + dest + ". [Message]:" + msg + ". [Exception]:" + (e.getMessage() != null ? e.getMessage() : e));
-                }
-            }
-        }.start();
-
+        this.dest = dest;
+        this.msg = msg;
+        Thread thread = new Thread(this);
+        thread.start();
     }
 
-    private void sendSmsGET(String url, String userId,String password,String to,String text) throws Exception {
+    @Override
+    public void run() {
+        boolean success = true;
+        try {
+            sendSmsGET(smsUrl, smsUser, smsPassword, dest, msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.severe("Failed to send SMS to [User]:" + dest + ". [Message]:" + msg + ". [Exception]:" + (e.getMessage() != null ? e.getMessage() : e));
+            success = false;
+        }
+        setChanged();
+        notifyObservers(success);
+    }
+
+    private void sendSmsGET(String url, String userId, String password, String to, String text) throws Exception {
 
         RequestBuilder builder = RequestBuilder.get().setUri(url);
         builder.addParameter("userid", userId);

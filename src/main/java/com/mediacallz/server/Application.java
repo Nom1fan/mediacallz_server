@@ -2,7 +2,9 @@ package com.mediacallz.server;
 
 import com.google.gson.Gson;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.mediacallz.server.database.config.DbConfig;
 import com.mediacallz.server.logs.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,35 +25,12 @@ public class Application {
     @Value("${server.port}")
     private int serverPort;
 
-    @Value("${db.host}")
-    private String dbHost;
+    private final DbConfig dbConfig;
 
-    @Value("${db.port}")
-    private int dbPort;
-
-    @Value("${db.name}")
-    private String dbName;
-
-    @Value("${db.username}")
-    private String dbUsername;
-
-    @Value("${db.password}")
-    private String dbPassword;
-
-    @Value("${db.maxPoolSize}")
-    private int maxPoolSize;
-
-    @Value("${db.acquireIncrement}")
-    private int acquireIncrement;
-
-    @Value("${db.testConnectionOnCheckIn}")
-    private Boolean testConnectionOnCheckIn;
-
-    @Value("${db.idleConnectionTestPeriod}")
-    private int idleConnectionTestPeriod;
-
-    @Value("${db.maxIdleTimeExcessConnections}")
-    private int maxIdleTimeExcessConnections;
+    @Autowired
+    public Application(DbConfig dbConfig) {
+        this.dbConfig = dbConfig;
+    }
 
     @PostConstruct
     public void init() {
@@ -86,15 +65,15 @@ public class Application {
     @Bean
     public ComboPooledDataSource getDataSource() {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        String jdbcUrl = "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName;
+        String jdbcUrl = "jdbc:mysql://" + dbConfig.getHost() + ":" + dbConfig.getPort() + "/" + dbConfig.getDbName();
         dataSource.setJdbcUrl(jdbcUrl);
-        dataSource.setUser(dbUsername);
-        dataSource.setPassword(dbPassword);
-        dataSource.setMaxPoolSize(maxPoolSize);
-        dataSource.setAcquireIncrement(acquireIncrement);
-        dataSource.setTestConnectionOnCheckin(testConnectionOnCheckIn);
-        dataSource.setIdleConnectionTestPeriod(idleConnectionTestPeriod);
-        dataSource.setMaxIdleTimeExcessConnections(maxIdleTimeExcessConnections);
+        dataSource.setUser(dbConfig.getUsername());
+        dataSource.setPassword(dbConfig.getPassword());
+        dataSource.setMaxPoolSize(dbConfig.getMaxPoolSize());
+        dataSource.setAcquireIncrement(dbConfig.getAcquireIncrement());
+        dataSource.setTestConnectionOnCheckin(dbConfig.getTestConnectionOnCheckIn());
+        dataSource.setIdleConnectionTestPeriod(dbConfig.getIdleConnectionTestPeriod());
+        dataSource.setMaxIdleTimeExcessConnections(dbConfig.getMaxIdleTimeExcessConnections());
         return dataSource;
     }
 
