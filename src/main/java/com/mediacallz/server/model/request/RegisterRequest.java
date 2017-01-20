@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 /**
@@ -15,6 +16,7 @@ import javax.validation.constraints.Min;
 public class RegisterRequest extends Request {
 
     @Min(1000)
+    @Max(9999)
     private int smsCode;
 }
 

@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = MediaCallDTOValidator.class)
 @Documented
 public @interface HasMedia {
-    String message() default "MediaCallDTO must contain either visual or audio media file";
+    String message() default "MediaCallDTO must contain at least one type of media";
 
     Class<?>[] groups() default {};
 
