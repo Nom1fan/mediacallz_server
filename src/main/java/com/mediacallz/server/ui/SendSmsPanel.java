@@ -1,7 +1,6 @@
 package com.mediacallz.server.ui;
 
 import com.mediacallz.server.services.SmsSender;
-import com.sun.deploy.panel.JSmartTextArea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,7 @@ import java.util.Observer;
  * Created by Mor on 28/03/2016.
  */
 @Component
-public class SendSmsPanel extends SendPanel implements Observer {
+public class SendSmsPanel extends SendPanel {
 
     private JTextField txtFieldSendTo;
     private JTextField txtFieldContent;
@@ -27,13 +26,6 @@ public class SendSmsPanel extends SendPanel implements Observer {
     @Autowired
     public SendSmsPanel(SmsSender smsSender) {
         this.smsSender = smsSender;
-    }
-
-    @Autowired
-    public void registerToObservables(List<Observable> observables) {
-        for (Observable observable : observables) {
-            observable.addObserver(this);
-        }
     }
 
     @Override
@@ -68,18 +60,18 @@ public class SendSmsPanel extends SendPanel implements Observer {
             dest = txtFieldSendTo.getText();
             String msg = txtFieldContent.getText();
             smsSender.sendSms(dest, msg);
-            jSmartTextAreaStatus.setText("Sending SMS to " + dest + "...");
+            textArea.setText("Sending SMS to " + dest + "...");
         });
 
         return btnSend;
     }
 
     @Override
-    protected JSmartTextArea getStatusTextArea() {
-        jSmartTextAreaStatus = new JSmartTextArea();
-        jSmartTextAreaStatus.setFont(new Font(null, Font.PLAIN, 10));
-        jSmartTextAreaStatus.setText("");
-        return jSmartTextAreaStatus;
+    protected JTextArea getStatusTextArea() {
+        textArea = new JTextArea();
+        textArea.setFont(new Font(null, Font.PLAIN, 10));
+        textArea.setText("");
+        return textArea;
     }
 
     @Override
@@ -87,10 +79,10 @@ public class SendSmsPanel extends SendPanel implements Observer {
         if(o instanceof SmsSender) {
             boolean success = (boolean) arg;
             if(success) {
-                jSmartTextAreaStatus.setText("Sms to " + dest + " was sent successfully!");
+                textArea.setText("Sms to " + dest + " was sent successfully!");
             }
             else {
-                jSmartTextAreaStatus.setText("Sms to " + dest + " failed!");
+                textArea.setText("Sms to " + dest + " failed!");
             }
         }
     }

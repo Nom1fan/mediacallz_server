@@ -1,21 +1,12 @@
 package com.mediacallz.server.ui;
 
-import com.sun.deploy.panel.JSmartTextArea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.awt.Font;
-import java.util.EventListener;
-import java.util.Observable;
-import java.util.Observer;
-
 import javax.annotation.PostConstruct;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Created by Mor on 27/03/2016.

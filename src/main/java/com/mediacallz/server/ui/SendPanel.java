@@ -1,26 +1,32 @@
 package com.mediacallz.server.ui;
 
-import com.mediacallz.server.database.dbo.UserDBO;
-import com.mediacallz.server.model.PushEventKeys;
-import com.sun.deploy.panel.JSmartTextArea;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.swing.*;
-import java.awt.*;
-import java.sql.SQLException;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by Mor on 1/17/2017.
  */
 @Component
-public abstract class SendPanel extends JPanel {
+public abstract class SendPanel extends JPanel implements Observer {
 
     protected JTextField txtFieldSendTo;
 
     protected JTextField txtFieldContent;
 
-    protected JSmartTextArea jSmartTextAreaStatus;
+    protected JTextArea textArea;
+
+    @Autowired
+    public void registerToObservables(List<Observable> observables) {
+        for (Observable observable : observables) {
+            observable.addObserver(this);
+        }
+    }
 
     @PostConstruct
     public void init() {
@@ -75,9 +81,9 @@ public abstract class SendPanel extends JPanel {
         return new JButton();
     }
 
-    protected JSmartTextArea getStatusTextArea() {
-        jSmartTextAreaStatus = new JSmartTextArea();
-        return jSmartTextAreaStatus;
+    protected JTextArea getStatusTextArea() {
+        textArea = new JTextArea();
+        return textArea;
     }
 
 }

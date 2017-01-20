@@ -3,27 +3,20 @@ package com.mediacallz.server.ui;
 import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.database.dbo.UserDBO;
 import com.mediacallz.server.model.PushEventKeys;
+import com.mediacallz.server.model.dto.UserDTO;
 import com.mediacallz.server.services.PushSender;
-import com.sun.deploy.panel.JSmartTextArea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.awt.*;
+import javax.swing.*;
 import java.sql.SQLException;
-
-import javax.annotation.PostConstruct;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import java.util.Observable;
 
 /**
  * Created by Mor on 28/03/2016.
  */
 @Component
-public class SendPushPanel extends SendPanel {
+public class SendPushPanel extends SendPanel implements Runnable {
 
     private final Dao dao;
 
@@ -31,7 +24,10 @@ public class SendPushPanel extends SendPanel {
 
     private JTextField txtFieldSendTo;
     private JTextField txtFieldContent;
-    private JSmartTextArea jSmartTextAreaStatus;
+
+    private String dest;
+    private String msg;
+    private UserDBO userRecord;
 
     @Autowired
     public SendPushPanel(Dao dao, PushSender pushSender) {
@@ -65,27 +61,46 @@ public class SendPushPanel extends SendPanel {
 
     @Override
     protected JButton getBtnSend() {
-        JButton _btnSend = new JButton();
-        _btnSend.setText("Send");
-        _btnSend.addActionListener(e -> {
-            String dest = txtFieldSendTo.getText();
-            String msg = txtFieldContent.getText();
+        JButton btnSend = new JButton();
+        btnSend.setText("Send");
+        btnSend.addActionListener(e -> {
+            dest = txtFieldSendTo.getText();
+            msg = txtFieldContent.getText();
 
-            String statusText = "Push to " + dest + " failed!";
+            textArea.setText("Sending push to: " + dest + "...");
+
             try {
-                UserDBO userRecord = dao.getUserRecord(dest);
+                userRecord = dao.getUserRecord(dest);
                 if(userRecord != null) {
-                    boolean success = pushSender.sendPush(userRecord.getToken(), PushEventKeys.SHOW_MESSAGE, "Notification", msg);
-                    if (success) {
-                        statusText = "Push to " + dest + " was sent successfully!";
-                    }
+                    new Thread(this).start();
+                }
+                else {
+                    textArea.setText("User " + dest + " does not exist");
                 }
             } catch (SQLException e1) {
                 e1.printStackTrace();
             }
-            jSmartTextAreaStatus.setText(statusText);
         });
 
-        return _btnSend;
+        return btnSend;
     }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if(o instanceof PushSender) {
+            boolean success = (boolean) arg;
+            String statusText = "Push to " + dest + " failed!";
+
+            if (success) {
+                statusText = "Push to " + dest + " was sent successfully!";
+            }
+            textArea.setText(statusText);
+        }
+    }
+
+    @Override
+    public void run() {
+        pushSender.sendPush(userRecord.getToken(), PushEventKeys.SHOW_MESSAGE, "Notification", msg);
+    }
+
 }

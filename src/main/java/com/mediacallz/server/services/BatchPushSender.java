@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Observable;
 import java.util.logging.Logger;
 
 
@@ -21,7 +22,7 @@ import java.util.logging.Logger;
  * Created by Mor on 15/09/2015.
  */
 @Service
-public class BatchPushSender implements PushSender {
+public class BatchPushSender extends Observable implements PushSender {
 
     @Value("${push.url}")
     private String pushUrl;
@@ -54,8 +55,11 @@ public class BatchPushSender implements PushSender {
             final String msg,
             final Object pushEventData) {
 
+        setChanged();
+
         if (deviceToken == null || deviceToken.equals("")) {
             logger.severe("Invalid device token. Aborting push send");
+            notifyObservers(false);
             return false;
         }
 
@@ -66,9 +70,11 @@ public class BatchPushSender implements PushSender {
         } catch (Exception e) {
             e.printStackTrace();
             logger.severe("Failed to send push to [Token]:" + deviceToken + ". [Exception]:" + (e.getMessage()!=null? e.getMessage() : e));
+            notifyObservers(false);
             return false;
         }
 
+        notifyObservers(true);
         return true;
     }
 
@@ -78,8 +84,11 @@ public class BatchPushSender implements PushSender {
             final String pushEventAction,
             final Object pushEventData) {
 
+        setChanged();
+
         if (deviceToken == null || deviceToken.equals("")) {
             logger.severe("Invalid device token. Aborting push send");
+            notifyObservers(false);
             return false;
         }
 
@@ -90,9 +99,11 @@ public class BatchPushSender implements PushSender {
         } catch (Exception e) {
             e.printStackTrace();
             logger.severe("Failed to send push to token:" + deviceToken + ". Exception:" + e.getMessage());
+            notifyObservers(false);
             return false;
         }
 
+        notifyObservers(true);
         return true;
     }
 
@@ -103,8 +114,11 @@ public class BatchPushSender implements PushSender {
             String title,
             final String msg) {
 
+        setChanged();
+
         if (deviceToken == null || deviceToken.equals("")) {
             logger.severe("Invalid device token. Aborting push send");
+            notifyObservers(false);
             return false;
         }
 
@@ -115,9 +129,11 @@ public class BatchPushSender implements PushSender {
         } catch (Exception e) {
             e.printStackTrace();
             logger.severe("Failed to send push to token:" + deviceToken + ". Exception:" + e.getMessage());
+            notifyObservers(false);
             return false;
         }
 
+        notifyObservers(true);
         return true;
     }
 
