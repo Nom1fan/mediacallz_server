@@ -1,10 +1,10 @@
 package com.mediacallz.server.database.dbo;
 
-import ma.glasnost.orika.MapperFacade;
+import java.io.Serializable;
 
 /**
  * Created by Mor on 20/12/2016.
  */
-public interface DBO {
+public interface DBO extends Serializable {
 
 }

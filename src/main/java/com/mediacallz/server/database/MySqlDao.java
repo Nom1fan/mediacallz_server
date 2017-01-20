@@ -1,6 +1,5 @@
 package com.mediacallz.server.database;
 
-import com.mchange.v2.c3p0.PooledDataSource;
 import com.mediacallz.server.database.dbo.*;
 import com.mediacallz.server.database.rowmappers.*;
 import com.mediacallz.server.model.UserStatus;
@@ -25,11 +24,15 @@ import java.util.logging.Logger;
 @Repository
 public class MySqlDao implements Dao {
 
-    @Autowired
-    private Logger logger;
+    private final Logger logger;
+
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private PooledDataSource dataSource;
+    public MySqlDao(Logger logger, JdbcTemplate jdbcTemplate) {
+        this.logger = logger;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public void registerUser(String uid, String token) throws SQLException {
@@ -140,10 +143,9 @@ public class MySqlDao implements Dao {
     public UserDBO getUserRecord(String uid) throws SQLException {
         UserDBO result = null;
         try {
-            JdbcOperations jdbcOperations = new JdbcTemplate(dataSource);
             String query = "SELECT *" + " FROM " + TABLE_USERS + " WHERE " + COL_UID + "=" + quote(uid);
             logger.config("Executing SQL query:[" + query + "]");
-            result = jdbcOperations.queryForObject(query, new UserDboRowMapper());
+            result = jdbcTemplate.queryForObject(query, new UserDboRowMapper());
         } catch (EmptyResultDataAccessException ignored) {
         }
         return result;
@@ -151,9 +153,8 @@ public class MySqlDao implements Dao {
 
     @Override
     public AppMetaDBO getAppMetaRecord() throws SQLException {
-        JdbcOperations jdbcOperations = new JdbcTemplate(dataSource);
         String query = "SELECT * FROM " + TABLE_APP_META;
-        return jdbcOperations.queryForObject(query, new AppMetaRowMapper());
+        return jdbcTemplate.queryForObject(query, new AppMetaRowMapper());
     }
 
     //TODO Mor: Test this method
@@ -309,7 +310,7 @@ public class MySqlDao implements Dao {
     @Override
     public int insertMediaTransferRecord(MediaTransferDBO mediaTransferDBO, MediaFileDBO mediaFileDBO) throws SQLException {
 
-        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(dataSource).
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource()).
                 withTableName(TABLE_MEDIA_TRANSFERS).
                 usingGeneratedKeyColumns(COL_TRANSFER_ID);
 
@@ -322,7 +323,7 @@ public class MySqlDao implements Dao {
     @Override
     public int insertMediaCallRecord(MediaCallDBO mediaCallDBO, List<MediaFileDBO> mediaFileDBOS) throws SQLException {
 
-        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(dataSource).
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource()).
                 withTableName(TABLE_MEDIA_CALLS).
                 usingGeneratedKeyColumns(COL_CALL_ID);
 
@@ -343,7 +344,7 @@ public class MySqlDao implements Dao {
             incrementColumn(TABLE_MEDIA_FILES, countColToInc, COL_MD5, mediaFileDBO.getMd5());
             return;
         }
-        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(dataSource).
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource()).
                 withTableName(TABLE_MEDIA_FILES);
 
         SqlParameterSource parameterSource = new BeanPropertySqlParameterSource(mediaFileDBO);
@@ -355,9 +356,8 @@ public class MySqlDao implements Dao {
     public MediaFileDBO getMediaFileRecord(String md5) throws SQLException {
         MediaFileDBO result = null;
         try {
-            JdbcOperations jdbcOperations = new JdbcTemplate(dataSource);
             String query = "SELECT * FROM " + TABLE_MEDIA_FILES + " WHERE " + COL_MD5 + "=" + quote(md5);
-            result = jdbcOperations.queryForObject(query, new MediaFileRowMapper());
+            result = jdbcTemplate.queryForObject(query, new MediaFileRowMapper());
         } catch (EmptyResultDataAccessException ignored) {
         }
         return result;
@@ -389,9 +389,7 @@ public class MySqlDao implements Dao {
         int smsCode = 0;
         try {
             String query = "SELECT * FROM " + TABLE_SMS_VERIFICATION + " WHERE " + COL_UID + "=" + quote(uid);
-            JdbcOperations jdbcOperations = new JdbcTemplate(dataSource);
-
-            SmsVerificationDBO smsVerificationDBO = jdbcOperations.queryForObject(query, new SmsVerificationRowMapper());
+            SmsVerificationDBO smsVerificationDBO = jdbcTemplate.queryForObject(query, new SmsVerificationRowMapper());
             smsCode = smsVerificationDBO.getCode();
         } catch (EmptyResultDataAccessException ignored) {
         }
@@ -400,9 +398,8 @@ public class MySqlDao implements Dao {
 
     @Override
     public List<MediaTransferDBO> getAllUserMediaTransferRecords(String uid) throws SQLException {
-        JdbcOperations jdbcOperations = new JdbcTemplate(dataSource);
         String query = "SELECT *" + " FROM " + TABLE_MEDIA_TRANSFERS + " WHERE " + COL_UID_SRC + "=?";
-        return jdbcOperations.query(query, new MediaTransferRowMapper(), uid);
+        return jdbcTemplate.query(query, new MediaTransferRowMapper(), uid);
     }
 
     @Override
@@ -435,8 +432,7 @@ public class MySqlDao implements Dao {
 
     private void executeQuery(String query) throws SQLException {
         logger.config("Executing SQL query:[" + query + "]");
-        JdbcOperations jdbcOperations = new JdbcTemplate(dataSource);
-        jdbcOperations.execute(query);
+        jdbcTemplate.execute(query);
     }
 
     private String quote(String str) {

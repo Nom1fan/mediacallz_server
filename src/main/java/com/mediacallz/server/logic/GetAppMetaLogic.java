@@ -26,7 +26,7 @@ public class GetAppMetaLogic extends AbstractServerLogic {
         this.dao = dao;
     }
 
-    public Response execute(Request request, HttpServletResponse response) {
+    public Response<AppMetaDTO> execute(Request request, HttpServletResponse response) {
         try {
             AppMetaDTO appMetaDTO = new AppMetaDTO();
             appMetaDTO.fromInternal(dao.getAppMetaRecord(), mapperFacade);

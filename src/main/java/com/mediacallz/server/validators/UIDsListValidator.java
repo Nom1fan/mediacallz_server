@@ -1,9 +1,6 @@
 package com.mediacallz.server.validators;
 
-import com.mediacallz.server.database.dbo.AppMetaDBO;
-import com.mediacallz.server.validators.handlers.international.uid.InternationalUIDValidationHandler;
 import com.mediacallz.server.validators.handlers.uid.UIDValidationHandler;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,7 +15,7 @@ import java.util.Map;
  * Created by Mor on 1/6/2017.
  */
 @Component
-public class UIDValidator implements ConstraintValidator<Uid, String> {
+public class UIDsListValidator implements ConstraintValidator<UidsList, List<String>> {
 
     @Value("${server.locale}")
     private String serverLocale;
@@ -33,22 +30,24 @@ public class UIDValidator implements ConstraintValidator<Uid, String> {
     }
 
     @Override
-    public void initialize(Uid uid) {
+    public void initialize(UidsList uid) {
 
     }
 
     @Override
-    public boolean isValid(String uid, ConstraintValidatorContext context) {
+    public boolean isValid(List<String> uidList, ConstraintValidatorContext context) {
         UIDValidationHandler handler = locale2HandlerMap.get(serverLocale);
-        boolean isValid = handler.isValid(uid);
 
-        if(isValid) {
-            return true;
+        for (String uid : uidList) {
+            boolean isValid = handler.isValid(uid);
+
+            if(!isValid) {
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate(handler.getValidationFailedMessage())
+                        .addConstraintViolation();
+                return false;
+            }
         }
-
-        context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate(handler.getValidationFailedMessage())
-                .addConstraintViolation();
-        return false;
+        return true;
     }
 }

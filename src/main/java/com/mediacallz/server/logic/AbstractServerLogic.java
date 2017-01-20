@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  * Created by Mor on 1/15/2017.
  */
 @Component
-public class AbstractServerLogic implements ServerLogic {
+public abstract class AbstractServerLogic implements ServerLogic {
 
     @Autowired
     protected Logger logger;

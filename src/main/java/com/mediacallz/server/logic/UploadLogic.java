@@ -5,7 +5,7 @@ import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.database.UsersDataAccess;
 import com.mediacallz.server.database.dbo.MediaFileDBO;
 import com.mediacallz.server.database.dbo.MediaTransferDBO;
-import com.mediacallz.server.controllers.upload.controller.SpMediaPathHandler;
+import com.mediacallz.server.controllers.handlers.upload.controller.SpMediaPathHandler;
 import com.mediacallz.server.lang.LangStrings;
 import com.mediacallz.server.model.PushEventKeys;
 import com.mediacallz.server.model.SpecialMediaType;

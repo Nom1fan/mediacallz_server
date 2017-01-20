@@ -32,7 +32,7 @@ public class IsRegisteredController extends AbstractController {
 
     @ResponseBody
     @RequestMapping(value = "/v1/IsRegistered", method = RequestMethod.POST)
-    public Response isRegistered(@Valid @RequestBody IsRegisteredRequest request, HttpServletResponse response) {
+    public Response<UserDTO> isRegistered(@Valid @RequestBody IsRegisteredRequest request, HttpServletResponse response) {
         return logic.execute(request, response);
     }
 }

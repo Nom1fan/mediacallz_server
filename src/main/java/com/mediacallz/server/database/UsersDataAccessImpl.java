@@ -2,12 +2,19 @@ package com.mediacallz.server.database;
 
 import com.mediacallz.server.database.dbo.MediaTransferDBO;
 import com.mediacallz.server.database.dbo.UserDBO;
+import com.mediacallz.server.database.rowmappers.UserDboRowMapper;
+import com.mediacallz.server.database.rowmappers.UserDboUserStatusRowMapper;
 import com.mediacallz.server.model.PushEventKeys;
 import com.mediacallz.server.model.SpecialMediaType;
 import com.mediacallz.server.model.UserStatus;
 import com.mediacallz.server.model.push.ClearMediaData;
 import com.mediacallz.server.services.PushSender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
@@ -19,21 +26,28 @@ import java.util.logging.Logger;
 
 
 /**
- * This class is a singleton that manages all user-related DAL access
+ * This class is manages all user-related DAL access
  *
  * @author Mor
  */
 @Component
 public class UsersDataAccessImpl implements UsersDataAccess {
 
-    @Autowired
-    private PushSender pushSender;
+    private final PushSender pushSender;
+
+    private final Dao dao;
+
+    private final Logger logger;
+
+    private final NamedParameterJdbcOperations jdbcOperations;
 
     @Autowired
-    private Dao dao;
-    
-    @Autowired
-    private Logger logger;
+    public UsersDataAccessImpl(PushSender pushSender, Dao dao, Logger logger, NamedParameterJdbcOperations jdbcOperations) {
+        this.pushSender = pushSender;
+        this.dao = dao;
+        this.logger = logger;
+        this.jdbcOperations = jdbcOperations;
+    }
 
     @Override
     public boolean unregisterUser(String userId, String token) {
@@ -44,13 +58,13 @@ public class UsersDataAccessImpl implements UsersDataAccess {
             Set<String> destinations = new HashSet<>();
 
             // Creating a set of all destinations who received media from the user
-            for(MediaTransferDBO record : records) {
-                if(record.isTransfer_success())
+            for (MediaTransferDBO record : records) {
+                if (record.isTransfer_success())
                     destinations.add(record.getUid_dest());
             }
 
             // Clearing all media sent to these destinations by user
-            for(String destination : destinations) {
+            for (String destination : destinations) {
 
                 String pushEventAction = PushEventKeys.CLEAR_MEDIA;
                 String destToken = dao.getUserRecord(destination).getToken();
@@ -58,7 +72,7 @@ public class UsersDataAccessImpl implements UsersDataAccess {
                 final SpecialMediaType[] specialMediaTypes = SpecialMediaType.values();
 
                 // Clearing all types of special media
-                for(SpecialMediaType specialMediaType : specialMediaTypes) {
+                for (SpecialMediaType specialMediaType : specialMediaTypes) {
 
 
                     ClearMediaData clearMediaData = new ClearMediaData();
@@ -123,6 +137,15 @@ public class UsersDataAccessImpl implements UsersDataAccess {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
         return result;
+    }
+
+    @Override
+    public List<UserDBO> getRegisteredContacts(List<String> contactsUids) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("ids", contactsUids);
+
+        String query = "SELECT uid,user_status FROM sys.users WHERE uid IN (:ids) AND user_status <> '" + UserStatus.UNREGISTERED.getStr() + "'";
+        return jdbcOperations.query(query, parameters, new UserDboUserStatusRowMapper());
     }
 
 }

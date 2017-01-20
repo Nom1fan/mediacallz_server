@@ -7,6 +7,7 @@ import com.mediacallz.server.database.dbo.MediaTransferDBO;
 import com.mediacallz.server.model.dto.AppMetaDTO;
 import com.mediacallz.server.model.dto.MediaCallDTO;
 import com.mediacallz.server.model.dto.MediaFileDTO;
+import com.mediacallz.server.model.dto.UserDTO;
 import com.mediacallz.server.model.request.UploadFileRequest;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ObjectCoreMapper extends ConfigurableMapper {
 
+    @Override
     protected void configure(MapperFactory mapperFactory) {
         mapperFactory.classMap(AppMetaDBO.class, AppMetaDTO.class)
                 .field("last_supported_version", "lastSupportedAppVersion")
@@ -46,7 +48,6 @@ public class ObjectCoreMapper extends ConfigurableMapper {
                 .field("content_size", "size")
                 .byDefault()
                 .register();
-
     }
 
 

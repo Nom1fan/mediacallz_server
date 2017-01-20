@@ -1,9 +1,17 @@
 package com.mediacallz.server.model;
 
-public enum UserStatus {
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 //	ONLINE,
 //	OFFLINE,
-	UNREGISTERED,
-	REGISTERED,
+@RequiredArgsConstructor
+public enum UserStatus {
+
+	UNREGISTERED("UNREGISTERED"),
+	REGISTERED("REGISTERED");
+
+	@Getter
+	private final String str;
+
 }

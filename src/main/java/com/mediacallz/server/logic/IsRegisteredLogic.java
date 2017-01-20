@@ -27,7 +27,7 @@ public class IsRegisteredLogic extends AbstractServerLogic {
         this.mapperFacade = mapperFacade;
     }
 
-    public Response execute(IsRegisteredRequest request, HttpServletResponse response) {
+    public Response<UserDTO> execute(IsRegisteredRequest request, HttpServletResponse response) {
         String messageInitiaterId = request.getMessageInitiaterId();
         String destId = request.getDestinationId();
         logger.info(messageInitiaterId + " is checking if " + destId + " is logged in...");

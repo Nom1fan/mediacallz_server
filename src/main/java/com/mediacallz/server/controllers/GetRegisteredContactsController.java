@@ -1,11 +1,11 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.logic.GetAppMetaLogic;
+import com.mediacallz.server.logic.GetRegisteredContactsLogic;
 import com.mediacallz.server.model.dto.AppMetaDTO;
+import com.mediacallz.server.model.dto.UserDTO;
+import com.mediacallz.server.model.request.GetRegisteredContactsRequest;
 import com.mediacallz.server.model.request.Request;
 import com.mediacallz.server.model.response.Response;
-import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,23 +16,24 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 /**
- * Created by Mor on 19/08/2016.
+ * Created by Mor on 1/18/2017.
  */
 @Controller
-public class GetAppRecordController extends AbstractController {
+public class GetRegisteredContactsController extends AbstractController {
 
-    private final GetAppMetaLogic getAppMetaLogic;
+    private final GetRegisteredContactsLogic logic;
 
     @Autowired
-    public GetAppRecordController(GetAppMetaLogic getAppMetaLogic) {
-        this.getAppMetaLogic = getAppMetaLogic;
+    public GetRegisteredContactsController(GetRegisteredContactsLogic logic) {
+        this.logic = logic;
     }
 
     @ResponseBody
-    @RequestMapping(value = "/v1/GetAppMeta", method = RequestMethod.POST)
-    public Response<AppMetaDTO> getAppMeta(@Valid @RequestBody Request request, HttpServletResponse response) throws IOException {
-        return getAppMetaLogic.execute(request, response);
+    @RequestMapping(value = "/v1/GetRegisteredContacts", method = RequestMethod.POST)
+    public Response<List<UserDTO>> getAppMeta(@Valid @RequestBody GetRegisteredContactsRequest request) throws IOException {
+        return logic.execute(request);
     }
 }
