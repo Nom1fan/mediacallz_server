@@ -29,8 +29,8 @@ public class ObjectCoreMapper extends ConfigurableMapper {
         mapperFactory.classMap(MediaCallDBO.class, MediaCallDTO.class)
                 .field("uid_src", "sourceId")
                 .field("uid_dest", "destinationId")
-                .field("md5_visual", "visualMediaFileDTO.md5")
-                .field("md5_audio", "audioMediaFileDTO.md5")
+                .field("md5_visual", "visualMediaFile.md5")
+                .field("md5_audio", "audioMediaFile.md5")
                 .field("type", "specialMediaType")
                 .byDefault()
                 .register();
@@ -39,7 +39,7 @@ public class ObjectCoreMapper extends ConfigurableMapper {
                 .field("uid_src", "sourceId")
                 .field("uid_dest", "destinationId")
                 .field("type", "specialMediaType")
-                .field("md5", "mediaFileDTO.md5")
+                .field("md5", "mediaFile.md5")
                 .byDefault()
                 .register();
 

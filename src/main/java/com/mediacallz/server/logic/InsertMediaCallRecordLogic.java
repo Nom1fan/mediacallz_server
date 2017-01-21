@@ -37,9 +37,9 @@ public class InsertMediaCallRecordLogic extends AbstractServerLogic {
     public Response execute(InsertMediaCallRecordRequest request, HttpServletResponse response) {
         int callId = -1;
         try {
-            MediaCallDTO mediaCallDTO = request.getMediaCallDTO();
+            MediaCallDTO mediaCallDTO = request.getMediaCall();
             MediaCallDBO mediaCallDBO = mediaCallDTO.toInternal(mapperFacade);
-            List<MediaFileDBO> mediaFileDBOS = prepareMediaFiles(mediaCallDTO.getVisualMediaFileDTO(), mediaCallDTO.getAudioMediaFileDTO());
+            List<MediaFileDBO> mediaFileDBOS = prepareMediaFiles(mediaCallDTO.getVisualMediaFile(), mediaCallDTO.getAudioMediaFile());
             callId = dao.insertMediaCallRecord(mediaCallDBO, mediaFileDBOS);
             logger.info("Insert call record was successful. Call Id returned:[" + callId + "]");
 

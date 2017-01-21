@@ -22,7 +22,7 @@ public class InsertMediaCallRecordRequest extends Request {
     @Valid
     @NotNull
     @HasMedia
-    private MediaCallDTO mediaCallDTO;
+    private MediaCallDTO mediaCall;
 }
 
 

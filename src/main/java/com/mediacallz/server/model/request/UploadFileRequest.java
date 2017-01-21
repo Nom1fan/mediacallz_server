@@ -26,7 +26,7 @@ public class UploadFileRequest extends Request {
     private String destinationContactName;
 
     @NotNull
-    private MediaFileDTO mediaFileDTO;
+    private MediaFileDTO mediaFile;
     private String filePathOnSrcSd;
     private SpecialMediaType specialMediaType;
 }

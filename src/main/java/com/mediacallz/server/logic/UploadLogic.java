@@ -132,7 +132,7 @@ public class UploadLogic extends AbstractServerLogic {
     private Integer insertFileUploadRecord(UploadFileRequest request) throws SQLException {
         MediaTransferDBO mediaTransferDBO = mapperFacade.map(request, MediaTransferDBO.class);
         mediaTransferDBO.setDatetime(new Date());
-        MediaFileDBO mediaFileDBO = request.getMediaFileDTO().toInternal(mapperFacade);
+        MediaFileDBO mediaFileDBO = request.getMediaFile().toInternal(mapperFacade);
         Integer commId = dao.insertMediaTransferRecord(mediaTransferDBO, mediaFileDBO);
         logger.info("commId returned:" + commId);
         return commId;
@@ -143,7 +143,7 @@ public class UploadLogic extends AbstractServerLogic {
                 ". [Destination]:" + request.getDestinationId() + "." +
                 " [Special Media Type]:" + request.getSpecialMediaType() +
                 " [File size]:" +
-                MediaFilesUtils.getFileSizeFormat(request.getMediaFileDTO().getSize());
+                MediaFilesUtils.getFileSizeFormat(request.getMediaFile().getSize());
         logger.info(infoMsg);
     }
 

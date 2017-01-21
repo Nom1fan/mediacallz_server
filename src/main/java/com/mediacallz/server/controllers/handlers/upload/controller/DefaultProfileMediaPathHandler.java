@@ -14,7 +14,7 @@ public class DefaultProfileMediaPathHandler implements SpMediaPathHandler {
     @Override
     public StringBuilder appendPathForMedia(UploadFileRequest request, StringBuilder filePathBuilder) {
         String messageInitiaterId = request.getMessageInitiaterId();
-        String extension = request.getMediaFileDTO().getExtension();
+        String extension = request.getMediaFile().getExtension();
 
         filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(messageInitiaterId).append("/").
                 append(ServerConstants.MY_DEFAULT_PROFILE_MEDIA_FOLDER).

@@ -15,7 +15,7 @@ public class ProfileMediaPathHandler implements SpMediaPathHandler {
     @Override
     public StringBuilder appendPathForMedia(UploadFileRequest request, StringBuilder filePathBuilder) {
         String destId = request.getDestinationId();
-        String extension = request.getMediaFileDTO().getExtension();
+        String extension = request.getMediaFile().getExtension();
         String srcWithExtension = destId + "." + extension;
 
         filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(destId).append("/").

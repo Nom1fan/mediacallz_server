@@ -25,10 +25,10 @@ public class MediaCallDTO extends DTOEntity<MediaCallDBO> {
     private String destinationId;
 
     @Valid
-    private MediaFileDTO visualMediaFileDTO;
+    private MediaFileDTO visualMediaFile;
 
     @Valid
-    private MediaFileDTO audioMediaFileDTO;
+    private MediaFileDTO audioMediaFile;
 
     @NotNull
     private SpecialMediaType specialMediaType;
