@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,6 +40,7 @@ public class InsertMediaCallRecordLogic extends AbstractServerLogic {
         try {
             MediaCallDTO mediaCallDTO = request.getMediaCall();
             MediaCallDBO mediaCallDBO = mediaCallDTO.toInternal(mapperFacade);
+            mediaCallDBO.setDatetime(new Date());
             List<MediaFileDBO> mediaFileDBOS = prepareMediaFiles(mediaCallDTO.getVisualMediaFile(), mediaCallDTO.getAudioMediaFile());
             callId = dao.insertMediaCallRecord(mediaCallDBO, mediaFileDBOS);
             logger.info("Insert call record was successful. Call Id returned:[" + callId + "]");
