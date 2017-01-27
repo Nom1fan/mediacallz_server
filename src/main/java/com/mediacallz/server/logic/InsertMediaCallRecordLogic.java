@@ -3,8 +3,6 @@ package com.mediacallz.server.logic;
 import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.database.dbo.MediaCallDBO;
 import com.mediacallz.server.database.dbo.MediaFileDBO;
-import com.mediacallz.server.model.EventReport;
-import com.mediacallz.server.model.EventType;
 import com.mediacallz.server.model.dto.MediaCallDTO;
 import com.mediacallz.server.model.dto.MediaFileDTO;
 import com.mediacallz.server.model.request.InsertMediaCallRecordRequest;
@@ -35,7 +33,7 @@ public class InsertMediaCallRecordLogic extends AbstractServerLogic {
         this.mapperFacade = mapperFacade;
     }
 
-    public Response execute(InsertMediaCallRecordRequest request, HttpServletResponse response) {
+    public Response<Integer> execute(InsertMediaCallRecordRequest request, HttpServletResponse response) {
         int callId = -1;
         try {
             MediaCallDTO mediaCallDTO = request.getMediaCall();
@@ -51,7 +49,7 @@ public class InsertMediaCallRecordLogic extends AbstractServerLogic {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
-        return new Response<>(new EventReport(EventType.NO_ACTION_REQUIRED, callId));
+        return new Response<>(callId);
     }
 
     private List<MediaFileDBO> prepareMediaFiles(MediaFileDTO visualMediaFileDTO, MediaFileDTO audioMediaFileDTO) {

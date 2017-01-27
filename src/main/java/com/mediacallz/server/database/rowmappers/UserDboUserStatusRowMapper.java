@@ -1,7 +1,7 @@
 package com.mediacallz.server.database.rowmappers;
 
 import com.mediacallz.server.database.dbo.UserDBO;
-import com.mediacallz.server.model.UserStatus;
+import com.mediacallz.server.enums.UserStatus;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

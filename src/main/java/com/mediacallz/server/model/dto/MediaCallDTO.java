@@ -1,7 +1,7 @@
 package com.mediacallz.server.model.dto;
 
 import com.mediacallz.server.database.dbo.MediaCallDBO;
-import com.mediacallz.server.model.SpecialMediaType;
+import com.mediacallz.server.enums.SpecialMediaType;
 import lombok.Data;
 import lombok.ToString;
 import org.hibernate.validator.constraints.NotEmpty;

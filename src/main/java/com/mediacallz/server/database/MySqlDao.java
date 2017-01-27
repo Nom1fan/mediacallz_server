@@ -2,10 +2,9 @@ package com.mediacallz.server.database;
 
 import com.mediacallz.server.database.dbo.*;
 import com.mediacallz.server.database.rowmappers.*;
-import com.mediacallz.server.model.UserStatus;
+import com.mediacallz.server.enums.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;

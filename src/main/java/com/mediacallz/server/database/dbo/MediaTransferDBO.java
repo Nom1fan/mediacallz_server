@@ -1,9 +1,7 @@
 package com.mediacallz.server.database.dbo;
 
-import com.mediacallz.server.model.SpecialMediaType;
-import lombok.AllArgsConstructor;
+import com.mediacallz.server.enums.SpecialMediaType;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
 

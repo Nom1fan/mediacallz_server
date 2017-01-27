@@ -2,19 +2,15 @@ package com.mediacallz.server.database;
 
 import com.mediacallz.server.database.dbo.MediaTransferDBO;
 import com.mediacallz.server.database.dbo.UserDBO;
-import com.mediacallz.server.database.rowmappers.UserDboRowMapper;
 import com.mediacallz.server.database.rowmappers.UserDboUserStatusRowMapper;
-import com.mediacallz.server.model.PushEventKeys;
-import com.mediacallz.server.model.SpecialMediaType;
-import com.mediacallz.server.model.UserStatus;
+import com.mediacallz.server.model.push.PushEventKeys;
+import com.mediacallz.server.enums.SpecialMediaType;
+import com.mediacallz.server.enums.UserStatus;
 import com.mediacallz.server.model.push.ClearMediaData;
 import com.mediacallz.server.services.PushSender;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;

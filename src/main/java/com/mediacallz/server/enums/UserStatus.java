@@ -1,4 +1,4 @@
-package com.mediacallz.server.model;
+package com.mediacallz.server.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,7 @@
 package com.mediacallz.server.services;
 
 
-import com.mediacallz.server.model.PushEventKeys;
-import com.mediacallz.server.model.push.PushData;
+import com.mediacallz.server.model.push.PushEventKeys;
 
 /**
  * Created by Mor on 25/07/2016.

@@ -1,7 +1,7 @@
 package com.mediacallz.server.database.rowmappers;
 
 import com.mediacallz.server.database.dbo.MediaTransferDBO;
-import com.mediacallz.server.model.SpecialMediaType;
+import com.mediacallz.server.enums.SpecialMediaType;
 import com.mediacallz.server.database.Dao;
 import org.springframework.jdbc.core.RowMapper;
 

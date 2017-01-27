@@ -2,8 +2,8 @@ package com.mediacallz.server.logic;
 
 import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.lang.LangStrings;
-import com.mediacallz.server.model.PushEventKeys;
-import com.mediacallz.server.model.SpecialMediaType;
+import com.mediacallz.server.model.push.PushEventKeys;
+import com.mediacallz.server.enums.SpecialMediaType;
 import com.mediacallz.server.model.push.ClearSuccessData;
 import com.mediacallz.server.model.request.NotifyMediaClearedRequest;
 import com.mediacallz.server.services.PushSender;

@@ -1,6 +1,6 @@
 package com.mediacallz.server.controllers.handlers.upload.controller;
 
-import com.mediacallz.server.model.SpecialMediaType;
+import com.mediacallz.server.enums.SpecialMediaType;
 import com.mediacallz.server.model.request.UploadFileRequest;
 
 

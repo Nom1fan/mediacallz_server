@@ -1,7 +1,7 @@
 package com.mediacallz.server.model.push;
 
 import com.mediacallz.server.model.dto.MediaFileDTO;
-import com.mediacallz.server.model.SpecialMediaType;
+import com.mediacallz.server.enums.SpecialMediaType;
 import lombok.Data;
 
 /**
@@ -17,6 +17,6 @@ public class PendingDownloadData extends AbstractPushData {
     private SpecialMediaType specialMediaType;
     private String filePathOnServer;
     private String filePathOnSrcSd;
-    private MediaFileDTO mediaFileDTO;
+    private MediaFileDTO mediaFile;
     private int commId;
 }

@@ -13,10 +13,12 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.Filter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -101,6 +103,15 @@ public class Application {
 
         logger = LogFactory.get_serverLogger(logLevel);
         return logger;
+    }
+
+    @Bean
+    public Filter logFilter() {
+        CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
+        filter.setIncludeQueryString(true);
+        filter.setIncludePayload(true);
+        filter.setMaxPayloadLength(5120);
+        return filter;
     }
 
     private static void setLogLevel(String logLevel) {

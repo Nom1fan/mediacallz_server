@@ -1,9 +1,8 @@
 package com.mediacallz.server.model.dto;
 
-import com.mediacallz.server.model.UserStatus;
+import com.mediacallz.server.enums.UserStatus;
 import com.mediacallz.server.validators.Uid;
 import lombok.Data;
-import ma.glasnost.orika.MapperFacade;
 import com.mediacallz.server.database.dbo.UserDBO;
 
 /**

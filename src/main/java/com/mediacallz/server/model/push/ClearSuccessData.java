@@ -1,6 +1,6 @@
 package com.mediacallz.server.model.push;
 
-import com.mediacallz.server.model.SpecialMediaType;
+import com.mediacallz.server.enums.SpecialMediaType;
 import lombok.Data;
 
 /**

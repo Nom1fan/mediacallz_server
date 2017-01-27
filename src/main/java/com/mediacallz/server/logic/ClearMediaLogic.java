@@ -2,7 +2,7 @@ package com.mediacallz.server.logic;
 
 import com.mediacallz.server.database.UsersDataAccess;
 import com.mediacallz.server.database.dbo.UserDBO;
-import com.mediacallz.server.model.PushEventKeys;
+import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.model.push.ClearMediaData;
 import com.mediacallz.server.model.request.ClearMediaRequest;
 import com.mediacallz.server.services.PushSender;

@@ -1,12 +1,10 @@
 package com.mediacallz.server.database.dbo;
 
-import com.mediacallz.server.model.UserStatus;
-import com.mediacallz.server.model.dto.UserDTO;
+import com.mediacallz.server.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import ma.glasnost.orika.MapperFacade;
 
 import java.util.Date;
 

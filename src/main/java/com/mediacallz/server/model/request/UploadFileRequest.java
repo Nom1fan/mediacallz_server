@@ -1,7 +1,7 @@
 package com.mediacallz.server.model.request;
 
 import com.mediacallz.server.model.dto.MediaFileDTO;
-import com.mediacallz.server.model.SpecialMediaType;
+import com.mediacallz.server.enums.SpecialMediaType;
 import com.mediacallz.server.validators.Uid;
 import lombok.Data;
 import lombok.NoArgsConstructor;

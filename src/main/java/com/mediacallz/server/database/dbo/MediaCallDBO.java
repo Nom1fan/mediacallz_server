@@ -1,11 +1,7 @@
 package com.mediacallz.server.database.dbo;
 
-import com.mediacallz.server.model.SpecialMediaType;
+import com.mediacallz.server.enums.SpecialMediaType;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import ma.glasnost.orika.MapperFacade;
-import com.mediacallz.server.model.dto.MediaCallDTO;
 
 import java.util.Date;
 

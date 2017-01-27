@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 @ToString
-public class DownloadFileRequest extends Request {
+public class NotifyMediaReadyRequest extends Request {
 
     @Min(1)
     private int commId;
@@ -28,9 +28,6 @@ public class DownloadFileRequest extends Request {
     private String destinationId;
 
     private String destinationContactName;
-
-    @NotBlank
-    private String filePathOnServer;
 
     @NotNull
     private SpecialMediaType specialMediaType;

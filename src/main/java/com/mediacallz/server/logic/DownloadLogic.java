@@ -4,7 +4,7 @@ import com.mediacallz.server.database.Dao;
 import com.mediacallz.server.database.UsersDataAccess;
 import com.mediacallz.server.exceptions.DownloadRequestFailedException;
 import com.mediacallz.server.lang.LangStrings;
-import com.mediacallz.server.model.PushEventKeys;
+import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.model.push.PendingDownloadData;
 import com.mediacallz.server.model.request.DownloadFileRequest;
 import com.mediacallz.server.services.PushSender;
@@ -62,8 +62,8 @@ public class DownloadLogic extends AbstractServerLogic {
         String sourceLocale = request.getSourceLocale();
         String filePathOnServer = request.getFilePathOnServer();
 
-        if (sourceLocale != null)
-            strings = stringsFactory.getStrings(sourceLocale);
+
+        strings = stringsFactory.getStrings(sourceLocale);
 
         logger.info(messageInitiaterId + " is requesting download from:" + sourceId + ". File path on server:" + filePathOnServer + "...");
 
@@ -75,13 +75,7 @@ public class DownloadLogic extends AbstractServerLogic {
         try {
             initiateDownload(request.getFilePathOnServer());
 
-            informSrcOfSuccess(pendingDownloadData);
-
-            // Marking in communication history record that the transfer was successful
-            char TRUE = '1';
-            dao.updateMediaTransferRecord(commId, Dao.COL_TRANSFER_SUCCESS, TRUE);
-
-        } catch (DownloadRequestFailedException | SQLException | IOException e) {
+        } catch (DownloadRequestFailedException | IOException e) {
             handleDownloadFailure(e, pendingDownloadData);
         }
     }
@@ -135,16 +129,6 @@ public class DownloadLogic extends AbstractServerLogic {
                 } catch (IOException ignored) {
                 }
         }
-    }
-
-    // Informing source (uploader) that file received by user (downloader)
-    private void informSrcOfSuccess(PendingDownloadData pendingDownloadData) {
-        String title = strings.media_ready_title();
-        String msg = String.format(strings.media_ready_body(), !destContactName.equals("") ? destContactName : destId);
-        String token = usersDataAccess.getUserRecord(sourceId).getToken();
-        boolean sent = pushSender.sendPush(token, PushEventKeys.TRANSFER_SUCCESS, title, msg, pendingDownloadData);
-        if (!sent)
-            logger.warning("Failed to inform user " + sourceId + " of transfer success to user: " + destId);
     }
 
     private void handleDownloadFailure(Exception e, PendingDownloadData pendingDownloadData) {

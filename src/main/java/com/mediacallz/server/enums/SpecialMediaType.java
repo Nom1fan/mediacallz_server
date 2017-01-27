@@ -1,4 +1,4 @@
-package com.mediacallz.server.model;
+package com.mediacallz.server.enums;
 
 /**
  * Created by Mor on 09/01/2016.
