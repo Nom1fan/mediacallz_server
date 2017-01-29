@@ -1,7 +1,5 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.database.SmsVerificationAccess;
 import com.mediacallz.server.logic.RegisterLogic;
 import com.mediacallz.server.model.request.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * Created by Mor on 19/08/2016.

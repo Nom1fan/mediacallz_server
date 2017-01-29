@@ -1,8 +1,7 @@
 package com.mediacallz.server.logic;
 
-import com.mediacallz.server.database.SmsVerificationAccess;
+import com.mediacallz.server.dao.SmsVerificationDao;
 import com.mediacallz.server.lang.LangStrings;
-import com.mediacallz.server.lang.StringsFactory;
 import com.mediacallz.server.model.request.GetSmsRequest;
 import com.mediacallz.server.services.SmsSender;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import java.util.Random;
 @Component
 public class GetSmsAuthLogic extends AbstractServerLogic {
 
-    private final SmsVerificationAccess smsVerificationAccess;
+    private final SmsVerificationDao smsVerificationDao;
 
     private final SmsSender smsSender;
 
@@ -29,22 +28,22 @@ public class GetSmsAuthLogic extends AbstractServerLogic {
     private int minCode;
 
     @Autowired
-    public GetSmsAuthLogic(SmsVerificationAccess smsVerificationAccess, SmsSender smsSender) {
-        this.smsVerificationAccess = smsVerificationAccess;
+    public GetSmsAuthLogic(SmsVerificationDao smsVerificationDao, SmsSender smsSender) {
+        this.smsVerificationDao = smsVerificationDao;
         this.smsSender = smsSender;
     }
 
     public void execute(GetSmsRequest request, HttpServletResponse response) {
         int code = generateSmsVerificationCode();
 
-        String messageInitiaterId = request.getMessageInitiaterId();
+        String messageInitiaterId = request.getUser().getUid();
         String internationalPhoneNumber = request.getInternationalPhoneNumber();
-        String sourceLocale = request.getSourceLocale();
+        String sourceLocale = request.getLocale();
 
         LangStrings strings = stringsFactory.getStrings(sourceLocale);
         String msg = String.format(strings.your_verification_code(), code);
 
-        boolean isOK = smsVerificationAccess.insertSmsVerificationCode(messageInitiaterId, code);
+        boolean isOK = smsVerificationDao.insertSmsVerificationCode(messageInitiaterId, code);
 
         if(isOK) {
             smsSender.sendSms(internationalPhoneNumber, msg);

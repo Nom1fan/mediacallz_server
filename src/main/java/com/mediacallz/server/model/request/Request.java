@@ -1,5 +1,6 @@
 package com.mediacallz.server.model.request;
 
+import com.mediacallz.server.model.dto.UserDTO;
 import com.mediacallz.server.validators.Uid;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.Valid;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Max;
 
@@ -18,15 +20,8 @@ import javax.validation.constraints.Max;
 @ToString
 public class Request {
 
-    @Uid
-    private String messageInitiaterId;
+    @Valid
+    private UserDTO user;
 
-    @NotBlank
-    private String pushToken;
-
-    private String deviceModel;
-    private String androidVersion;
-    private String iosVersion;
-    private String appVersion;
-    private String sourceLocale;
+    private String locale;
 }

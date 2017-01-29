@@ -1,4 +1,4 @@
-package com.mediacallz.server.database.config;
+package com.mediacallz.server.db.config;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,13 +1,10 @@
 package com.mediacallz.server.logic;
 
-import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.database.UsersDataAccess;
-import com.mediacallz.server.enums.SpecialMediaType;
+import com.mediacallz.server.dao.Dao;
+import com.mediacallz.server.dao.UsersDao;
 import com.mediacallz.server.lang.LangStrings;
-import com.mediacallz.server.model.push.ClearSuccessData;
 import com.mediacallz.server.model.push.PendingDownloadData;
 import com.mediacallz.server.model.push.PushEventKeys;
-import com.mediacallz.server.model.request.NotifyMediaClearedRequest;
 import com.mediacallz.server.model.request.NotifyMediaReadyRequest;
 import com.mediacallz.server.services.PushSender;
 import ma.glasnost.orika.MapperFacade;
@@ -29,15 +26,15 @@ public class NotifyMediaReadyLogic extends AbstractServerLogic {
 
     private final MapperFacade mapperFacade;
 
-    private final UsersDataAccess usersDataAccess;
+    private final UsersDao usersDao;
 
 
     @Autowired
-    public NotifyMediaReadyLogic(PushSender pushSender, Dao dao, MapperFacade mapperFacade, UsersDataAccess usersDataAccess) {
+    public NotifyMediaReadyLogic(PushSender pushSender, Dao dao, MapperFacade mapperFacade, UsersDao usersDao) {
         this.pushSender = pushSender;
         this.dao = dao;
         this.mapperFacade = mapperFacade;
-        this.usersDataAccess = usersDataAccess;
+        this.usersDao = usersDao;
     }
 
     public void execute(NotifyMediaReadyRequest request, HttpServletResponse response) {
@@ -65,7 +62,7 @@ public class NotifyMediaReadyLogic extends AbstractServerLogic {
         LangStrings strings = stringsFactory.getStrings(pendingDownloadData.getSourceLocale());
         String title = strings.media_ready_title();
         String msg = String.format(strings.media_ready_body(), !destContactName.equals("") ? destContactName : destId);
-        String token = usersDataAccess.getUserRecord(sourceId).getToken();
+        String token = usersDao.getUserRecord(sourceId).getToken();
         boolean sent = pushSender.sendPush(token, PushEventKeys.TRANSFER_SUCCESS, title, msg, pendingDownloadData);
         if (!sent)
             logger.warning("Failed to inform user " + sourceId + " of transfer success to user: " + destId);

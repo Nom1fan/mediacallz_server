@@ -1,9 +1,7 @@
-package com.mediacallz.server.database.dbo;
+package com.mediacallz.server.db.dbo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ma.glasnost.orika.MapperFacade;
-import com.mediacallz.server.model.dto.AppMetaDTO;
 
 /**
  * Created by Mor on 26/03/2016.

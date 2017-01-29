@@ -1,14 +1,14 @@
-package com.mediacallz.server.database.rowmappers;
+package com.mediacallz.server.db.rowmappers;
 
-import com.mediacallz.server.database.dbo.MediaTransferDBO;
+import com.mediacallz.server.db.dbo.MediaTransferDBO;
 import com.mediacallz.server.enums.SpecialMediaType;
-import com.mediacallz.server.database.Dao;
+import com.mediacallz.server.dao.Dao;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static com.mediacallz.server.database.Dao.*;
+import static com.mediacallz.server.dao.Dao.*;
 
 
 /**

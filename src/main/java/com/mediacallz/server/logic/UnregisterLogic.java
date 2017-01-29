@@ -1,6 +1,6 @@
 package com.mediacallz.server.logic;
 
-import com.mediacallz.server.database.UsersDataAccess;
+import com.mediacallz.server.dao.UsersDao;
 import com.mediacallz.server.model.request.UnRegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,16 +11,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class UnregisterLogic extends AbstractServerLogic {
 
-    private final UsersDataAccess usersDataAccess;
+    private final UsersDao usersDao;
 
     @Autowired
-    public UnregisterLogic(UsersDataAccess usersDataAccess) {
-        this.usersDataAccess = usersDataAccess;
+    public UnregisterLogic(UsersDao usersDao) {
+        this.usersDao = usersDao;
     }
 
     public void execute(UnRegisterRequest request) {
-        String messageInitiaterId = request.getMessageInitiaterId();
-        String token = request.getPushToken();
-        usersDataAccess.unregisterUser(messageInitiaterId, token);
+        String messageInitiaterId = request.getUser().getUid();
+        String token = request.getUser().getToken();
+        usersDao.unregisterUser(messageInitiaterId, token);
     }
 }

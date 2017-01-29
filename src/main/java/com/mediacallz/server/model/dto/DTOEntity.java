@@ -1,6 +1,6 @@
 package com.mediacallz.server.model.dto;
 
-import com.mediacallz.server.database.dbo.DBOEntity;
+import com.mediacallz.server.db.dbo.DBOEntity;
 import ma.glasnost.orika.MapperFacade;
 
 import java.lang.reflect.ParameterizedType;

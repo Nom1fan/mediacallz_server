@@ -1,10 +1,10 @@
 package com.mediacallz.server.logic;
 
 import com.google.gson.Gson;
-import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.database.UsersDataAccess;
-import com.mediacallz.server.database.dbo.MediaFileDBO;
-import com.mediacallz.server.database.dbo.MediaTransferDBO;
+import com.mediacallz.server.dao.Dao;
+import com.mediacallz.server.dao.UsersDao;
+import com.mediacallz.server.db.dbo.MediaFileDBO;
+import com.mediacallz.server.db.dbo.MediaTransferDBO;
 import com.mediacallz.server.controllers.handlers.upload.controller.SpMediaPathHandler;
 import com.mediacallz.server.lang.LangStrings;
 import com.mediacallz.server.model.push.PushEventKeys;
@@ -34,7 +34,7 @@ import java.util.Map;
 @Component
 public class UploadLogic extends AbstractServerLogic {
 
-    private final UsersDataAccess usersDataAccess;
+    private final UsersDao usersDao;
 
     private final PushSender pushSender;
 
@@ -52,8 +52,8 @@ public class UploadLogic extends AbstractServerLogic {
     }
 
     @Autowired
-    public UploadLogic(UsersDataAccess usersDataAccess, PushSender pushSender, Dao dao, Gson gson, MapperFacade mapperFacade) {
-        this.usersDataAccess = usersDataAccess;
+    public UploadLogic(UsersDao usersDao, PushSender pushSender, Dao dao, Gson gson, MapperFacade mapperFacade) {
+        this.usersDao = usersDao;
         this.pushSender = pushSender;
         this.dao = dao;
         this.mapperFacade = mapperFacade;
@@ -139,7 +139,7 @@ public class UploadLogic extends AbstractServerLogic {
     }
 
     private void logFileUploadInfoMsg(UploadFileRequest request) {
-        String infoMsg = "Initiating file upload. [Source]:" + request.getMessageInitiaterId() +
+        String infoMsg = "Initiating file upload. [Source]:" + request.getUser().getUid() +
                 ". [Destination]:" + request.getDestinationId() + "." +
                 " [Special Media Type]:" + request.getSpecialMediaType() +
                 " [File size]:" +
@@ -149,18 +149,18 @@ public class UploadLogic extends AbstractServerLogic {
 
     private void sendMediaUndeliveredMsgToUploader(UploadFileRequest request) {
 
-        String messageInitiaterId = request.getMessageInitiaterId();
+        String messageInitiaterId = request.getUser().getUid();
         String destId = request.getDestinationId();
         String destContact = request.getDestinationContactName();
         logger.severe("Upload from [Source]:" + messageInitiaterId + " to [Destination]:" + destId + " Failed.");
 
-        LangStrings strings = stringsFactory.getStrings(request.getSourceLocale());
+        LangStrings strings = stringsFactory.getStrings(request.getLocale());
         String title = strings.media_undelivered_title();
 
         String dest = (!destContact.equals("") ? destContact : destId);
         String errMsg = String.format(strings.media_undelivered_body(), dest);
 
-        String uploaderToken = usersDataAccess.getUserRecord(messageInitiaterId).getToken();
+        String uploaderToken = usersDao.getUserRecord(messageInitiaterId).getToken();
 
         // Informing source (uploader) that the file was not sent to destination
         PendingDownloadData pendingDownloadData = mapperFacade.map(request, PendingDownloadData.class);

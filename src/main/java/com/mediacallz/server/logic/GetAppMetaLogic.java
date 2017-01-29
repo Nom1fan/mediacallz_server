@@ -1,6 +1,6 @@
 package com.mediacallz.server.logic;
 
-import com.mediacallz.server.database.Dao;
+import com.mediacallz.server.dao.Dao;
 import com.mediacallz.server.model.dto.AppMetaDTO;
 import com.mediacallz.server.model.request.Request;
 import com.mediacallz.server.model.response.Response;

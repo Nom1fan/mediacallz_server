@@ -1,6 +1,6 @@
 package com.mediacallz.server.logic;
 
-import com.mediacallz.server.database.Dao;
+import com.mediacallz.server.dao.Dao;
 import com.mediacallz.server.lang.LangStrings;
 import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.enums.SpecialMediaType;
@@ -34,11 +34,11 @@ public class NotifyMediaClearedLogic extends AbstractServerLogic {
     }
 
     public void execute(NotifyMediaClearedRequest request, HttpServletResponse response) {
-        String clearerId = request.getMessageInitiaterId();
+        String clearerId = request.getUser().getUid();
         String clearRequesterId = request.getSourceId();
         String clearerName = request.getDestinationContactName();
         SpecialMediaType specialMediaType = request.getSpecialMediaType();
-        String sourceLocale = request.getSourceLocale();
+        String sourceLocale = request.getLocale();
 
         logger.info("Informing [Clear media requester]:" +
                 clearRequesterId + " that [User]:" + clearerId +

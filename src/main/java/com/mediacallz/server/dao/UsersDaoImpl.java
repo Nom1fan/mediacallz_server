@@ -1,24 +1,33 @@
-package com.mediacallz.server.database;
+package com.mediacallz.server.dao;
 
-import com.mediacallz.server.database.dbo.MediaTransferDBO;
-import com.mediacallz.server.database.dbo.UserDBO;
-import com.mediacallz.server.database.rowmappers.UserDboUserStatusRowMapper;
+import com.mediacallz.server.db.dbo.MediaTransferDBO;
+import com.mediacallz.server.db.dbo.UserDBO;
+import com.mediacallz.server.db.rowmappers.UserDboRowMapper;
+import com.mediacallz.server.db.rowmappers.UserDboUserStatusRowMapper;
 import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.enums.SpecialMediaType;
 import com.mediacallz.server.enums.UserStatus;
 import com.mediacallz.server.model.push.ClearMediaData;
 import com.mediacallz.server.services.PushSender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.simple.AbstractJdbcInsert;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.mediacallz.server.dao.Dao.*;
 
 
 /**
@@ -27,7 +36,7 @@ import java.util.logging.Logger;
  * @author Mor
  */
 @Component
-public class UsersDataAccessImpl implements UsersDataAccess {
+public class UsersDaoImpl implements UsersDao {
 
     private final PushSender pushSender;
 
@@ -37,12 +46,64 @@ public class UsersDataAccessImpl implements UsersDataAccess {
 
     private final NamedParameterJdbcOperations jdbcOperations;
 
+    private SimpleJdbcInsert jdbcInsert;
+
+    private JdbcTemplate jdbcTemplate;
+
     @Autowired
-    public UsersDataAccessImpl(PushSender pushSender, Dao dao, Logger logger, NamedParameterJdbcOperations jdbcOperations) {
+    public UsersDaoImpl(PushSender pushSender,
+                        Dao dao, Logger logger,
+                        NamedParameterJdbcOperations jdbcOperations,
+                        SimpleJdbcInsert jdbcInsert,
+                        JdbcTemplate jdbcTemplate) {
         this.pushSender = pushSender;
         this.dao = dao;
         this.logger = logger;
         this.jdbcOperations = jdbcOperations;
+        this.jdbcInsert = jdbcInsert;
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public boolean registerUser(UserDBO user) {
+        if (getUserRecord(user.getUid()) == null) {
+            user.setRegistered_date(new Date());
+            user.setUserStatus(UserStatus.REGISTERED);
+            BeanPropertySqlParameterSource parameters = new BeanPropertySqlParameterSource(user);
+            jdbcInsert.withTableName(TABLE_USERS);
+            int numRowsAffected = jdbcInsert.execute(parameters);
+            return numRowsAffected != 0;
+        }
+        return updateUser(user);
+    }
+
+    @Override
+    public boolean updateUser(UserDBO user) {
+        String param = "=?,";
+        String lastParam = "=?";
+        String strquery = "UPDATE " +
+                TABLE_USERS + " SET " +
+                COL_TOKEN + param +
+                COL_REGISTERED_DATE + param +
+                COL_USER_STATUS + param +
+                COL_DEVICE_MODEL + param +
+                COL_OS + param +
+                COL_OS_VERSION + param +
+                COL_APP_VERSION + lastParam +
+                " WHERE " + COL_UID + lastParam;
+
+        int numRowsUpdated = jdbcTemplate.update(
+                strquery,
+                user.getToken(),
+                new Date(),
+                UserStatus.REGISTERED.getStr(),
+                user.getDeviceModel(),
+                user.getOs(),
+                user.getOsVersion(),
+                user.getAppVersion(),
+                user.getUid());
+
+        return numRowsUpdated != 0;
     }
 
     @Override
@@ -94,20 +155,17 @@ public class UsersDataAccessImpl implements UsersDataAccess {
 
     @Override
     public boolean isRegistered(String userId) {
-
         UserDBO record;
         try {
 
             record = dao.getUserRecord(userId);
 
             if (record == null) {
-
-                logger.info("[User]:" + userId + " is " + UserStatus.UNREGISTERED.toString());
+                logger.info("User not found. [User]:" + userId + " is " + UserStatus.UNREGISTERED.toString());
                 return false;
             }
 
             if (record.getUserStatus().equals(UserStatus.REGISTERED)) {
-
                 logger.info("[User]:" + userId + " is " + UserStatus.REGISTERED.toString());
                 return true;
             }
@@ -123,14 +181,13 @@ public class UsersDataAccessImpl implements UsersDataAccess {
     }
 
     @Override
-    public UserDBO getUserRecord(String destId) {
+    public UserDBO getUserRecord(String uid) {
         UserDBO result = null;
-
         try {
-            result = dao.getUserRecord(destId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            String query = "SELECT * FROM " + TABLE_USERS + " WHERE " + COL_UID + "=" + quote(uid);
+            logger.config("Executing SQL query:[" + query + "]");
+            result = jdbcTemplate.queryForObject(query, new UserDboRowMapper());
+        } catch (EmptyResultDataAccessException ignored) {
         }
         return result;
     }
@@ -142,6 +199,10 @@ public class UsersDataAccessImpl implements UsersDataAccess {
 
         String query = "SELECT uid,user_status FROM sys.users WHERE uid IN (:ids) AND user_status <> '" + UserStatus.UNREGISTERED.getStr() + "'";
         return jdbcOperations.query(query, parameters, new UserDboUserStatusRowMapper());
+    }
+
+    private String quote(String str) {
+        return "\"" + str + "\"";
     }
 
 }

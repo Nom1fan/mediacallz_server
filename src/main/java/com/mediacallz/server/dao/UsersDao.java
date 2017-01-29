@@ -1,14 +1,18 @@
-package com.mediacallz.server.database;
+package com.mediacallz.server.dao;
 
 
-import com.mediacallz.server.database.dbo.UserDBO;
+import com.mediacallz.server.db.dbo.UserDBO;
 
 import java.util.List;
 
 /**
  * Created by Mor on 25/07/2016.
  */
-public interface UsersDataAccess {
+public interface UsersDao {
+    boolean registerUser(UserDBO user);
+
+    boolean updateUser(UserDBO user);
+
     boolean unregisterUser(String userId, String token);
 
     boolean isRegistered(String userId);

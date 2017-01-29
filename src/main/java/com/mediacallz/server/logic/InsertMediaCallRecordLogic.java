@@ -1,8 +1,8 @@
 package com.mediacallz.server.logic;
 
-import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.database.dbo.MediaCallDBO;
-import com.mediacallz.server.database.dbo.MediaFileDBO;
+import com.mediacallz.server.dao.Dao;
+import com.mediacallz.server.db.dbo.MediaCallDBO;
+import com.mediacallz.server.db.dbo.MediaFileDBO;
 import com.mediacallz.server.model.dto.MediaCallDTO;
 import com.mediacallz.server.model.dto.MediaFileDTO;
 import com.mediacallz.server.model.request.InsertMediaCallRecordRequest;

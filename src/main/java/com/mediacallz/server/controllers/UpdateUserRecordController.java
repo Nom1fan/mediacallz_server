@@ -1,7 +1,5 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.database.dbo.UserDBO;
 import com.mediacallz.server.logic.UpdateUserRecordLogic;
 import com.mediacallz.server.model.request.UpdateUserRecordRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.sql.SQLException;
 
 /**
  * Created by Mor on 04/10/2016.

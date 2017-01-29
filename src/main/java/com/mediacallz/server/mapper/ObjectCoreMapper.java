@@ -1,13 +1,10 @@
 package com.mediacallz.server.mapper;
 
-import com.mediacallz.server.database.dbo.AppMetaDBO;
-import com.mediacallz.server.database.dbo.MediaCallDBO;
-import com.mediacallz.server.database.dbo.MediaFileDBO;
-import com.mediacallz.server.database.dbo.MediaTransferDBO;
+import com.mediacallz.server.db.dbo.*;
 import com.mediacallz.server.model.dto.AppMetaDTO;
 import com.mediacallz.server.model.dto.MediaCallDTO;
 import com.mediacallz.server.model.dto.MediaFileDTO;
-import com.mediacallz.server.model.dto.UserDTO;
+import com.mediacallz.server.model.request.Request;
 import com.mediacallz.server.model.request.UploadFileRequest;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
@@ -48,6 +45,7 @@ public class ObjectCoreMapper extends ConfigurableMapper {
                 .field("content_size", "size")
                 .byDefault()
                 .register();
+
     }
 
 

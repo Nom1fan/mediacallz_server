@@ -1,9 +1,8 @@
-package com.mediacallz.server.database.dbo;
+package com.mediacallz.server.db.dbo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Created by Mor on 27/09/2016.

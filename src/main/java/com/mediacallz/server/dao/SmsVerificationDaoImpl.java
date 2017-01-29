@@ -1,4 +1,4 @@
-package com.mediacallz.server.database;
+package com.mediacallz.server.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  * Created by Mor on 28/03/2016.
  */
 @Component
-public class SmsVerificationAccessImpl implements SmsVerificationAccess {
+public class SmsVerificationDaoImpl implements SmsVerificationDao {
 
     @Autowired
     private Dao dao;

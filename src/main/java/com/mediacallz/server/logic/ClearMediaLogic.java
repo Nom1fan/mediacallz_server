@@ -1,7 +1,7 @@
 package com.mediacallz.server.logic;
 
-import com.mediacallz.server.database.UsersDataAccess;
-import com.mediacallz.server.database.dbo.UserDBO;
+import com.mediacallz.server.dao.UsersDao;
+import com.mediacallz.server.db.dbo.UserDBO;
 import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.model.push.ClearMediaData;
 import com.mediacallz.server.model.request.ClearMediaRequest;
@@ -18,22 +18,22 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class ClearMediaLogic extends AbstractServerLogic {
 
-    private final UsersDataAccess usersDataAccess;
+    private final UsersDao usersDao;
 
     private final PushSender pushSender;
 
     private final MapperFacade mapperFacade;
 
     @Autowired
-    public ClearMediaLogic(UsersDataAccess usersDataAccess, PushSender pushSender, MapperFacade mapperFacade) {
-        this.usersDataAccess = usersDataAccess;
+    public ClearMediaLogic(UsersDao usersDao, PushSender pushSender, MapperFacade mapperFacade) {
+        this.usersDao = usersDao;
         this.pushSender = pushSender;
         this.mapperFacade = mapperFacade;
     }
 
     public void execute(ClearMediaRequest request, HttpServletResponse response) {
         String destId = request.getDestinationId();
-        UserDBO userRecord = usersDataAccess.getUserRecord(destId);
+        UserDBO userRecord = usersDao.getUserRecord(destId);
         boolean sentOK = false;
         if(userRecord!=null) {
             String destToken = userRecord.getToken();

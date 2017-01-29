@@ -1,7 +1,7 @@
 package com.mediacallz.server.ui;
 
-import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.database.dbo.UserDBO;
+import com.mediacallz.server.dao.Dao;
+import com.mediacallz.server.db.dbo.UserDBO;
 import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.services.PushSender;
 import org.springframework.beans.factory.annotation.Autowired;

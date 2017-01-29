@@ -1,9 +1,9 @@
-package com.mediacallz.server.database;
+package com.mediacallz.server.dao;
 
 /**
  * Created by Mor on 25/07/2016.
  */
-public interface SmsVerificationAccess {
+public interface SmsVerificationDao {
 
     int NO_SMS_CODE = -1;
 

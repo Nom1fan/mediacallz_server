@@ -1,7 +1,7 @@
 package com.mediacallz.server.logic;
 
-import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.database.UsersDataAccess;
+import com.mediacallz.server.dao.Dao;
+import com.mediacallz.server.dao.UsersDao;
 import com.mediacallz.server.exceptions.DownloadRequestFailedException;
 import com.mediacallz.server.lang.LangStrings;
 import com.mediacallz.server.model.push.PushEventKeys;
@@ -34,7 +34,7 @@ public class DownloadLogic extends AbstractServerLogic {
 
     private final PushSender pushSender;
 
-    private final UsersDataAccess usersDataAccess;
+    private final UsersDao usersDao;
 
     private final MapperFacade mapperFacade;
 
@@ -43,10 +43,10 @@ public class DownloadLogic extends AbstractServerLogic {
     private HttpServletRequest servletRequest;
 
     @Autowired
-    public DownloadLogic(Dao dao, PushSender pushSender, UsersDataAccess usersDataAccess, MapperFacade mapperFacade) {
+    public DownloadLogic(Dao dao, PushSender pushSender, UsersDao usersDao, MapperFacade mapperFacade) {
         this.dao = dao;
         this.pushSender = pushSender;
-        this.usersDataAccess = usersDataAccess;
+        this.usersDao = usersDao;
         this.mapperFacade = mapperFacade;
     }
 
@@ -54,12 +54,12 @@ public class DownloadLogic extends AbstractServerLogic {
         this.response = response;
         this.servletRequest = servletRequest;
 
-        messageInitiaterId = request.getMessageInitiaterId();
+        messageInitiaterId = request.getUser().getUid();
         commId = request.getCommId();
         sourceId = request.getSourceId();
         destId = request.getDestinationId();
         destContactName = request.getDestinationContactName();
-        String sourceLocale = request.getSourceLocale();
+        String sourceLocale = request.getLocale();
         String filePathOnServer = request.getFilePathOnServer();
 
 
@@ -142,7 +142,7 @@ public class DownloadLogic extends AbstractServerLogic {
 
         // Informing sender that file did not reach destination
         logger.severe("Informing sender:" + sourceId + " that file did not reach destination:" + destId);
-        String senderToken = usersDataAccess.getUserRecord(sourceId).getToken();
+        String senderToken = usersDao.getUserRecord(sourceId).getToken();
         boolean sent = pushSender.sendPush(senderToken, PushEventKeys.TRANSFER_FAILURE, title, msgTransferFailed, pendingDownloadData);
 
         if (!sent)

@@ -1,4 +1,4 @@
-package com.mediacallz.server.database.dbo;
+package com.mediacallz.server.db.dbo;
 
 import com.mediacallz.server.enums.UserStatus;
 import lombok.AllArgsConstructor;
@@ -24,7 +24,7 @@ public class UserDBO extends DBOEntity {
     private Date unregistered_date;
     private int unregistered_count;
     private String deviceModel;
-    private String androidVersion;
-    private String iOSVersion;
+    private String os;
+    private String osVersion;
     private String appVersion;
 }

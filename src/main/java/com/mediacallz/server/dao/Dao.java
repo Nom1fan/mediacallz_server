@@ -1,6 +1,6 @@
-package com.mediacallz.server.database;
+package com.mediacallz.server.dao;
 
-import com.mediacallz.server.database.dbo.*;
+import com.mediacallz.server.db.dbo.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -20,8 +20,8 @@ public interface Dao {
     String COL_UNREGISTERED_DATE    =   "unregistered_date";
     String COL_UNREGISTERED_COUNT   =   "unregistered_count";
     String COL_DEVICE_MODEL         =   "device_model";
-    String COL_ANDROID_VERSION      =   "android_version";
-    String COL_IOS_VERSION          =   "ios_version";
+    String COL_OS                   =   "os";
+    String COL_OS_VERSION           =   "os_version";
     String COL_APP_VERSION          =   "app_version";
     //endregion
     //endregion
@@ -76,17 +76,9 @@ public interface Dao {
     //endregion
     //endregion
 
-    void registerUser(String uid, String token) throws SQLException;
-
-    void registerUser(String uid, String token, String deviceModel, String androidVersion, String iOSVersion, String appVersion) throws SQLException;
-
     void unregisterUser(String uid, String token) throws SQLException;
 
-    void reRegisterUser(String uid, String token) throws SQLException;
-
-    void reRegisterUser(String uid, String token, String deviceModel, String androidVersion) throws SQLException;
-
-    void updateUserRecord(String uid, UserDBO userRecord) throws SQLException;
+    void updateUserRecord(UserDBO userRecord) throws SQLException;
 
     int insertMediaTransferRecord(MediaTransferDBO mediaTransferDBO, MediaFileDBO mediaFileDBO) throws SQLException;
 

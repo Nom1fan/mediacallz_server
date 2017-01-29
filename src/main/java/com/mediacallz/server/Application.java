@@ -2,17 +2,20 @@ package com.mediacallz.server;
 
 import com.google.gson.Gson;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mediacallz.server.database.config.DbConfig;
+import com.mediacallz.server.db.config.DbConfig;
 import com.mediacallz.server.logs.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.AbstractJdbcInsert;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
@@ -76,6 +79,11 @@ public class Application {
     @Bean
     public JdbcTemplate jdbcTemplate() {
         return new JdbcTemplate(getDataSource());
+    }
+
+    @Bean
+    public SimpleJdbcInsert jdbcInsert() {
+        return new SimpleJdbcInsert(getDataSource());
     }
 
     @Bean

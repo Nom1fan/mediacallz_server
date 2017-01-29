@@ -1,6 +1,6 @@
 package com.mediacallz.server.model.dto;
 
-import com.mediacallz.server.database.dbo.MediaCallDBO;
+import com.mediacallz.server.db.dbo.MediaCallDBO;
 import com.mediacallz.server.enums.SpecialMediaType;
 import lombok.Data;
 import lombok.ToString;

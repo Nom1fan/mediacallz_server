@@ -1,8 +1,11 @@
 package com.mediacallz.server.logic;
 
-import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.database.SmsVerificationAccess;
+import com.mediacallz.server.dao.SmsVerificationDao;
+import com.mediacallz.server.dao.UsersDao;
+import com.mediacallz.server.db.dbo.UserDBO;
+import com.mediacallz.server.model.dto.UserDTO;
 import com.mediacallz.server.model.request.RegisterRequest;
+import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,30 +19,32 @@ import java.sql.SQLException;
 @Component
 public class RegisterLogic extends AbstractServerLogic {
 
-    private final SmsVerificationAccess smsVerificationAccess;
+    private final SmsVerificationDao smsVerificationDao;
 
-    private final Dao dao;
+    private UsersDao usersDao;
+
+    private MapperFacade mapperFacade;
 
     @Autowired
-    public RegisterLogic(SmsVerificationAccess smsVerificationAccess, Dao dao) {
-        this.smsVerificationAccess = smsVerificationAccess;
-        this.dao = dao;
+    public RegisterLogic(SmsVerificationDao smsVerificationDao, UsersDao usersDao, MapperFacade mapperFacade) {
+        this.smsVerificationDao = smsVerificationDao;
+        this.usersDao = usersDao;
+        this.mapperFacade = mapperFacade;
     }
 
     public void execute(RegisterRequest request, HttpServletResponse response) throws IOException {
-        String messageInitiaterId = request.getMessageInitiaterId();
+        UserDTO user = request.getUser();
+        String messageInitiaterId = user.getUid();
         logger.info("[User]:" + messageInitiaterId + " is attempting to register.");
 
         int smsCode = request.getSmsCode();
-        int expectedSmsCode = smsVerificationAccess.getSmsVerificationCode(messageInitiaterId);
+        int expectedSmsCode = smsVerificationDao.getSmsVerificationCode(messageInitiaterId);
 
-        if (smsCode != SmsVerificationAccess.NO_SMS_CODE && smsCode == expectedSmsCode) {
-            try {
-                registerUser(request);
-            } catch (SQLException e) {
-                handleException(messageInitiaterId, e);
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            }
+        if (smsCode != SmsVerificationDao.NO_SMS_CODE && smsCode == expectedSmsCode) {
+            UserDBO userDBO = user.toInternal(mapperFacade);
+            usersDao.registerUser(userDBO);
+            logger.info("[User]:" + messageInitiaterId + " registered successfully.");
+
         } else {
             registrationRejected(messageInitiaterId, smsCode, expectedSmsCode);
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -55,17 +60,6 @@ public class RegisterLogic extends AbstractServerLogic {
     private void handleException(String messageInitiaterId, Exception e) throws IOException {
         logger.severe("Failed registration for [User]:" + messageInitiaterId +
                 ". [Exception]:" + (e.getMessage() != null ? e.getMessage() : e));
-    }
-
-    private void registerUser(RegisterRequest request) throws SQLException {
-        String messageInitiaterId = request.getMessageInitiaterId();
-        String deviceModel = request.getDeviceModel();
-        String androidVersion = request.getAndroidVersion();
-        String pushToken = request.getPushToken();
-        String iOSVersion = request.getIosVersion();
-        String appVersion = request.getAppVersion();
-        dao.registerUser(messageInitiaterId, pushToken, deviceModel, androidVersion, iOSVersion, appVersion);
-        logger.info("[User]:" + messageInitiaterId + " registered successfully.");
     }
     //endregion
 }

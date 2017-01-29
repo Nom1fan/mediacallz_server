@@ -1,10 +1,11 @@
 package com.mediacallz.server.logic;
 
-import com.mediacallz.server.database.Dao;
+import com.mediacallz.server.dao.Dao;
+import com.mediacallz.server.dao.UsersDao;
+import com.mediacallz.server.db.dbo.UserDBO;
 import com.mediacallz.server.model.dto.UserDTO;
 import com.mediacallz.server.model.request.IsRegisteredRequest;
 import com.mediacallz.server.model.response.Response;
-import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,27 +18,22 @@ import java.sql.SQLException;
 @Component
 public class IsRegisteredLogic extends AbstractServerLogic {
 
-    private final Dao dao;
-
-    private final MapperFacade mapperFacade;
+    private final UsersDao usersDao;
 
     @Autowired
-    public IsRegisteredLogic(Dao dao, MapperFacade mapperFacade) {
-        this.dao = dao;
-        this.mapperFacade = mapperFacade;
+    public IsRegisteredLogic(UsersDao usersDao) {
+        this.usersDao = usersDao;
     }
 
-    public Response<UserDTO> execute(IsRegisteredRequest request, HttpServletResponse response) {
-        String messageInitiaterId = request.getMessageInitiaterId();
+    public Response<UserDTO> execute(IsRegisteredRequest request) {
+        String messageInitiaterId = request.getUser().getUid();
         String destId = request.getDestinationId();
         logger.info(messageInitiaterId + " is checking if " + destId + " is logged in...");
-        try {
-            UserDTO userDTO = new UserDTO();
-            userDTO.fromInternal(dao.getUserRecord(destId), mapperFacade);
-            return new Response<>(userDTO);
-        } catch (SQLException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return null;
-        }
+        UserDTO userDTO = new UserDTO();
+        UserDBO userDBO = usersDao.getUserRecord(destId);
+        userDTO.setUid(userDBO.getUid());
+        userDTO.setUserStatus(userDBO.getUserStatus());
+        return new Response<>(userDTO);
+
     }
 }

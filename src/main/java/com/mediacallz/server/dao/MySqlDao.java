@@ -1,7 +1,8 @@
-package com.mediacallz.server.database;
+package com.mediacallz.server.dao;
 
-import com.mediacallz.server.database.dbo.*;
-import com.mediacallz.server.database.rowmappers.*;
+import com.mediacallz.server.dao.Dao;
+import com.mediacallz.server.db.dbo.*;
+import com.mediacallz.server.db.rowmappers.*;
 import com.mediacallz.server.enums.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -31,78 +32,6 @@ public class MySqlDao implements Dao {
     public MySqlDao(Logger logger, JdbcTemplate jdbcTemplate) {
         this.logger = logger;
         this.jdbcTemplate = jdbcTemplate;
-    }
-
-    @Override
-    public void registerUser(String uid, String token) throws SQLException {
-
-        UserDBO record = getUserRecord(uid);
-
-        // User registering for the first time
-        if (record == null) {
-
-            StringBuilder query = new StringBuilder();
-            uid = quote(uid);
-            token = quote(token);
-            String userStatus = quote(UserStatus.REGISTERED.toString());
-
-            query.
-                    append("INSERT INTO ").
-                    append(TABLE_USERS).
-                    append(" (").
-                    append(COL_UID).append(",").
-                    append(COL_TOKEN).append(",").
-                    append(COL_USER_STATUS).
-                    append(")").
-                    append(" VALUES (").
-                    append(uid).append(",").
-                    append(token).append(",").
-                    append(userStatus).
-                    append(")");
-
-            executeQuery(query.toString());
-        } else {
-            // User re-registering
-            reRegisterUser(uid, token);
-        }
-    }
-
-    @Override
-    public void registerUser(String uid, String token, String deviceModel, String androidVersion, String iOSVersion, String appVersion) throws SQLException {
-
-        StringBuilder query = new StringBuilder();
-        deviceModel = quote(deviceModel);
-        androidVersion = quote(androidVersion);
-
-        registerUser(uid, token);
-        uid = quote(uid);
-        appVersion = quote(appVersion);
-
-        query.
-                append("UPDATE ").
-                append(TABLE_USERS).
-                append(" SET ").
-                append(COL_DEVICE_MODEL).
-                append("=").
-                append(deviceModel).
-                append(", ").
-                append(COL_ANDROID_VERSION).
-                append("=").
-                append(androidVersion).
-                append(", ").
-                append(COL_IOS_VERSION).
-                append("=").
-                append(iOSVersion).
-                append(", ").
-                append(COL_APP_VERSION).
-                append("=").
-                append(appVersion).
-                append(" WHERE ").
-                append(COL_UID).
-                append("=").
-                append(uid);
-
-        executeQuery(query.toString());
     }
 
     @Override
@@ -200,74 +129,22 @@ public class MySqlDao implements Dao {
     }
 
     @Override
-    public void reRegisterUser(String uid, String token) throws SQLException {
-
-        StringBuilder query = new StringBuilder();
-        String userStatus = quote(UserStatus.REGISTERED.toString());
-
-        query.
-                append("UPDATE ").
-                append(TABLE_USERS).
-                append(" SET ").
-                append(COL_TOKEN).
-                append("=").
-                append(quote(token)).append(",").
-                append(COL_USER_STATUS).
-                append("=").
-                append(userStatus).
-                append(" WHERE ").
-                append(COL_UID).
-                append("=").
-                append(quote(uid));
-
-        executeQuery(query.toString());
-    }
-
-    @Override
-    public void reRegisterUser(String uid, String token, String deviceModel, String androidVersion) throws SQLException {
-
-        StringBuilder query = new StringBuilder();
-        reRegisterUser(uid, token);
-
-        deviceModel = quote(deviceModel);
-        androidVersion = quote(androidVersion);
-
-        query.
-                append("UPDATE ").
-                append(TABLE_USERS).
-                append(" SET ").
-                append(COL_DEVICE_MODEL).
-                append("=").
-                append(deviceModel).
-                append(", ").
-                append(COL_ANDROID_VERSION).
-                append("=").
-                append(androidVersion).
-                append(" WHERE ").
-                append(COL_UID).
-                append("=").
-                append(uid);
-
-        executeQuery(query.toString());
-    }
-
-    @Override
-    public void updateUserRecord(String uid, UserDBO userRecord) throws SQLException {
+    public void updateUserRecord(UserDBO userRecord) throws SQLException {
 
         StringBuilder query = new StringBuilder("UPDATE " + TABLE_USERS).append(" SET ");
-        uid = quote(uid);
-        String androidVersion = userRecord.getAndroidVersion() == null ? "NULL" : quote(userRecord.getAndroidVersion());
-        String iOSVersion = userRecord.getIOSVersion() == null ? "NULL" : quote(userRecord.getIOSVersion());
+        String uid = quote(userRecord.getUid());
+        String osVersion = userRecord.getOsVersion() == null ? "NULL" : quote(userRecord.getOsVersion());
+        String os = userRecord.getOs() == null ? "NULL" : quote(userRecord.getOs());
         String appVersion = userRecord.getAppVersion() == null ? "NULL" : quote(userRecord.getAppVersion());
 
         query.
-                append(COL_ANDROID_VERSION).
+                append(COL_OS_VERSION).
                 append("=").
-                append(androidVersion).
+                append(osVersion).
                 append(",").
-                append(COL_IOS_VERSION).
+                append(COL_OS).
                 append("=").
-                append(iOSVersion).
+                append(os).
                 append(",").
                 append(COL_APP_VERSION).
                 append("=").

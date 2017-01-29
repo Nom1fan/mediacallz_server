@@ -1,8 +1,10 @@
 package com.mediacallz.server.logic;
 
-import com.mediacallz.server.database.Dao;
-import com.mediacallz.server.database.dbo.UserDBO;
+import com.mediacallz.server.dao.Dao;
+import com.mediacallz.server.db.dbo.UserDBO;
+import com.mediacallz.server.model.dto.UserDTO;
 import com.mediacallz.server.model.request.UpdateUserRecordRequest;
+import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,29 +18,25 @@ import java.sql.SQLException;
 public class UpdateUserRecordLogic extends AbstractServerLogic {
 
     private final Dao dao;
+    private MapperFacade mapperFacade;
 
     @Autowired
-    public UpdateUserRecordLogic(Dao dao) {
+    public UpdateUserRecordLogic(Dao dao, MapperFacade mapperFacade) {
         this.dao = dao;
+        this.mapperFacade = mapperFacade;
     }
 
     public void execute(UpdateUserRecordRequest request, HttpServletResponse response) {
-        String messageInitiaterId = request.getMessageInitiaterId();
-        logger.info(messageInitiaterId + " is updating its record...");
+        UserDTO user = request.getUser();
+        logger.info(user.getUid() + " is updating its record...");
 
-        String androidVersion = request.getAndroidVersion();
-        String iosVersion = request.getIosVersion();
-        String appVersion = request.getAppVersion();
-        UserDBO userRecord = new UserDBO();
-        userRecord.setAndroidVersion(androidVersion);
-        userRecord.setIOSVersion(iosVersion);
-        userRecord.setAppVersion(appVersion);
+        UserDBO userDBO = user.toInternal(mapperFacade);
 
         try {
-            dao.updateUserRecord(messageInitiaterId, userRecord);
+            dao.updateUserRecord(userDBO);
         } catch (SQLException e) {
             e.printStackTrace();
-            logger.severe("Failed to update record of user: " + messageInitiaterId + ". [Exception]:" + (e.getMessage()!=null ? e.getMessage() : e));
+            logger.severe("Failed to update record of user: " + user.getUid() + ". [Exception]:" + (e.getMessage()!=null ? e.getMessage() : e));
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

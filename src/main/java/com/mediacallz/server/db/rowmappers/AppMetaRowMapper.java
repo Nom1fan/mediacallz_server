@@ -1,7 +1,7 @@
-package com.mediacallz.server.database.rowmappers;
+package com.mediacallz.server.db.rowmappers;
 
-import com.mediacallz.server.database.dbo.AppMetaDBO;
-import com.mediacallz.server.database.Dao;
+import com.mediacallz.server.db.dbo.AppMetaDBO;
+import com.mediacallz.server.dao.Dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

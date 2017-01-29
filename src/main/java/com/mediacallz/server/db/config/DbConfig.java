@@ -1,6 +1,4 @@
-package com.mediacallz.server.database.config;
-
-import org.springframework.beans.factory.annotation.Value;
+package com.mediacallz.server.db.config;
 
 /**
  * Created by Mor on 1/17/2017.

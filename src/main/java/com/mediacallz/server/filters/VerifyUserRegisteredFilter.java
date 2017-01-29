@@ -3,8 +3,8 @@ package com.mediacallz.server.filters;
 import com.google.gson.Gson;
 import com.google.gson.stream.MalformedJsonException;
 import com.mediacallz.server.controllers.PreRegistrationController;
-import com.mediacallz.server.database.UsersDataAccess;
-import com.mediacallz.server.database.dbo.UserDBO;
+import com.mediacallz.server.dao.UsersDao;
+import com.mediacallz.server.db.dbo.UserDBO;
 import com.mediacallz.server.model.request.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,7 +29,7 @@ public class VerifyUserRegisteredFilter implements Filter {
     Logger logger;
 
     @Autowired
-    private UsersDataAccess usersDataAccess;
+    private UsersDao usersDao;
 
     @Autowired
     private Gson gson;
@@ -50,40 +50,44 @@ public class VerifyUserRegisteredFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-         if (servletRequest instanceof HttpServletRequest) {
+        if (servletRequest instanceof HttpServletRequest) {
             String url = ((HttpServletRequest) servletRequest).getRequestURI();
-             try {
+            try {
                 boolean verificationOK = true;
                 ServletRequestWrapper requestWrapper = new ServletRequestWrapper((HttpServletRequest) servletRequest);
                 String jsonPayload = requestWrapper.getJsonPayload();
                 Request request = gson.fromJson(jsonPayload, Request.class);
 
-                if(request == null) {
+                if (request == null) {
                     throw new MalformedJsonException("Request cannot be null");
                 }
+                if(request.getUser() == null) {
+                    throw new MalformedJsonException("User cannot be null");
+                }
 
-                String messageInitiaterId = request.getMessageInitiaterId();
-                String token = request.getPushToken();
+                String messageInitiaterId = request.getUser().getUid();
+                String token = request.getUser().getToken();
 
                 // Verify user credentials
                 if (messageInitiaterId == null || token == null) {
                     verificationOK = false;
-                    sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest)servletRequest, request);
+                    logger.warning("Failed on token fetch. [messageInitiaterId]:" + messageInitiaterId + ", [token]:" + token);
+                    sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest) servletRequest, request);
                 } else if (!isPreRegistrationRequest(url)) { // The request requires the user to already be registered
-                    boolean isRegistered = usersDataAccess.isRegistered(messageInitiaterId);
+                    boolean isRegistered = usersDao.isRegistered(messageInitiaterId);
                     if (!isRegistered) {
                         verificationOK = false;
-                        sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest)servletRequest, request);
+                        sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest) servletRequest, request);
                     }
-                    UserDBO userRecord = usersDataAccess.getUserRecord(messageInitiaterId);
-                    if(userRecord == null) {
+                    UserDBO userRecord = usersDao.getUserRecord(messageInitiaterId);
+                    if (userRecord == null) {
                         verificationOK = false;
-                        sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest)servletRequest, request);
-                    }
-                    else {
+                        sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest) servletRequest, request);
+                    } else {
                         String expectedToken = userRecord.getToken();
                         if (expectedToken == null || !expectedToken.equals(token)) {
                             verificationOK = false;
+                            logger.warning("Failed on token verification. [Expected token]:" + expectedToken + ", [Received token]:" + token);
                             sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest) servletRequest, request);
                         }
                     }
@@ -91,37 +95,37 @@ public class VerifyUserRegisteredFilter implements Filter {
 
                 if (verificationOK)
                     filterChain.doFilter(requestWrapper, servletResponse);
-            } catch(Exception malformedJsonException) {
+            } catch (Exception malformedJsonException) {
                 malformedJsonException.printStackTrace();
-                logger.warning("Failed to process request for url:" + url +". Responding with bad request (400). [Exception]:" + malformedJsonException.getMessage());
-                ((HttpServletResponse)servletResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                logger.warning("Failed to process request for url:" + url + ". Responding with bad request (400). [Exception]:" + malformedJsonException.getMessage());
+                ((HttpServletResponse) servletResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
     }
 
     private void sendForbiddenError(HttpServletResponse servletResponse, String url, HttpServletRequest servletRequest, Request request) throws IOException {
         String userId = getUserId(servletRequest, request);
-        userId = (userId !=null ? userId : "anonymous");
+        userId = (userId != null ? userId : "anonymous");
         logger.warning("User " + userId + " attempted a request in url:" + url + " but is unregistered. Request was blocked.");
         servletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 
     private String getUserId(HttpServletRequest servletRequest, Request request) {
-        String user = null;
-        if(request.getMessageInitiaterId()!=null)
-            user = request.getMessageInitiaterId();
-        else if(servletRequest.getRemoteUser()!=null)
-            user = servletRequest.getRemoteUser();
-        else if(servletRequest.getRemoteAddr()!=null)
-            user = servletRequest.getRemoteAddr();
+        String userId = null;
+        if (request.getUser().getUid() != null)
+            userId = request.getUser().getUid();
+        else if (servletRequest.getRemoteUser() != null)
+            userId = servletRequest.getRemoteUser();
+        else if (servletRequest.getRemoteAddr() != null)
+            userId = servletRequest.getRemoteAddr();
 
-        return user;
+        return userId;
     }
 
     private boolean isPreRegistrationRequest(String url) {
         boolean result = false;
         for (String preRegistrationUrl : preRegistrationUrls) {
-            if(url.contains(preRegistrationUrl)) {
+            if (url.contains(preRegistrationUrl)) {
                 result = true;
                 break;
             }
