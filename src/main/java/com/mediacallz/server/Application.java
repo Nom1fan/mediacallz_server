@@ -82,11 +82,6 @@ public class Application {
     }
 
     @Bean
-    public SimpleJdbcInsert jdbcInsert() {
-        return new SimpleJdbcInsert(getDataSource());
-    }
-
-    @Bean
     public ComboPooledDataSource getDataSource() {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
         String jdbcUrl = "jdbc:mysql://" + dbConfig.getHost() + ":" + dbConfig.getPort() + "/" + dbConfig.getDbName();

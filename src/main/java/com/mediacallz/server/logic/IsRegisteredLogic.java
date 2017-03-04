@@ -3,6 +3,7 @@ package com.mediacallz.server.logic;
 import com.mediacallz.server.dao.Dao;
 import com.mediacallz.server.dao.UsersDao;
 import com.mediacallz.server.db.dbo.UserDBO;
+import com.mediacallz.server.enums.UserStatus;
 import com.mediacallz.server.model.dto.UserDTO;
 import com.mediacallz.server.model.request.IsRegisteredRequest;
 import com.mediacallz.server.model.response.Response;
@@ -31,9 +32,8 @@ public class IsRegisteredLogic extends AbstractServerLogic {
         logger.info(messageInitiaterId + " is checking if " + destId + " is logged in...");
         UserDTO userDTO = new UserDTO();
         UserDBO userDBO = usersDao.getUserRecord(destId);
-        userDTO.setUid(userDBO.getUid());
-        userDTO.setUserStatus(userDBO.getUserStatus());
+        userDTO.setUid(destId);
+        userDTO.setUserStatus(userDBO == null ? UserStatus.UNREGISTERED : userDBO.getUserStatus());
         return new Response<>(userDTO);
-
     }
 }

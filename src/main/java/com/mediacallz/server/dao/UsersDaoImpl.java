@@ -46,31 +46,28 @@ public class UsersDaoImpl implements UsersDao {
 
     private final NamedParameterJdbcOperations jdbcOperations;
 
-    private SimpleJdbcInsert jdbcInsert;
-
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
     public UsersDaoImpl(PushSender pushSender,
                         Dao dao, Logger logger,
                         NamedParameterJdbcOperations jdbcOperations,
-                        SimpleJdbcInsert jdbcInsert,
                         JdbcTemplate jdbcTemplate) {
         this.pushSender = pushSender;
         this.dao = dao;
         this.logger = logger;
         this.jdbcOperations = jdbcOperations;
-        this.jdbcInsert = jdbcInsert;
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public boolean registerUser(UserDBO user) {
         if (getUserRecord(user.getUid()) == null) {
+            SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource());
+            jdbcInsert.withTableName(TABLE_USERS);
             user.setRegistered_date(new Date());
             user.setUserStatus(UserStatus.REGISTERED);
             BeanPropertySqlParameterSource parameters = new BeanPropertySqlParameterSource(user);
-            jdbcInsert.withTableName(TABLE_USERS);
             int numRowsAffected = jdbcInsert.execute(parameters);
             return numRowsAffected != 0;
         }
