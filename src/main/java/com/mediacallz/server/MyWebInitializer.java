@@ -5,8 +5,6 @@ package com.mediacallz.server;
  */
 
 import com.mediacallz.server.filters.ErrorHandleFilter;
-//import com.mediacallz.server.filters.RequestLogFilter;
-import com.mediacallz.server.filters.RequestLogFilter;
 import com.mediacallz.server.filters.VerifyUserRegisteredFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
@@ -23,7 +21,7 @@ public class MyWebInitializer extends
 
     @Override
     protected Filter[] getServletFilters() {
-        return new Filter[]{new ErrorHandleFilter(), new RequestLogFilter(), new VerifyUserRegisteredFilter()};
+        return new Filter[]{new ErrorHandleFilter(), new VerifyUserRegisteredFilter()};
     }
 
     @Override

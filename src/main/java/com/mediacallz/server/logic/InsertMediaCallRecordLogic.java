@@ -7,6 +7,7 @@ import com.mediacallz.server.model.dto.MediaCallDTO;
 import com.mediacallz.server.model.dto.MediaFileDTO;
 import com.mediacallz.server.model.request.InsertMediaCallRecordRequest;
 import com.mediacallz.server.model.response.Response;
+import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import java.util.logging.Level;
  * Created by Mor on 1/15/2017.
  */
 @Component
+@Slf4j
 public class InsertMediaCallRecordLogic extends AbstractServerLogic {
 
     private final Dao dao;
@@ -42,11 +44,11 @@ public class InsertMediaCallRecordLogic extends AbstractServerLogic {
             mediaCallDBO.setDatetime(new Date());
             List<MediaFileDBO> mediaFileDBOS = prepareMediaFiles(mediaCallDTO.getVisualMediaFile(), mediaCallDTO.getAudioMediaFile());
             callId = dao.insertMediaCallRecord(mediaCallDBO, mediaFileDBOS);
-            logger.info("Insert call record was successful. Call Id returned:[" + callId + "]. " + mediaCallDTO);
+            log.info("Insert call record was successful. Call Id returned:[" + callId + "]. " + mediaCallDTO);
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.log(Level.SEVERE, "Insert call record failed. Exception:[" + e.getMessage() + "] " + mediaCallDTO , e);
+            log.error("Insert call record failed. Exception:[" + e.getMessage() + "] " + mediaCallDTO , e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 

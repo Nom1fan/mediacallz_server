@@ -7,6 +7,7 @@ import com.mediacallz.server.enums.SpecialMediaType;
 import com.mediacallz.server.model.push.ClearSuccessData;
 import com.mediacallz.server.model.request.NotifyMediaClearedRequest;
 import com.mediacallz.server.services.PushSender;
+import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import java.sql.SQLException;
  * Created by Mor on 1/15/2017.
  */
 @Component
+@Slf4j
 public class NotifyMediaClearedLogic extends AbstractServerLogic {
 
     private final Dao dao;
@@ -40,7 +42,7 @@ public class NotifyMediaClearedLogic extends AbstractServerLogic {
         SpecialMediaType specialMediaType = request.getSpecialMediaType();
         String sourceLocale = request.getLocale();
 
-        logger.info("Informing [Clear media requester]:" +
+        log.info("Informing [Clear media requester]:" +
                 clearRequesterId + " that [User]:" + clearerId +
                 " cleared his media of [SpecialMediaType]: " + specialMediaType);
 
@@ -55,7 +57,7 @@ public class NotifyMediaClearedLogic extends AbstractServerLogic {
             clearSuccessData.setDestinationId(clearerId);
             boolean sent = pushSender.sendPush(clearRequesterToken, PushEventKeys.CLEAR_SUCCESS, title, msgBody, clearSuccessData);
             if (!sent) {
-                logger.severe("Failed to inform [Clear media requester]:" +
+                log.error("Failed to inform [Clear media requester]:" +
                         clearRequesterId + "that [User]:" + clearerId +
                         " cleared his media of [SpecialMediaType]:" +
                         specialMediaType + ". Push not sent");
@@ -64,7 +66,7 @@ public class NotifyMediaClearedLogic extends AbstractServerLogic {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            logger.severe("Failed to inform [Clear media requester]:" +
+            log.error("Failed to inform [Clear media requester]:" +
                     clearRequesterId + " that [User]:" + clearerId +
                     " cleared his media of [SpecialMediaType]: " +
                     specialMediaType + ". Exception:[" + e.getMessage() + "]");

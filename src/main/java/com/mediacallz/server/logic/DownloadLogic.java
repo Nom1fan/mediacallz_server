@@ -8,6 +8,7 @@ import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.model.push.PendingDownloadData;
 import com.mediacallz.server.model.request.DownloadFileRequest;
 import com.mediacallz.server.services.PushSender;
+import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import java.sql.SQLException;
  * Created by Mor on 1/15/2017.
  */
 @Component
+@Slf4j
 public class DownloadLogic extends AbstractServerLogic {
 
     private LangStrings strings;
@@ -65,7 +67,7 @@ public class DownloadLogic extends AbstractServerLogic {
 
         strings = stringsFactory.getStrings(sourceLocale);
 
-        logger.info(messageInitiaterId + " is requesting download from:" + sourceId + ". File path on server:" + filePathOnServer + "...");
+        log.info(messageInitiaterId + " is requesting download from:" + sourceId + ". File path on server:" + filePathOnServer + "...");
 
         initiateDownloadFlow(request);
     }
@@ -92,7 +94,7 @@ public class DownloadLogic extends AbstractServerLogic {
                 // set to binary type if MIME mapping not found
                 mimeType = "application/octet-stream";
             }
-            logger.info("MIME type: " + mimeType);
+            log.info("MIME type: " + mimeType);
 
             // set content attributes for the response
             response.setContentType(mimeType);
@@ -104,7 +106,7 @@ public class DownloadLogic extends AbstractServerLogic {
                     fileForDownload.getName());
             response.setHeader(headerKey, headerValue);
 
-            logger.info("Initiating data send...");
+            log.info("Initiating data send...");
 
             DataOutputStream dos = new DataOutputStream(os);
             FileInputStream fis = new FileInputStream(fileForDownload);
@@ -133,7 +135,7 @@ public class DownloadLogic extends AbstractServerLogic {
 
     private void handleDownloadFailure(Exception e, PendingDownloadData pendingDownloadData) {
 
-        logger.severe("User " + messageInitiaterId + " download request failed. Exception:" + e.getMessage());
+        log.error("User " + messageInitiaterId + " download request failed. Exception:" + e.getMessage());
 
         String title = strings.media_undelivered_title();
 
@@ -141,12 +143,13 @@ public class DownloadLogic extends AbstractServerLogic {
         String msgTransferFailed = String.format(strings.media_undelivered_body(), dest);
 
         // Informing sender that file did not reach destination
-        logger.severe("Informing sender:" + sourceId + " that file did not reach destination:" + destId);
+        log.error("Informing sender:" + sourceId + " that file did not reach destination:" + destId);
         String senderToken = usersDao.getUserRecord(sourceId).getToken();
         boolean sent = pushSender.sendPush(senderToken, PushEventKeys.TRANSFER_FAILURE, title, msgTransferFailed, pendingDownloadData);
 
-        if (!sent)
-            logger.severe("Failed trying to Inform sender:" + sourceId + " that file did not reach destination:" + destId + ". Empty token");
+        if (!sent) {
+            log.error("Failed trying to Inform sender:" + sourceId + " that file did not reach destination:" + destId + ". Empty token");
+        }
 
         // Marking in communication history record that the transfer has failed
         char FALSE = '0';

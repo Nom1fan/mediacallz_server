@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mediacallz.server.db.config.DbConfig;
 import com.mediacallz.server.logs.LogFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -29,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @SpringBootApplication
+@Slf4j
 public class Application {
 
     @Value("${server.port}")
@@ -43,22 +45,11 @@ public class Application {
 
     @PostConstruct
     public void init() {
-        logger().info("Server running on port:" + serverPort + "...");
+        log.info("Server running on port:" + serverPort + "...");
     }
 
-    private static Map<String,Level> logLevelsMap = new HashMap<String,Level>() {{
-        put("DEBUG", Level.CONFIG);
-        put("CONFIG", Level.CONFIG);
-        put("INFO", Level.INFO);
-    }};
-    private static Logger logger;
-    private static Level logLevel = Level.INFO;
-
     public static void main(String[] args) {
-        if(args.length > 0)
-            setLogLevel(args[0]);
         SpringApplication.run(Application.class, args);
-        logger.info("Log level:" + logger.getLevel());
     }
 
     @Bean
@@ -97,28 +88,12 @@ public class Application {
     }
 
     @Bean
-    public Logger logger() {
-        try {
-            LogFactory.createServerLogsDir();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        logger = LogFactory.get_serverLogger(logLevel);
-        return logger;
-    }
-
-    @Bean
     public Filter logFilter() {
         CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
+        filter.setIncludeClientInfo(true);
         filter.setIncludeQueryString(true);
         filter.setIncludePayload(true);
         filter.setMaxPayloadLength(5120);
         return filter;
-    }
-
-    private static void setLogLevel(String logLevel) {
-        if(logLevel !=null)
-            Application.logLevel = logLevelsMap.get(logLevel.toUpperCase());
     }
 }

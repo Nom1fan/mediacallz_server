@@ -13,6 +13,7 @@ import com.mediacallz.server.model.push.PendingDownloadData;
 import com.mediacallz.server.model.request.UploadFileRequest;
 import com.mediacallz.server.services.PushSender;
 import com.mediacallz.server.utils.MediaFilesUtils;
+import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,7 @@ import java.util.Map;
  * Created by Mor on 1/16/2017.
  */
 @Component
+@Slf4j
 public class UploadLogic extends AbstractServerLogic {
 
     private final UsersDao usersDao;
@@ -96,7 +98,7 @@ public class UploadLogic extends AbstractServerLogic {
             bos = new BufferedOutputStream(fos);
             DataInputStream dis = new DataInputStream(fileForUpload.getInputStream());
 
-            logger.info("Reading data...");
+            log.info("Reading data...");
             byte[] buf = new byte[1024 * 8];
             int bytesRead;
             while (bytesLeft > 0 && (bytesRead = dis.read(buf, 0, (int) Math.min(buf.length, bytesLeft))) != -1) {
@@ -134,7 +136,7 @@ public class UploadLogic extends AbstractServerLogic {
         mediaTransferDBO.setDatetime(new Date());
         MediaFileDBO mediaFileDBO = request.getMediaFile().toInternal(mapperFacade);
         Integer commId = dao.insertMediaTransferRecord(mediaTransferDBO, mediaFileDBO);
-        logger.info("commId returned:" + commId);
+        log.info("commId returned:" + commId);
         return commId;
     }
 
@@ -144,7 +146,7 @@ public class UploadLogic extends AbstractServerLogic {
                 " [Special Media Type]:" + request.getSpecialMediaType() +
                 " [File size]:" +
                 MediaFilesUtils.getFileSizeFormat(request.getMediaFile().getSize());
-        logger.info(infoMsg);
+        log.info(infoMsg);
     }
 
     private void sendMediaUndeliveredMsgToUploader(UploadFileRequest request) {
@@ -152,7 +154,7 @@ public class UploadLogic extends AbstractServerLogic {
         String messageInitiaterId = request.getUser().getUid();
         String destId = request.getDestinationId();
         String destContact = request.getDestinationContactName();
-        logger.severe("Upload from [Source]:" + messageInitiaterId + " to [Destination]:" + destId + " Failed.");
+        log.error("Upload from [Source]:" + messageInitiaterId + " to [Destination]:" + destId + " Failed.");
 
         LangStrings strings = stringsFactory.getStrings(request.getLocale());
         String title = strings.media_undelivered_title();

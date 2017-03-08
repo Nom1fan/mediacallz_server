@@ -7,6 +7,7 @@ import com.mediacallz.server.model.push.PendingDownloadData;
 import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.model.request.NotifyMediaReadyRequest;
 import com.mediacallz.server.services.PushSender;
+import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import java.sql.SQLException;
  * Created by Mor on 1/15/2017.
  */
 @Component
+@Slf4j
 public class NotifyMediaReadyLogic extends AbstractServerLogic {
 
     private final Dao dao;
@@ -47,7 +49,7 @@ public class NotifyMediaReadyLogic extends AbstractServerLogic {
             dao.updateMediaTransferRecord(pendingDownloadData.getCommId(), Dao.COL_TRANSFER_SUCCESS, TRUE);
         } catch (SQLException e) {
             e.printStackTrace();
-            logger.config("Failed to write transfer success from [Source]:" +
+            log.debug("Failed to write transfer success from [Source]:" +
                     pendingDownloadData.getSourceId() + " to [Dest]:" +
                     pendingDownloadData.getDestinationId() + " for [commId]:" +
                     pendingDownloadData.getCommId());
@@ -64,8 +66,9 @@ public class NotifyMediaReadyLogic extends AbstractServerLogic {
         String msg = String.format(strings.media_ready_body(), !destContactName.equals("") ? destContactName : destId);
         String token = usersDao.getUserRecord(sourceId).getToken();
         boolean sent = pushSender.sendPush(token, PushEventKeys.TRANSFER_SUCCESS, title, msg, pendingDownloadData);
-        if (!sent)
-            logger.warning("Failed to inform user " + sourceId + " of transfer success to user: " + destId);
+        if (!sent) {
+            log.debug("Failed to inform user " + sourceId + " of transfer success to user: " + destId);
+        }
     }
 
 
