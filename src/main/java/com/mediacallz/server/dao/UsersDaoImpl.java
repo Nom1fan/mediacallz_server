@@ -4,28 +4,25 @@ import com.mediacallz.server.db.dbo.MediaTransferDBO;
 import com.mediacallz.server.db.dbo.UserDBO;
 import com.mediacallz.server.db.rowmappers.UserDboRowMapper;
 import com.mediacallz.server.db.rowmappers.UserDboUserStatusRowMapper;
-import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.enums.SpecialMediaType;
 import com.mediacallz.server.enums.UserStatus;
 import com.mediacallz.server.model.push.ClearMediaData;
+import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.services.PushSender;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
-import org.springframework.jdbc.core.simple.AbstractJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.mediacallz.server.dao.Dao.*;
 
@@ -36,26 +33,24 @@ import static com.mediacallz.server.dao.Dao.*;
  * @author Mor
  */
 @Component
+@Slf4j
 public class UsersDaoImpl implements UsersDao {
 
     private final PushSender pushSender;
 
     private final Dao dao;
-
-    private final Logger logger;
-
+    
     private final NamedParameterJdbcOperations jdbcOperations;
 
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
     public UsersDaoImpl(PushSender pushSender,
-                        Dao dao, Logger logger,
+                        Dao dao,
                         NamedParameterJdbcOperations jdbcOperations,
                         JdbcTemplate jdbcTemplate) {
         this.pushSender = pushSender;
         this.dao = dao;
-        this.logger = logger;
         this.jdbcOperations = jdbcOperations;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -134,17 +129,17 @@ public class UsersDaoImpl implements UsersDao {
                     clearMediaData.setSourceId(userId);
                     boolean sent = pushSender.sendPush(destToken, pushEventAction, clearMediaData);
                     if (!sent)
-                        logger.warning("Failed to send push to clear media. [User]:" + destination + " [SpecialMediaType]:" + specialMediaType);
+                        log.warn("Failed to send push to clear media. [User]:" + destination + " [SpecialMediaType]:" + specialMediaType);
                 }
             }
 
             dao.unregisterUser(userId, token);
 
-            logger.info("Unregistered [User]:" + userId + ". [Token]:" + token + " successfully");
+            log.info("Unregistered [User]:" + userId + ". [Token]:" + token + " successfully");
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            logger.severe("Unregistered failure. " + " [User]:" + userId +
+            log.error("Unregistered failure. " + " [User]:" + userId +
                     "[Exception]:" + (e.getMessage() != null ? e.getMessage() : e));
             return false;
         }
@@ -158,22 +153,22 @@ public class UsersDaoImpl implements UsersDao {
             record = dao.getUserRecord(userId);
 
             if (record == null) {
-                logger.info("User not found. [User]:" + userId + " is " + UserStatus.UNREGISTERED.toString());
+                log.info("User not found. [User]:" + userId + " is " + UserStatus.UNREGISTERED.toString());
                 return false;
             }
 
             if (record.getUserStatus().equals(UserStatus.REGISTERED)) {
-                logger.info("[User]:" + userId + " is " + UserStatus.REGISTERED.toString());
+                log.info("[User]:" + userId + " is " + UserStatus.REGISTERED.toString());
                 return true;
             }
 
         } catch (Exception e) {
-            logger.severe("isRegistered failure. " + " [User]:" + userId +
+            log.error("isRegistered failure. " + " [User]:" + userId +
                     "[Exception]:" + (e.getMessage() != null ? e.getMessage() : e));
             return false;
         }
 
-        logger.info("[User]:" + userId + " is " + record.getUserStatus());
+        log.info("[User]:" + userId + " is " + record.getUserStatus());
         return false;
     }
 
@@ -182,7 +177,7 @@ public class UsersDaoImpl implements UsersDao {
         UserDBO result = null;
         try {
             String query = "SELECT * FROM " + TABLE_USERS + " WHERE " + COL_UID + "=" + quote(uid);
-            logger.config("Executing SQL query:[" + query + "]");
+            log.debug("Executing SQL query:[" + query + "]");
             result = jdbcTemplate.queryForObject(query, new UserDboRowMapper());
         } catch (EmptyResultDataAccessException ignored) {
         }

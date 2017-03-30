@@ -1,5 +1,6 @@
 package com.mediacallz.server.filters;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +13,8 @@ import java.util.logging.Logger;
  * Created by Mor on 23/08/2016.
  */
 @Component
+@Slf4j
 public class ErrorHandleFilter implements Filter {
-
-    @Autowired
-    private Logger logger;
 
     @Override
     public void destroy() {
@@ -36,7 +35,7 @@ public class ErrorHandleFilter implements Filter {
             chain.doFilter(request, response);
         } catch (Exception ex) {
             ex.printStackTrace();
-            logger.log(Level.SEVERE, "Failed while handling request", ex);
+            log.error("Failed while handling request", ex);
         }
 
     }

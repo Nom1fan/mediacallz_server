@@ -4,6 +4,7 @@ import com.mediacallz.server.dao.Dao;
 import com.mediacallz.server.db.dbo.*;
 import com.mediacallz.server.db.rowmappers.*;
 import com.mediacallz.server.enums.UserStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,15 +23,13 @@ import java.util.logging.Logger;
  * Created by Mor on 19/12/2015.
  */
 @Repository
+@Slf4j
 public class MySqlDao implements Dao {
-
-    private final Logger logger;
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public MySqlDao(Logger logger, JdbcTemplate jdbcTemplate) {
-        this.logger = logger;
+    public MySqlDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -72,7 +71,7 @@ public class MySqlDao implements Dao {
         UserDBO result = null;
         try {
             String query = "SELECT * FROM " + TABLE_USERS + " WHERE " + COL_UID + "=" + quote(uid);
-            logger.config("Executing SQL query:[" + query + "]");
+            log.debug("Executing SQL query:[" + query + "]");
             result = jdbcTemplate.queryForObject(query, new UserDboRowMapper());
         } catch (EmptyResultDataAccessException ignored) {
         }
@@ -307,7 +306,7 @@ public class MySqlDao implements Dao {
     //endregion
 
     private void executeQuery(String query) throws SQLException {
-        logger.config("Executing SQL query:[" + query + "]");
+        log.debug("Executing SQL query:[" + query + "]");
         jdbcTemplate.execute(query);
     }
 

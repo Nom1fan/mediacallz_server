@@ -1,6 +1,7 @@
 package com.mediacallz.server.services;
 
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -15,13 +16,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Observable;
-import java.util.logging.Logger;
 
 
 /**
  * Created by Mor on 15/09/2015.
  */
 @Service
+@Slf4j
 public class BatchPushSender extends Observable implements PushSender {
 
     @Value("${push.url}")
@@ -29,8 +30,6 @@ public class BatchPushSender extends Observable implements PushSender {
 
     @Value("${push.rest.api.key}")
     private String restApiKey;
-
-    private final Logger logger;
 
     private final Gson gson;
 
@@ -42,8 +41,7 @@ public class BatchPushSender extends Observable implements PushSender {
     }
 
     @Autowired
-    public BatchPushSender(Logger logger, Gson gson) {
-        this.logger = logger;
+    public BatchPushSender(Gson gson) {
         this.gson = gson;
     }
 
@@ -58,7 +56,7 @@ public class BatchPushSender extends Observable implements PushSender {
         setChanged();
 
         if (deviceToken == null || deviceToken.equals("")) {
-            logger.severe("Invalid device token. Aborting push send");
+            log.error("Invalid device token. Aborting push send");
             notifyObservers(false);
             return false;
         }
@@ -69,7 +67,7 @@ public class BatchPushSender extends Observable implements PushSender {
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.severe("Failed to send push to [Token]:" + deviceToken + ". [Exception]:" + (e.getMessage()!=null? e.getMessage() : e));
+            log.error("Failed to send push to [Token]:" + deviceToken + ". [Exception]:" + (e.getMessage()!=null? e.getMessage() : e));
             notifyObservers(false);
             return false;
         }
@@ -87,7 +85,7 @@ public class BatchPushSender extends Observable implements PushSender {
         setChanged();
 
         if (deviceToken == null || deviceToken.equals("")) {
-            logger.severe("Invalid device token. Aborting push send");
+            log.error("Invalid device token. Aborting push send");
             notifyObservers(false);
             return false;
         }
@@ -98,7 +96,7 @@ public class BatchPushSender extends Observable implements PushSender {
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.severe("Failed to send push to token:" + deviceToken + ". Exception:" + e.getMessage());
+            log.error("Failed to send push to token:" + deviceToken + ". Exception:" + e.getMessage());
             notifyObservers(false);
             return false;
         }
@@ -117,7 +115,7 @@ public class BatchPushSender extends Observable implements PushSender {
         setChanged();
 
         if (deviceToken == null || deviceToken.equals("")) {
-            logger.severe("Invalid device token. Aborting push send");
+            log.error("Invalid device token. Aborting push send");
             notifyObservers(false);
             return false;
         }
@@ -128,7 +126,7 @@ public class BatchPushSender extends Observable implements PushSender {
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.severe("Failed to send push to token:" + deviceToken + ". Exception:" + e.getMessage());
+            log.error("Failed to send push to token:" + deviceToken + ". Exception:" + e.getMessage());
             notifyObservers(false);
             return false;
         }
@@ -139,7 +137,7 @@ public class BatchPushSender extends Observable implements PushSender {
 
 
     private void pushData(String postData) throws Exception {
-        logger.info("Sending push data:" + postData);
+        log.info("Sending push data:" + postData);
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response;
         HttpEntity entity;
@@ -160,7 +158,7 @@ public class BatchPushSender extends Observable implements PushSender {
                 String reason = response.getStatusLine().getReasonPhrase();
                 throw new Exception("Push POST failed. Status code:" + statusCode + ". Reason:" + reason);
             }
-            logger.info("Push response:" + responseString);
+            log.info("Push response:" + responseString);
 
         } finally {
             response.close();

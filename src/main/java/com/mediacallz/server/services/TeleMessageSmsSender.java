@@ -1,18 +1,15 @@
 package com.mediacallz.server.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.List;
 import java.util.Observable;
-import java.util.Observer;
-import java.util.logging.Logger;
 
 /**
  * Created by Mor on 28/03/2016.
@@ -23,6 +20,7 @@ import java.util.logging.Logger;
  * Created by Mor on 28/03/2016.
  */
 @Service
+@Slf4j
 public class TeleMessageSmsSender extends Observable implements SmsSender, Runnable {
 
     @Value(value = "${sms.username}")
@@ -34,16 +32,9 @@ public class TeleMessageSmsSender extends Observable implements SmsSender, Runna
     @Value(value = "${sms.url}")
     private String smsUrl;
 
-    private final Logger logger;
-
     private String dest;
 
     private String msg;
-
-    @Autowired
-    public TeleMessageSmsSender(Logger logger) {
-        this.logger = logger;
-    }
 
     @Override
     public void sendSms(final String dest, final String msg) {
@@ -60,7 +51,7 @@ public class TeleMessageSmsSender extends Observable implements SmsSender, Runna
             sendSmsGET(smsUrl, smsUser, smsPassword, dest, msg);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.severe("Failed to send SMS to [User]:" + dest + ". [Message]:" + msg + ". [Exception]:" + (e.getMessage() != null ? e.getMessage() : e));
+            log.error("Failed to send SMS to [User]:" + dest + ". [Message]:" + msg + ". [Exception]:" + (e.getMessage() != null ? e.getMessage() : e));
             success = false;
         }
         setChanged();
@@ -74,12 +65,12 @@ public class TeleMessageSmsSender extends Observable implements SmsSender, Runna
         builder.addParameter("password", password);
         builder.addParameter("to", to);
         builder.addParameter("text", text);
-        logger.info("Sending SMS to [User]:" + to);
+        log.info("Sending SMS to [User]:" + to);
         HttpResponse response = HttpClients.createDefault().execute(builder.build());
 
         if (response != null && response.getStatusLine().getStatusCode() == 200) {
             //response.getEntity().writeTo(System.out);
-            logger.info("SMS GET Response: 200 OK");
+            log.info("SMS GET Response: 200 OK");
         } else if (response != null) {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
@@ -88,12 +79,12 @@ public class TeleMessageSmsSender extends Observable implements SmsSender, Runna
                 sb.append(line).append("\n");
             }
 
-            logger.severe("SMS GET failed. [Response String]:" + sb.toString());
+            log.error("SMS GET failed. [Response String]:" + sb.toString());
             throw new Exception("SMS GET failed. [Status]:" + response.getStatusLine().getStatusCode() + ". [Message Id]:" + sb.toString());
 
         } else {
 
-            logger.severe("SMS GET failed. Response  is NULL");
+            log.error("SMS GET failed. Response  is NULL");
             throw new Exception("SMS GET failed. Response  is NULL");
 
         }

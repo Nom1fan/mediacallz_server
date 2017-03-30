@@ -6,6 +6,7 @@ import com.mediacallz.server.controllers.PreRegistrationController;
 import com.mediacallz.server.dao.UsersDao;
 import com.mediacallz.server.db.dbo.UserDBO;
 import com.mediacallz.server.model.request.Request;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,12 +22,10 @@ import java.util.logging.Logger;
  * Created by Mor on 24/08/2016.
  */
 @Component
+@Slf4j
 public class VerifyUserRegisteredFilter implements Filter {
 
     private List<String> preRegistrationUrls;
-
-    @Autowired
-    Logger logger;
 
     @Autowired
     private UsersDao usersDao;
@@ -71,7 +70,7 @@ public class VerifyUserRegisteredFilter implements Filter {
                 // Verify user credentials
                 if (messageInitiaterId == null || token == null) {
                     verificationOK = false;
-                    logger.warning("Failed on token fetch. [messageInitiaterId]:" + messageInitiaterId + ", [token]:" + token);
+                    log.warn("Failed on token fetch. [messageInitiaterId]:" + messageInitiaterId + ", [token]:" + token);
                     sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest) servletRequest, request);
                 } else if (!isPreRegistrationRequest(url)) { // The request requires the user to already be registered
                     boolean isRegistered = usersDao.isRegistered(messageInitiaterId);
@@ -87,7 +86,7 @@ public class VerifyUserRegisteredFilter implements Filter {
                         String expectedToken = userRecord.getToken();
                         if (expectedToken == null || !expectedToken.equals(token)) {
                             verificationOK = false;
-                            logger.warning("Failed on token verification. [Expected token]:" + expectedToken + ", [Received token]:" + token);
+                            log.warn("Failed on token verification. [Expected token]:" + expectedToken + ", [Received token]:" + token);
                             sendForbiddenError((HttpServletResponse) servletResponse, url, (HttpServletRequest) servletRequest, request);
                         }
                     }
@@ -97,7 +96,7 @@ public class VerifyUserRegisteredFilter implements Filter {
                     filterChain.doFilter(requestWrapper, servletResponse);
             } catch (Exception malformedJsonException) {
                 malformedJsonException.printStackTrace();
-                logger.warning("Failed to process request for url:" + url + ". Responding with bad request (400). [Exception]:" + malformedJsonException.getMessage());
+                log.warn("Failed to process request for url:" + url + ". Responding with bad request (400). [Exception]:" + malformedJsonException.getMessage());
                 ((HttpServletResponse) servletResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
@@ -106,7 +105,7 @@ public class VerifyUserRegisteredFilter implements Filter {
     private void sendForbiddenError(HttpServletResponse servletResponse, String url, HttpServletRequest servletRequest, Request request) throws IOException {
         String userId = getUserId(servletRequest, request);
         userId = (userId != null ? userId : "anonymous");
-        logger.warning("User " + userId + " attempted a request in url:" + url + " but is unregistered. Request was blocked.");
+        log.warn("User " + userId + " attempted a request in url:" + url + " but is unregistered. Request was blocked.");
         servletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 

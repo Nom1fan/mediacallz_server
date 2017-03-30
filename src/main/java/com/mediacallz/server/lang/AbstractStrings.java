@@ -1,5 +1,6 @@
 package com.mediacallz.server.lang;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +15,8 @@ import java.util.logging.Logger;
  * Created by Mor on 7/28/2016.
  */
 @Component
+@Slf4j
 public abstract class AbstractStrings implements LangStrings {
-
-    @Autowired
-    protected Logger logger;
 
     private String oops;
     private String upload_failed;
@@ -47,7 +46,7 @@ public abstract class AbstractStrings implements LangStrings {
 
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
-            logger.log(Level.SEVERE, "Failed to load strings from properties file for language:" + getLanguage(), e);
+            log.error("Failed to load strings from properties file for language:" + getLanguage(), e);
         }
     }
 
