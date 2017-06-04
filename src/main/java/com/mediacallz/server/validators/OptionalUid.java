@@ -13,11 +13,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE, })
 @Retention(RUNTIME)
-@Constraint(validatedBy = UIDsListValidator.class)
+@Constraint(validatedBy = OptionalUIDValidator.class)
 @Documented
-public @interface UidsList {
-
-    String message() default "User ID's list is invalid";
+public @interface OptionalUid {
+    String message() default "User ID must be exactly 10 digits";
 
     Class<?>[] groups() default {};
 

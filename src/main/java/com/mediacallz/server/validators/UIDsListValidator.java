@@ -38,6 +38,10 @@ public class UIDsListValidator implements ConstraintValidator<UidsList, List<Str
     public boolean isValid(List<String> uidList, ConstraintValidatorContext context) {
         UIDValidationHandler handler = locale2HandlerMap.get(serverLocale);
 
+        if(uidList == null || uidList.isEmpty()) {
+            return false;
+        }
+
         for (String uid : uidList) {
             boolean isValid = handler.isValid(uid);
 

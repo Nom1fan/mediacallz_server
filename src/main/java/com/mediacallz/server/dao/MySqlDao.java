@@ -3,6 +3,7 @@ package com.mediacallz.server.dao;
 import com.mediacallz.server.dao.Dao;
 import com.mediacallz.server.db.dbo.*;
 import com.mediacallz.server.db.rowmappers.*;
+import com.mediacallz.server.enums.SpecialMediaType;
 import com.mediacallz.server.enums.UserStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,6 +197,39 @@ public class MySqlDao implements Dao {
     }
 
     @Override
+    public MediaTransferDBO getLastMediaTransferRecord(String sourceUid, SpecialMediaType specialMediaType) {
+        return getLastMediaTransferRecord(sourceUid, null, specialMediaType);
+    }
+
+    @Override
+    public MediaTransferDBO getLastMediaTransferRecord(String sourceUid, String destUid, SpecialMediaType specialMediaType) {
+        MediaTransferDBO result = null;
+        try {
+            StringBuilder queryBuilder = new StringBuilder(
+                    "SELECT * " + " FROM " + TABLE_MEDIA_TRANSFERS
+                            + " WHERE " + COL_UID_SRC + "=?"
+                            + " AND " + COL_TYPE + "=?"
+                            + " ORDER BY " + COL_DATETIME + " DESC LIMIT 1");
+            if (destUid != null) {
+                queryBuilder.append(" AND " + COL_UID_DEST + "=?");
+                String query = queryBuilder.toString();
+                result = jdbcTemplate.queryForObject(query, new MediaTransferRowMapper(), sourceUid, specialMediaType, destUid);
+            }
+            else {
+                String query = queryBuilder.toString();
+                result = jdbcTemplate.queryForObject(query, new MediaTransferRowMapper(), sourceUid, specialMediaType);
+            }
+        } catch(EmptyResultDataAccessException ignored) {}
+        return  result;
+    }
+
+    @Override
+    public List<MediaTransferDBO> getAllUserMediaTransferRecords(String uid) throws SQLException {
+        String query = "SELECT *" + " FROM " + TABLE_MEDIA_TRANSFERS + " WHERE " + COL_UID_SRC + "=?";
+        return jdbcTemplate.query(query, new MediaTransferRowMapper(), uid);
+    }
+
+    @Override
     public int insertMediaCallRecord(MediaCallDBO mediaCallDBO, List<MediaFileDBO> mediaFileDBOS) throws SQLException {
 
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource()).
@@ -269,12 +303,6 @@ public class MySqlDao implements Dao {
         } catch (EmptyResultDataAccessException ignored) {
         }
         return smsCode;
-    }
-
-    @Override
-    public List<MediaTransferDBO> getAllUserMediaTransferRecords(String uid) throws SQLException {
-        String query = "SELECT *" + " FROM " + TABLE_MEDIA_TRANSFERS + " WHERE " + COL_UID_SRC + "=?";
-        return jdbcTemplate.query(query, new MediaTransferRowMapper(), uid);
     }
 
     @Override

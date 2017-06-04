@@ -1,4 +1,4 @@
-package com.mediacallz.server.logic;
+package com.mediacallz.server.controllers.logic;
 
 import com.mediacallz.server.dao.Dao;
 import com.mediacallz.server.dao.UsersDao;

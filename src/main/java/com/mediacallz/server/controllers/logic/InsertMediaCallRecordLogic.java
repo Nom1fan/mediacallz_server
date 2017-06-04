@@ -1,4 +1,4 @@
-package com.mediacallz.server.logic;
+package com.mediacallz.server.controllers.logic;
 
 import com.mediacallz.server.dao.Dao;
 import com.mediacallz.server.db.dbo.MediaCallDBO;
@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * Created by Mor on 1/15/2017.

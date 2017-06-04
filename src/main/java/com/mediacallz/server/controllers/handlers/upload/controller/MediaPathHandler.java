@@ -7,7 +7,8 @@ import com.mediacallz.server.model.request.UploadFileRequest;
 /**
  * Created by Mor on 25/07/2016.
  */
-public interface SpMediaPathHandler {
-    StringBuilder appendPathForMedia(UploadFileRequest request, StringBuilder filePathBuilder);
+public interface MediaPathHandler {
+    String appendPathForMedia(UploadFileRequest request);
+
     SpecialMediaType getHandledSpMediaType();
 }

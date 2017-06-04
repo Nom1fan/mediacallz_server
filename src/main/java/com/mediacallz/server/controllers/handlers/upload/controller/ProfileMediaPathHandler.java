@@ -1,6 +1,5 @@
 package com.mediacallz.server.controllers.handlers.upload.controller;
 
-import com.mediacallz.server.lang.ServerConstants;
 import com.mediacallz.server.enums.SpecialMediaType;
 import com.mediacallz.server.model.request.UploadFileRequest;
 import org.springframework.stereotype.Component;
@@ -10,21 +9,26 @@ import org.springframework.stereotype.Component;
  * Created by Mor on 25/07/2016.
  */
 @Component
-public class ProfileMediaPathHandler implements SpMediaPathHandler {
+public class ProfileMediaPathHandler extends BaseMediaPathHandler {
+
+    private static SpecialMediaType specialMediaType = SpecialMediaType.PROFILE_MEDIA;
+
+    public ProfileMediaPathHandler() {
+        super(specialMediaType);
+    }
 
     @Override
-    public StringBuilder appendPathForMedia(UploadFileRequest request, StringBuilder filePathBuilder) {
+    public String appendPathForMedia(UploadFileRequest request) {
         String destId = request.getDestinationId();
         String extension = request.getMediaFile().getExtension();
-        String srcWithExtension = destId + "." + extension;
+        String srcWithExtension = request.getUser().getUid() + "." + extension;
 
-        filePathBuilder.append(ServerConstants.UPLOAD_FOLDER).append(destId).append("/").
-                append(ServerConstants.PROFILE_MEDIA_RECEIVED_FOLDER).append(srcWithExtension);
-        return filePathBuilder;
+        // Caller Media is saved in the destination's caller media folder,
+        return getFolder() + destId + "/" + srcWithExtension;
     }
 
     @Override
     public SpecialMediaType getHandledSpMediaType() {
-        return SpecialMediaType.PROFILE_MEDIA;
+        return specialMediaType;
     }
 }

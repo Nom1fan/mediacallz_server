@@ -1,8 +1,6 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.logic.NotifyMediaClearedLogic;
-import com.mediacallz.server.logic.NotifyMediaReadyLogic;
-import com.mediacallz.server.model.request.NotifyMediaClearedRequest;
+import com.mediacallz.server.controllers.logic.NotifyMediaReadyLogic;
 import com.mediacallz.server.model.request.NotifyMediaReadyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -1,6 +1,6 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.logic.UpdateUserRecordLogic;
+import com.mediacallz.server.controllers.logic.UpdateUserRecordLogic;
 import com.mediacallz.server.model.request.UpdateUserRecordRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

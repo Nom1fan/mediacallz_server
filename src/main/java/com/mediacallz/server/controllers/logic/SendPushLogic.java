@@ -1,13 +1,9 @@
-package com.mediacallz.server.logic;
+package com.mediacallz.server.controllers.logic;
 
 import com.mediacallz.server.dao.UsersDao;
 import com.mediacallz.server.db.dbo.UserDBO;
-import com.mediacallz.server.enums.UserStatus;
-import com.mediacallz.server.model.dto.UserDTO;
 import com.mediacallz.server.model.push.PushEventKeys;
-import com.mediacallz.server.model.request.IsRegisteredRequest;
 import com.mediacallz.server.model.request.SendPushRequest;
-import com.mediacallz.server.model.response.Response;
 import com.mediacallz.server.services.PushSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

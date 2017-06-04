@@ -1,6 +1,6 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.logic.DownloadLogic;
+import com.mediacallz.server.controllers.logic.DownloadLogic;
 import com.mediacallz.server.model.request.DownloadFileRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

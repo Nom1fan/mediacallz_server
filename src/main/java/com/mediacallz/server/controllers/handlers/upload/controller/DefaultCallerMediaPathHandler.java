@@ -9,17 +9,17 @@ import org.springframework.stereotype.Component;
  * Created by Mor on 25/07/2016.
  */
 @Component
-public class DefaultProfileMediaPathHandler extends BaseMediaPathHandler {
+public class DefaultCallerMediaPathHandler extends BaseMediaPathHandler {
 
-    private static SpecialMediaType specialMediaType = SpecialMediaType.DEFAULT_PROFILE_MEDIA;
+    private static SpecialMediaType specialMediaType = SpecialMediaType.DEFAULT_CALLER_MEDIA;
 
-    public DefaultProfileMediaPathHandler() {
+    public DefaultCallerMediaPathHandler() {
         super(specialMediaType);
     }
 
     @Override
     public String appendPathForMedia(UploadFileRequest request) {
-        return getFolder() + request.getUser().getUid() + "/" + ServerConstants.DEFAULT_PROFILE_MEDIA_FILENAME + "." + request.getMediaFile().getExtension();
+        return getFolder() + request.getUser().getUid() + "/" + ServerConstants.DEFAULT_CALLER_MEDIA_FILENAME + "." + request.getMediaFile().getExtension();
     }
 
     @Override

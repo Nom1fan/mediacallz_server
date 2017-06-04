@@ -1,4 +1,4 @@
-package com.mediacallz.server.logic;
+package com.mediacallz.server.controllers.logic;
 
 import com.mediacallz.server.dao.Dao;
 import com.mediacallz.server.dao.UsersDao;
@@ -154,7 +154,8 @@ public class DownloadLogic extends AbstractServerLogic {
         // Marking in communication history record that the transfer has failed
         char FALSE = '0';
         try {
-            dao.updateMediaTransferRecord(commId, Dao.COL_TRANSFER_SUCCESS, FALSE);
+            dao.updateMediaTransferRecord(
+                    commId, Dao.COL_TRANSFER_SUCCESS, FALSE);
         } catch (SQLException e1) {
             e1.printStackTrace();
         }

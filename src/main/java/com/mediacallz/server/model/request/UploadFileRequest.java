@@ -2,6 +2,7 @@ package com.mediacallz.server.model.request;
 
 import com.mediacallz.server.model.dto.MediaFileDTO;
 import com.mediacallz.server.enums.SpecialMediaType;
+import com.mediacallz.server.validators.OptionalUid;
 import com.mediacallz.server.validators.Uid;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,15 +19,18 @@ import javax.validation.constraints.NotNull;
 public class UploadFileRequest extends Request {
 
     @Uid
+    @Deprecated
     private String sourceId;
 
-    @Uid
+    @OptionalUid
     private String destinationId;
 
     private String destinationContactName;
 
     @NotNull
     private MediaFileDTO mediaFile;
+
     private String filePathOnSrcSd;
+
     private SpecialMediaType specialMediaType;
 }

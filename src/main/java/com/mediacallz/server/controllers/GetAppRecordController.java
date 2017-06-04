@@ -1,6 +1,6 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.logic.GetAppMetaLogic;
+import com.mediacallz.server.controllers.logic.GetAppMetaLogic;
 import com.mediacallz.server.model.dto.AppMetaDTO;
 import com.mediacallz.server.model.request.Request;
 import com.mediacallz.server.model.response.Response;

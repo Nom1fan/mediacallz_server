@@ -9,15 +9,14 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Created by Mor on 1/6/2017.
+ * Created by Mor on 03/06/2017.
  */
 @Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE, })
 @Retention(RUNTIME)
-@Constraint(validatedBy = UIDsListValidator.class)
+@Constraint(validatedBy = DefaultMediaOnlyValidator.class)
 @Documented
-public @interface UidsList {
-
-    String message() default "User ID's list is invalid";
+public @interface DefaultMediaOnly {
+    String message() default "Special media type must be default type only";
 
     Class<?>[] groups() default {};
 

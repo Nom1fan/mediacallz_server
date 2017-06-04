@@ -1,6 +1,5 @@
-package com.mediacallz.server.logic;
+package com.mediacallz.server.controllers.logic;
 
-import com.mediacallz.server.dao.Dao;
 import com.mediacallz.server.dao.UsersDao;
 import com.mediacallz.server.db.dbo.UserDBO;
 import com.mediacallz.server.enums.UserStatus;
@@ -10,9 +9,6 @@ import com.mediacallz.server.model.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
 
 /**
  * Created by Mor on 1/15/2017.

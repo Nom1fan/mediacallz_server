@@ -1,6 +1,6 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.logic.IsRegisteredLogic;
+import com.mediacallz.server.controllers.logic.IsRegisteredLogic;
 import com.mediacallz.server.model.dto.UserDTO;
 import com.mediacallz.server.model.request.IsRegisteredRequest;
 import com.mediacallz.server.model.response.Response;

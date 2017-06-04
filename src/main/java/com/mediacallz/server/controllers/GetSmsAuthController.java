@@ -1,6 +1,6 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.logic.GetSmsAuthLogic;
+import com.mediacallz.server.controllers.logic.GetSmsAuthLogic;
 import com.mediacallz.server.model.request.GetSmsRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

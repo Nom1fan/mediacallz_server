@@ -1,18 +1,18 @@
-package com.mediacallz.server.logic;
+package com.mediacallz.server.controllers.logic;
 
-import com.google.gson.Gson;
+import com.mediacallz.server.controllers.handlers.upload.controller.MediaPathHandler;
+import com.mediacallz.server.controllers.handlers.upload.controller.MediaPathHandlersFactory;
 import com.mediacallz.server.dao.Dao;
 import com.mediacallz.server.dao.UsersDao;
 import com.mediacallz.server.db.dbo.MediaFileDBO;
 import com.mediacallz.server.db.dbo.MediaTransferDBO;
-import com.mediacallz.server.controllers.handlers.upload.controller.SpMediaPathHandler;
 import com.mediacallz.server.lang.LangStrings;
-import com.mediacallz.server.model.push.PushEventKeys;
-import com.mediacallz.server.enums.SpecialMediaType;
 import com.mediacallz.server.model.push.PendingDownloadData;
+import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.model.request.UploadFileRequest;
 import com.mediacallz.server.services.PushSender;
-import com.mediacallz.server.utils.MediaFilesUtils;
+import com.mediacallz.server.utils.MediaFileUtils;
+import com.mediacallz.server.utils.SpecialMediaTypeUtils;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Mor on 1/16/2017.
@@ -44,17 +39,18 @@ public class UploadLogic extends AbstractServerLogic {
 
     private final MapperFacade mapperFacade;
 
-    private final Map<SpecialMediaType, SpMediaPathHandler> spMedia2PathHandlerMap = new HashMap<>();
 
     @Autowired
-    public void initMap(List<SpMediaPathHandler> spMediaPathHandlerList) {
-        for (SpMediaPathHandler spMediaPathHandler : spMediaPathHandlerList) {
-            spMedia2PathHandlerMap.put(spMediaPathHandler.getHandledSpMediaType(), spMediaPathHandler);
-        }
-    }
+    private MediaFileUtils mediaFileUtils;
 
     @Autowired
-    public UploadLogic(UsersDao usersDao, PushSender pushSender, Dao dao, Gson gson, MapperFacade mapperFacade) {
+    private MediaPathHandlersFactory mediaPathHandlersFactory;
+
+    @Autowired
+    private SpecialMediaTypeUtils specialMediaTypeUtils;
+
+    @Autowired
+    public UploadLogic(UsersDao usersDao, PushSender pushSender, Dao dao, MapperFacade mapperFacade) {
         this.usersDao = usersDao;
         this.pushSender = pushSender;
         this.dao = dao;
@@ -62,20 +58,28 @@ public class UploadLogic extends AbstractServerLogic {
     }
 
     public void execute(MultipartFile fileForUpload, UploadFileRequest request, HttpServletResponse response) {
-        StringBuilder filePathBuilder = new StringBuilder();
-        Path currentRelativePath = Paths.get("");
-        // Working directory
-        filePathBuilder.append(currentRelativePath.toAbsolutePath().toString());
-        SpMediaPathHandler spMediaPathHandler = spMedia2PathHandlerMap.get(request.getSpecialMediaType());
-        spMediaPathHandler.appendPathForMedia(request, filePathBuilder);
+
+        MediaPathHandler mediaPathHandler = mediaPathHandlersFactory.getPathHandler(request.getSpecialMediaType());
+        String uploadFilePath = mediaPathHandler.appendPathForMedia(request);
 
         try {
+            initUploadFileFlow(request, response, fileForUpload, uploadFilePath);
 
-            boolean sent = initUploadFileFlow(request, response, fileForUpload, filePathBuilder);
+            // Inserting the record of the file upload, retrieving back the commId
+            Integer commId = insertFileUploadRecord(request);
 
-            if (!sent) {
-                sendMediaUndeliveredMsgToUploader(request);
+            if (!specialMediaTypeUtils.isDefaultMediaType(request.getSpecialMediaType())) {
+                // Sending file to destination
+                PendingDownloadData pushData = mapperFacade.map(request, PendingDownloadData.class);
+                pushData.setCommId(commId);
+                pushData.setFilePathOnServer(uploadFilePath);
+                String destToken = dao.getUserRecord(request.getDestinationId()).getToken();
+                pushSender.sendPush(destToken, PushEventKeys.PENDING_DOWNLOAD, pushData);
             }
+
+            String folder = new File(uploadFilePath).getParent();
+            mediaFileUtils.deleteFilesIfNecessary(folder, request.getMediaFile());
+
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -83,12 +87,13 @@ public class UploadLogic extends AbstractServerLogic {
         }
     }
 
-    private boolean initUploadFileFlow(UploadFileRequest request, HttpServletResponse servletResponse, MultipartFile fileForUpload, StringBuilder filePathBuilder) throws Exception {
+    private void initUploadFileFlow(UploadFileRequest request, HttpServletResponse servletResponse, MultipartFile fileForUpload, String uploadedFilePath) throws Exception {
         logFileUploadInfoMsg(request);
+        boolean success = false;
 
         long bytesLeft = fileForUpload.getSize();
         // Preparing file placeholder
-        File newFile = new File(filePathBuilder.toString());
+        File newFile = new File(uploadedFilePath);
         newFile.getParentFile().mkdirs();
         newFile.createNewFile();
 
@@ -115,15 +120,6 @@ public class UploadLogic extends AbstractServerLogic {
             // Informing source (uploader) that the file is on the way
             servletResponse.setStatus(HttpServletResponse.SC_OK);
 
-            // Inserting the record of the file upload, retrieving back the commId
-            Integer commId = insertFileUploadRecord(request);
-
-            // Sending file to destination
-            PendingDownloadData pushData = mapperFacade.map(request, PendingDownloadData.class);
-            pushData.setCommId(commId);
-            pushData.setFilePathOnServer(filePathBuilder.toString());
-            String destToken = dao.getUserRecord(request.getDestinationId()).getToken();
-            return pushSender.sendPush(destToken, PushEventKeys.PENDING_DOWNLOAD, pushData);
         } finally {
             if (bos != null) {
                 bos.close();
@@ -145,7 +141,7 @@ public class UploadLogic extends AbstractServerLogic {
                 ". [Destination]:" + request.getDestinationId() + "." +
                 " [Special Media Type]:" + request.getSpecialMediaType() +
                 " [File size]:" +
-                MediaFilesUtils.getFileSizeFormat(request.getMediaFile().getSize());
+                mediaFileUtils.getFileSizeFormat(request.getMediaFile().getSize());
         log.info(infoMsg);
     }
 

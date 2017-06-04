@@ -1,7 +1,7 @@
 package com.mediacallz.server.controllers;
 
 import com.google.gson.Gson;
-import com.mediacallz.server.logic.UploadLogic;
+import com.mediacallz.server.controllers.logic.UploadLogic;
 import com.mediacallz.server.model.request.UploadFileRequest;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;

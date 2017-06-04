@@ -1,6 +1,7 @@
 package com.mediacallz.server.validators;
 
 import com.mediacallz.server.validators.handlers.uid.UIDValidationHandler;
+import com.mediacallz.server.validators.handlers.uid.UIDValidationHandlersFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,14 +21,8 @@ public class UIDValidator implements ConstraintValidator<Uid, String> {
     @Value("${server.locale}")
     private String serverLocale;
 
-    private Map<String, UIDValidationHandler> locale2HandlerMap = new HashMap<>();;
-
     @Autowired
-    public void initHandlers(List<UIDValidationHandler> handlers) {
-        for (UIDValidationHandler handler : handlers) {
-            locale2HandlerMap.put(handler.getLocale(), handler);
-        }
-    }
+    private UIDValidationHandlersFactory uidValidationHandlersFactory;
 
     @Override
     public void initialize(Uid uid) {
@@ -36,7 +31,8 @@ public class UIDValidator implements ConstraintValidator<Uid, String> {
 
     @Override
     public boolean isValid(String uid, ConstraintValidatorContext context) {
-        UIDValidationHandler handler = locale2HandlerMap.get(serverLocale);
+
+        UIDValidationHandler handler = uidValidationHandlersFactory.getUidValidationHandler(serverLocale);
         boolean isValid = handler.isValid(uid);
 
         if(isValid) {

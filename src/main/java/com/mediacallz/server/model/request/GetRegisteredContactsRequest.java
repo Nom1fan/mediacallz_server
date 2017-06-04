@@ -2,6 +2,7 @@ package com.mediacallz.server.model.request;
 
 import com.mediacallz.server.validators.UidsList;
 import lombok.Data;
+import org.hibernate.validator.constraints.NotBlank;
 
 import java.util.List;
 

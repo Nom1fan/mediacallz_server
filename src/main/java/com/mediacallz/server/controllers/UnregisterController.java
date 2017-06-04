@@ -1,6 +1,6 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.logic.UnregisterLogic;
+import com.mediacallz.server.controllers.logic.UnregisterLogic;
 import com.mediacallz.server.model.request.UnRegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

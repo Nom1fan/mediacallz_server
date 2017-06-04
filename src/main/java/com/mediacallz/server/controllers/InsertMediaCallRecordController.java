@@ -1,6 +1,6 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.logic.InsertMediaCallRecordLogic;
+import com.mediacallz.server.controllers.logic.InsertMediaCallRecordLogic;
 import com.mediacallz.server.model.request.InsertMediaCallRecordRequest;
 import com.mediacallz.server.model.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;

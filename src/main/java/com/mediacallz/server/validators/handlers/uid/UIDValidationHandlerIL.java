@@ -1,7 +1,7 @@
 package com.mediacallz.server.validators.handlers.uid;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 /**
  * Created by Mor on 1/19/2017.
@@ -14,9 +14,9 @@ public class UIDValidationHandlerIL implements UIDValidationHandler {
     @Override
     public boolean isValid(String uid) {
         boolean isValid = true;
-        boolean isNumeric = org.apache.commons.lang.StringUtils.isNumeric(uid);
+        boolean isNumeric = StringUtils.isNumeric(uid);
         if(!isNumeric) {
-            validationFailedMessage = uid + " is not a numerical only value";
+            validationFailedMessage = uid + " is not a numerical value";
             isValid = false;
         }
         else if(uid.length() != 10) {
