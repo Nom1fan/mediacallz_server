@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 @ToString
 public class DownloadFileRequest extends Request {
 
-    @Min(1)
+    //@Min(1) //TODO commId should not be here, we should completely change the flow of upload/download
     private int commId;
 
     @Uid

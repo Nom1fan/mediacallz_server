@@ -2,6 +2,7 @@ package com.mediacallz.server.controllers;
 
 import com.mediacallz.server.controllers.logic.GetDefaultMediaDataLogic;
 import com.mediacallz.server.controllers.logic.GetRegisteredContactsLogic;
+import com.mediacallz.server.model.dto.DefaultMediaDataContainerDTO;
 import com.mediacallz.server.model.dto.DefaultMediaDataDTO;
 import com.mediacallz.server.model.dto.UserDTO;
 import com.mediacallz.server.model.request.GetDefaultMediaDataRequest;
@@ -33,7 +34,7 @@ public class GetDefaultMediaDataController extends AbstractController {
 
     @ResponseBody
     @RequestMapping(value = "/v1/GetDefaultMediaData", method = RequestMethod.POST)
-    public Response<List<DefaultMediaDataDTO>> getAppMeta(@Valid @RequestBody GetDefaultMediaDataRequest request) throws IOException {
+    public Response<List<DefaultMediaDataContainerDTO>> getAppMeta(@Valid @RequestBody GetDefaultMediaDataRequest request) throws IOException {
         return logic.execute(request);
     }
 }

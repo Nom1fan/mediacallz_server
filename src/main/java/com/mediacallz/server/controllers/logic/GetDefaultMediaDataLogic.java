@@ -3,6 +3,7 @@ package com.mediacallz.server.controllers.logic;
 import com.mediacallz.server.dao.Dao;
 import com.mediacallz.server.db.dbo.MediaTransferDBO;
 import com.mediacallz.server.enums.SpecialMediaType;
+import com.mediacallz.server.model.dto.DefaultMediaDataContainerDTO;
 import com.mediacallz.server.model.dto.DefaultMediaDataDTO;
 import com.mediacallz.server.model.dto.MediaFileDTO;
 import com.mediacallz.server.model.request.GetDefaultMediaDataRequest;
@@ -43,28 +44,39 @@ public class GetDefaultMediaDataLogic extends AbstractServerLogic {
     @Autowired
     FileExplorer fileExplorer;
 
-    public Response<List<DefaultMediaDataDTO>> execute(GetDefaultMediaDataRequest request) throws IOException {
-        log.info("Initializing get default media process for [user]:" + request.getUser().getUid() +
-                " on [user]:" + request.getUid());
+    public Response<List<DefaultMediaDataContainerDTO>> execute(GetDefaultMediaDataRequest request) throws IOException {
 
-        List<DefaultMediaDataDTO> defaultMediaDataList = new ArrayList<>();;
+        List<DefaultMediaDataContainerDTO> defaultMediaDataContainerDTOS = new ArrayList<>();
 
         SpecialMediaType specialMediaType = request.getSpecialMediaType();
 
-        String defaultMediaFolderPath = pathUtils.getFolderPath(specialMediaType);
-        defaultMediaFolderPath += request.getUid() + "/";
-        File[] files = fileExplorer.getFiles(defaultMediaFolderPath);
-        if (files != null && files.length > 0) {
-            for (File file : files) {
-                if(mediaFileUtils.isValidMediaFile(file)) {
-                    MediaFileDTO mediaFileDTO = prepareMediaFile(file);
-                    DefaultMediaDataDTO defaultMediaData = prepareDefaultMediaData(request.getUid(), specialMediaType, file, mediaFileDTO);
-                    defaultMediaDataList.add(defaultMediaData);
+        List<String> contactUids = request.getContactUids();
+
+        for (String contactUid : contactUids) {
+            List<DefaultMediaDataDTO> defaultMediaDataList = new ArrayList<>();
+
+            String defaultMediaFolderPath = pathUtils.getFolderPath(specialMediaType);
+            defaultMediaFolderPath += contactUid + "/";
+            File[] files = fileExplorer.getFiles(defaultMediaFolderPath);
+            if (files != null && files.length > 0) {
+                for (File file : files) {
+                    if (mediaFileUtils.isValidMediaFile(file)) {
+                        MediaFileDTO mediaFileDTO = prepareMediaFile(file);
+                        DefaultMediaDataDTO defaultMediaData = prepareDefaultMediaData(file, mediaFileDTO);
+                        defaultMediaDataList.add(defaultMediaData);
+                    }
                 }
+            }
+            if (!defaultMediaDataList.isEmpty()) {
+                DefaultMediaDataContainerDTO defaultMediaDataContainer = new DefaultMediaDataContainerDTO();
+                defaultMediaDataContainer.setUid(contactUid);
+                defaultMediaDataContainer.setDefaultMediaDataList(defaultMediaDataList);
+                defaultMediaDataContainer.setSpecialMediaType(specialMediaType);
+                defaultMediaDataContainerDTOS.add(defaultMediaDataContainer);
             }
         }
 
-        return new Response<>(defaultMediaDataList);
+        return new Response<>(defaultMediaDataContainerDTOS);
     }
 
     private long getCreationDateInUnixTime(File file) throws IOException {
@@ -73,14 +85,11 @@ public class GetDefaultMediaDataLogic extends AbstractServerLogic {
         return attr.creationTime().toMillis();
     }
 
-    private DefaultMediaDataDTO prepareDefaultMediaData(String uid, SpecialMediaType specialMediaType, File file, MediaFileDTO mediaFileDTO) throws IOException {
+    private DefaultMediaDataDTO prepareDefaultMediaData(File file, MediaFileDTO mediaFileDTO) throws IOException {
         DefaultMediaDataDTO defaultMediaData = new DefaultMediaDataDTO();
-
         long unixTime = getCreationDateInUnixTime(file);
         defaultMediaData.setDefaultMediaUnixTime(unixTime);
-        defaultMediaData.setUid(uid);
         defaultMediaData.setFilePathOnServer(file.getAbsolutePath());
-        defaultMediaData.setSpecialMediaType(specialMediaType);
         defaultMediaData.setMediaFile(mediaFileDTO);
         return defaultMediaData;
     }
