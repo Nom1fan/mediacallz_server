@@ -14,5 +14,5 @@ import java.util.List;
 public class GetContactsRequest extends Request {
 
     @UidsList
-    private List<String> uids;
+    private List<String> contactsUids;
 }

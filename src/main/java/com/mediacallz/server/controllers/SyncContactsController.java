@@ -1,8 +1,10 @@
 package com.mediacallz.server.controllers;
 
 import com.mediacallz.server.controllers.logic.GetRegisteredContactsLogic;
+import com.mediacallz.server.controllers.logic.SyncContactsLogic;
 import com.mediacallz.server.model.dto.UserDTO;
 import com.mediacallz.server.model.request.GetRegisteredContactsRequest;
+import com.mediacallz.server.model.request.SyncContactsRequest;
 import com.mediacallz.server.model.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,18 +21,18 @@ import java.util.List;
  * Created by Mor on 1/18/2017.
  */
 @Controller
-public class GetRegisteredContactsController extends AbstractController {
+public class SyncContactsController extends AbstractController {
 
-    private final GetRegisteredContactsLogic logic;
+    private final SyncContactsLogic logic;
 
     @Autowired
-    public GetRegisteredContactsController(GetRegisteredContactsLogic logic) {
+    public SyncContactsController(SyncContactsLogic logic) {
         this.logic = logic;
     }
 
     @ResponseBody
-    @RequestMapping(value = "/v1/GetRegisteredContacts", method = RequestMethod.POST)
-    public Response<List<UserDTO>> getRegisteredContacts(@Valid @RequestBody GetRegisteredContactsRequest request) throws IOException {
-        return logic.execute(request);
+    @RequestMapping(value = "/v1/SyncContacts", method = RequestMethod.POST)
+    public void getContacts(@Valid @RequestBody SyncContactsRequest request) throws IOException {
+        logic.execute(request);
     }
 }
