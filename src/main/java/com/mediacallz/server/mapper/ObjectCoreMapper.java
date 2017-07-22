@@ -2,6 +2,7 @@ package com.mediacallz.server.mapper;
 
 import com.mediacallz.server.db.dbo.*;
 import com.mediacallz.server.model.dto.AppMetaDTO;
+import com.mediacallz.server.model.dto.ContactDTO;
 import com.mediacallz.server.model.dto.MediaCallDTO;
 import com.mediacallz.server.model.dto.MediaFileDTO;
 import com.mediacallz.server.model.request.Request;
@@ -43,6 +44,13 @@ public class ObjectCoreMapper extends ConfigurableMapper {
         mapperFactory.classMap(MediaFileDBO.class, MediaFileDTO.class)
                 .field("content_ext", "extension")
                 .field("content_size", "size")
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(ContactDBO.class, ContactDTO.class)
+                .field("contact_uid", "contactUid")
+                .field("contact_name", "contactName")
+                .field("contact_source", "contactSource")
                 .byDefault()
                 .register();
 

@@ -62,7 +62,7 @@ public class Application {
         return new Gson();
     }
 
-    @Bean
+    @Bean(name = "myNamedParameterJdbcOperations")
     public NamedParameterJdbcOperations namedParameterJdbcOperations() {
         return new NamedParameterJdbcTemplate(getDataSource());
     }

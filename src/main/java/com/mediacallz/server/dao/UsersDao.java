@@ -1,6 +1,7 @@
 package com.mediacallz.server.dao;
 
 
+import com.mediacallz.server.db.dbo.ContactDBO;
 import com.mediacallz.server.db.dbo.UserDBO;
 
 import java.util.List;
@@ -20,4 +21,8 @@ public interface UsersDao {
     UserDBO getUserRecord(String destId);
 
     List<UserDBO> getRegisteredContacts(List<String> contactsUids);
+
+    boolean syncContacts(List<ContactDBO> contacts);
+
+    List<ContactDBO> getContacts(List<String> contactsUids);
 }

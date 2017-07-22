@@ -13,7 +13,6 @@ import javax.validation.constraints.NotNull;
  * Created by Mor on 10/03/2016.
  */
 @Data
-@ToString
 public class MediaCallDTO extends DTOEntity<MediaCallDBO> {
 
     @NotNull

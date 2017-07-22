@@ -12,7 +12,7 @@ import java.util.List;
 public interface Dao {
 
     //region Table users
-    String TABLE_USERS = "users";
+    String  TABLE_USERS = "users";
     //region Table keys
     String COL_UID = "uid";
     String COL_TOKEN = "token";
@@ -75,6 +75,16 @@ public interface Dao {
     // COL_UID also used here
     String COL_CODE = "code";
     //endregion
+    //endregion
+
+    //region Table contacts
+    String TABLE_CONTACTS = "contacts";
+    //region Table keys
+    String COL_CONTACT_UID = "contact_uid";
+    String COL_CONTACT_NAME = "contact_name";
+    String COL_CONTACT_SOURCE = "contact_source";
+    //endregion
+
     //endregion
 
     void unregisterUser(String uid, String token) throws SQLException;

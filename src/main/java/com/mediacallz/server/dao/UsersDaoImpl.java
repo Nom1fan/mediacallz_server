@@ -1,7 +1,10 @@
 package com.mediacallz.server.dao;
 
+import com.mchange.v2.c3p0.impl.NewProxyCallableStatement;
+import com.mediacallz.server.db.dbo.ContactDBO;
 import com.mediacallz.server.db.dbo.MediaTransferDBO;
 import com.mediacallz.server.db.dbo.UserDBO;
+import com.mediacallz.server.db.rowmappers.ContactDboRowMapper;
 import com.mediacallz.server.db.rowmappers.UserDboRowMapper;
 import com.mediacallz.server.db.rowmappers.UserDboUserStatusRowMapper;
 import com.mediacallz.server.enums.SpecialMediaType;
@@ -11,18 +14,20 @@ import com.mediacallz.server.model.push.PushEventKeys;
 import com.mediacallz.server.services.PushSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.mediacallz.server.dao.Dao.*;
 
@@ -34,6 +39,7 @@ import static com.mediacallz.server.dao.Dao.*;
  */
 @Component
 @Slf4j
+@Transactional
 public class UsersDaoImpl implements UsersDao {
 
     private final PushSender pushSender;
@@ -47,6 +53,7 @@ public class UsersDaoImpl implements UsersDao {
     @Autowired
     public UsersDaoImpl(PushSender pushSender,
                         Dao dao,
+                        @Qualifier("myNamedParameterJdbcOperations")
                         NamedParameterJdbcOperations jdbcOperations,
                         JdbcTemplate jdbcTemplate) {
         this.pushSender = pushSender;
@@ -191,6 +198,27 @@ public class UsersDaoImpl implements UsersDao {
 
         String query = "SELECT uid,user_status FROM sys.users WHERE uid IN (:ids) AND user_status <> '" + UserStatus.UNREGISTERED.getStr() + "'";
         return jdbcOperations.query(query, parameters, new UserDboUserStatusRowMapper());
+    }
+
+    @Override
+    public boolean syncContacts(List<ContactDBO> contacts) {
+        List<ContactDBO> existingContacts = getContacts(contacts.stream().map(ContactDBO::getContact_uid).collect(Collectors.toList()));
+        List<ContactDBO> filteredContacts = contacts.stream().filter(contact -> !existingContacts.contains(contact)).collect(Collectors.toList());
+        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(filteredContacts.toArray());
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate.getDataSource());
+        insert.withTableName(TABLE_CONTACTS);
+        insert.executeBatch(batch);
+        return true;
+    }
+
+    @Override
+    public List<ContactDBO> getContacts(List<String> contactsUids) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("ids", contactsUids);
+
+        String query = "SELECT * FROM sys.contacts WHERE contacts.contact_uid IN (:ids)";
+
+        return jdbcOperations.query(query, parameters, new ContactDboRowMapper());
     }
 
     private String quote(String str) {
