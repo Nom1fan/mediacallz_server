@@ -50,7 +50,6 @@ public class ObjectCoreMapper extends ConfigurableMapper {
         mapperFactory.classMap(ContactDBO.class, ContactDTO.class)
                 .field("contact_uid", "contactUid")
                 .field("contact_name", "contactName")
-                .field("contact_source", "contactSource")
                 .byDefault()
                 .register();
 

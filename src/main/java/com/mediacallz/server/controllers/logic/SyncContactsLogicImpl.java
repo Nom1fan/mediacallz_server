@@ -33,6 +33,7 @@ public class SyncContactsLogicImpl extends AbstractServerLogic implements SyncCo
         log.info("Initiating sync contacts from source:{}, for contacts:{}", request.getUser().getUid(), request.getContacts());
         List<ContactDBO> contactDBOS = new ArrayList<>();
         contacts.forEach(contact -> contactDBOS.add(contact.toInternal(mapperFacade)));
+        contactDBOS.forEach(contactDBO -> contactDBO.setContact_source(request.getUser().getUid()));
         usersDao.syncContacts(contactDBOS);
     }
 }

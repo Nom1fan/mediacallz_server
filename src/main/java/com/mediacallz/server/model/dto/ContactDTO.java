@@ -20,7 +20,4 @@ public class ContactDTO extends DTOEntity<ContactDBO> {
 
     @NotBlank
     private String contactName;
-
-    @Uid
-    private String contactSource;
 }
