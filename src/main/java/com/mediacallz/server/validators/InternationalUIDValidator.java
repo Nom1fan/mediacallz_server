@@ -36,7 +36,8 @@ public class InternationalUIDValidator implements ConstraintValidator<Internatio
 
     @Override
     public boolean isValid(String internationalUID, ConstraintValidatorContext context) {
-        InternationalUIDValidationHandler handler = locale2HandlerMap.get(serverLocale);
-        return handler.isValid(internationalUID);
+//        InternationalUIDValidationHandler handler = locale2HandlerMap.get(serverLocale);
+//        return handler.isValid(internationalUID);
+        return true;
     }
 }

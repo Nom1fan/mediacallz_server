@@ -32,16 +32,17 @@ public class UIDValidator implements ConstraintValidator<Uid, String> {
     @Override
     public boolean isValid(String uid, ConstraintValidatorContext context) {
 
-        UIDValidationHandler handler = uidValidationHandlersFactory.getUidValidationHandler(serverLocale);
-        boolean isValid = handler.isValid(uid);
-
-        if(isValid) {
-            return true;
-        }
-
-        context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate(handler.getValidationFailedMessage())
-                .addConstraintViolation();
-        return false;
+//        UIDValidationHandler handler = uidValidationHandlersFactory.getUidValidationHandler(serverLocale);
+//        boolean isValid = handler.isValid(uid);
+//
+//        if(isValid) {
+//            return true;
+//        }
+//
+//        context.disableDefaultConstraintViolation();
+//        context.buildConstraintViolationWithTemplate(handler.getValidationFailedMessage())
+//                .addConstraintViolation();
+//        return false;
+        return true;
     }
 }

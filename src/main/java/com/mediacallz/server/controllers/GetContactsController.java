@@ -1,6 +1,6 @@
 package com.mediacallz.server.controllers;
 
-import com.mediacallz.server.controllers.logic.GetContactsNamesLogic;
+import com.mediacallz.server.controllers.logic.GetContactsLogic;
 import com.mediacallz.server.model.dto.ContactDTO;
 import com.mediacallz.server.model.request.GetContactsRequest;
 import com.mediacallz.server.model.response.Response;
@@ -19,17 +19,17 @@ import java.util.List;
  * Created by Mor on 1/18/2017.
  */
 @Controller
-public class GetContactsNamesController extends AbstractController {
+public class GetContactsController extends AbstractController {
 
-    private final GetContactsNamesLogic logic;
+    private final GetContactsLogic logic;
 
     @Autowired
-    public GetContactsNamesController(GetContactsNamesLogic logic) {
+    public GetContactsController(GetContactsLogic logic) {
         this.logic = logic;
     }
 
     @ResponseBody
-    @RequestMapping(value = "/v1/GetContactsNames", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/GetContacts", method = RequestMethod.POST)
     public Response<List<ContactDTO>> getContacts(@Valid @RequestBody GetContactsRequest request) throws IOException {
         return logic.execute(request);
     }

@@ -21,8 +21,9 @@ public class OptionalUIDValidator implements ConstraintValidator<OptionalUid, St
 
     @Override
     public boolean isValid(String uid, ConstraintValidatorContext context) {
-        boolean isValid;
-        isValid = uid == null || uidValidator.isValid(uid, context);
-        return isValid;
+//        boolean isValid;
+//        isValid = uid == null || uidValidator.isValid(uid, context);
+//        return isValid;
+        return true;
     }
 }

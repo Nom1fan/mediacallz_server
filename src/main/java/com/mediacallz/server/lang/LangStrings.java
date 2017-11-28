@@ -22,7 +22,7 @@ public interface LangStrings {
     String KEY_MEDIA_CLEARED_BODY = "media_cleared_body";
     String KEY_YOUR_VERIFICATION_CODE = "your_verification_code";
 
-    String LANGS_DIR = Paths.get("").toAbsolutePath().toString() + "\\resources\\lang\\";
+    String LANGS_DIR = Paths.get("").toAbsolutePath().toString() + "/resources/lang/";
     String STRINGS_FILE = LANGS_DIR + "%s.properties";
 
     Languages getLanguage();

@@ -15,7 +15,7 @@ import java.util.List;
 
 @Component
 @Setter
-public class GetContactsNamesLogicImpl extends AbstractServerLogic implements GetContactsNamesLogic {
+public class GetContactsLogicImpl extends AbstractServerLogic implements GetContactsLogic {
 
     @Autowired
     private UsersDao usersDao;

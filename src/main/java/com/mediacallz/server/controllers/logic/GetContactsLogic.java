@@ -7,7 +7,7 @@ import com.mediacallz.server.model.response.Response;
 
 import java.util.List;
 
-public interface GetContactsNamesLogic extends ServerLogic {
+public interface GetContactsLogic extends ServerLogic {
 
     void setUsersDao(UsersDao usersDao);
 

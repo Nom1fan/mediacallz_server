@@ -36,22 +36,22 @@ public class UIDsListValidator implements ConstraintValidator<UidsList, List<Str
 
     @Override
     public boolean isValid(List<String> uidList, ConstraintValidatorContext context) {
-        UIDValidationHandler handler = locale2HandlerMap.get(serverLocale);
-
-        if(uidList == null || uidList.isEmpty()) {
-            return false;
-        }
-
-        for (String uid : uidList) {
-            boolean isValid = handler.isValid(uid);
-
-            if(!isValid) {
-                context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate(handler.getValidationFailedMessage())
-                        .addConstraintViolation();
-                return false;
-            }
-        }
+//        UIDValidationHandler handler = locale2HandlerMap.get(serverLocale);
+//
+//        if(uidList == null || uidList.isEmpty()) {
+//            return false;
+//        }
+//
+//        for (String uid : uidList) {
+//            boolean isValid = handler.isValid(uid);
+//
+//            if(!isValid) {
+//                context.disableDefaultConstraintViolation();
+//                context.buildConstraintViolationWithTemplate(handler.getValidationFailedMessage())
+//                        .addConstraintViolation();
+//                return false;
+//            }
+//        }
         return true;
     }
 }
