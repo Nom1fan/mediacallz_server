@@ -5,7 +5,7 @@
 
     <groupId>com.mediacallz</groupId>
     <artifactId>server</artifactId>
-    <version>0.0.9-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>mediacallz_server</name>
@@ -89,6 +89,12 @@
             <groupId>ma.glasnost.orika</groupId>
             <artifactId>orika-core</artifactId>
             <version>1.5.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>1.23.0</version>
         </dependency>
     </dependencies>
 
