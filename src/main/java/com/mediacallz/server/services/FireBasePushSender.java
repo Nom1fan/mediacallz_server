@@ -220,6 +220,9 @@ public class FireBasePushSender extends Observable implements PushSender {
         private static class Message {
             private String token;
             private Map<String, String> data;
+            private Map<String,String> android = new HashMap<String, String>() {{
+                put("priority", "high");
+            }};
             private Notification notification;
 
             @Data
