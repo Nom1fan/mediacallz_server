@@ -41,15 +41,15 @@ public class RegisterLogic extends AbstractServerLogic {
         int smsCode = request.getSmsCode();
         int expectedSmsCode = smsVerificationDao.getSmsVerificationCode(messageInitiaterId);
 
-        if (smsCode != SmsVerificationDao.NO_SMS_CODE && smsCode == expectedSmsCode) {
+//        if (smsCode != SmsVerificationDao.NO_SMS_CODE && smsCode == expectedSmsCode) {
             UserDBO userDBO = user.toInternal(mapperFacade);
             usersDao.registerUser(userDBO);
             log.info("[User]:" + messageInitiaterId + " registered successfully.");
 
-        } else {
-            registrationRejected(messageInitiaterId, smsCode, expectedSmsCode);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        }
+//        } else {
+//            registrationRejected(messageInitiaterId, smsCode, expectedSmsCode);
+//            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+//        }
     }
 
     //region Assisting methods

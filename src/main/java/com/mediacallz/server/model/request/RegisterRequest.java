@@ -15,8 +15,8 @@ import javax.validation.constraints.Min;
 @ToString
 public class RegisterRequest extends Request {
 
-    @Min(1000)
-    @Max(9999)
+//    @Min(1000)
+//    @Max(9999)
     private int smsCode;
 }
 
