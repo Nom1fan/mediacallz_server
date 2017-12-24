@@ -22,7 +22,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -204,7 +203,7 @@ public class FireBasePushSender extends Observable implements PushSender {
     private String getAccessToken() throws IOException {
         Resource resource = new ClassPathResource("service-account.json");
         GoogleCredential googleCredential = GoogleCredential
-                .fromStream(new FileInputStream(resource.getFile()))
+                .fromStream(resource.getInputStream())
                 .createScoped(Collections.singletonList("https://www.googleapis.com/auth/firebase.messaging"));
         googleCredential.refreshToken();
         return googleCredential.getAccessToken();
