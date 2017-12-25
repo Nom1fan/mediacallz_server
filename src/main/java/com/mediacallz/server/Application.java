@@ -65,7 +65,7 @@ public class Application {
     @Bean
     public ComboPooledDataSource getDataSource() {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        String jdbcUrl = "jdbc:mysql://" + dbConfig.getHost() + ":" + dbConfig.getPort() + "/" + dbConfig.getDbName();
+        String jdbcUrl = "jdbc:mysql://" + dbConfig.getHost() + ":" + dbConfig.getPort() + "/" + dbConfig.getDbName() + "?useUnicode=yes&characterEncoding=UTF-8";
         dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setUser(dbConfig.getUsername());
         dataSource.setPassword(dbConfig.getPassword());
