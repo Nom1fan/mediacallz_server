@@ -22,7 +22,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +39,9 @@ public class FireBasePushSender extends Observable implements PushSender {
 
     @Value("${push.url}")
     private String pushUrl;
+
+    @Value("${service.account.path}")
+    private String serviceAccountPath;
 
     private final Gson gson;
 
@@ -201,13 +205,36 @@ public class FireBasePushSender extends Observable implements PushSender {
     }
 
     private String getAccessToken() throws IOException {
-        Resource resource = new ClassPathResource("service-account.json");
         GoogleCredential googleCredential = GoogleCredential
-                .fromStream(resource.getInputStream())
+                .fromStream(getServiceAccountInputStream())
                 .createScoped(Collections.singletonList("https://www.googleapis.com/auth/firebase.messaging"));
         googleCredential.refreshToken();
         return googleCredential.getAccessToken();
     }
+
+    private InputStream getServiceAccountInputStream() {
+        File file = new File(serviceAccountPath);
+        try {
+            return new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("Couldn't find service-account.json");
+        }
+    }
+
+    private void printServiceAccountJson() throws IOException {
+        InputStream is = getServiceAccountInputStream();
+        String str;
+        StringBuilder buf = new StringBuilder();
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        while ((str = reader.readLine()) != null) {
+            buf.append(str).append("\n");
+        }
+
+        log.info("Contents of service-account.json:\n");
+        log.info(buf.toString());
+    }
+
 
     @Data
     @RequiredArgsConstructor
@@ -219,7 +246,7 @@ public class FireBasePushSender extends Observable implements PushSender {
         private static class Message {
             private String token;
             private Map<String, String> data;
-            private Map<String,String> android = new HashMap<String, String>() {{
+            private Map<String, String> android = new HashMap<String, String>() {{
                 put("priority", "high");
             }};
             private Notification notification;
