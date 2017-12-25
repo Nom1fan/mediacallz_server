@@ -1,12 +1,7 @@
 /target
 /logs
 /.mvn
-src/main/resources/static/
-src/main/resources/templates/
 /.idea
-Downloaded/
-sampleFiles/
-src/test/java/com/
 uploads/
-medicallz.com.server.iml
 MediaCallz_Server.iml
+service-account.json
