@@ -64,6 +64,7 @@ public class UploadLogic extends AbstractServerLogic {
 
         try {
             initUploadFileFlow(request, response, fileForUpload, uploadFilePath);
+            response.setStatus(HttpServletResponse.SC_OK);
 
             // Inserting the record of the file upload, retrieving back the commId
             Integer commId = insertFileUploadRecord(request);
