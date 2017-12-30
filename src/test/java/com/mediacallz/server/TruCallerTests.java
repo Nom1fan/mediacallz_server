@@ -1,7 +1,6 @@
 package com.mediacallz.server;
 
-import com.mediacallz.server.controllers.logic.GetContactsNamesLogic;
-import com.mediacallz.server.controllers.logic.GetRegisteredContactsLogic;
+import com.mediacallz.server.controllers.logic.GetContactsLogicImpl;
 import com.mediacallz.server.controllers.logic.SyncContactsLogic;
 import com.mediacallz.server.dao.UsersDao;
 import com.mediacallz.server.db.dbo.ContactDBO;
@@ -43,7 +42,7 @@ public class TruCallerTests {
     SyncContactsLogic syncContactsLogic;
 
     @Autowired
-    GetContactsNamesLogic getContactsLogic;
+    GetContactsLogicImpl getContactsLogic;
 
     @Autowired
     MapperFacade mapperFacade;
