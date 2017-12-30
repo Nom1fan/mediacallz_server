@@ -139,7 +139,7 @@ public class DownloadLogic extends AbstractServerLogic {
 
         String title = strings.media_undelivered_title();
 
-        String dest = (!destContactName.equals("") ? destContactName : destId);
+        String dest = (destContactName != null && !destContactName.equals("") ? destContactName : destId);
         String msgTransferFailed = String.format(strings.media_undelivered_body(), dest);
 
         // Informing sender that file did not reach destination
