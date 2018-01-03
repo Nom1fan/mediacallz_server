@@ -1,7 +1,7 @@
 /target
-/logs
 /.mvn
 /.idea
 uploads/
-MediaCallz_Server.iml
-service-account.json
+*.log*
+server.iml
+src/test/java/com/mediacallz/server/generators/
