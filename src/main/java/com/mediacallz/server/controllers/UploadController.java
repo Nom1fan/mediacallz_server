@@ -3,6 +3,7 @@ package com.mediacallz.server.controllers;
 import com.google.gson.Gson;
 import com.mediacallz.server.controllers.logic.UploadLogic;
 import com.mediacallz.server.controllers.logic.UploadLogicV2;
+import com.mediacallz.server.model.request.Request;
 import com.mediacallz.server.model.request.UploadFileRequest;
 import com.mediacallz.server.model.response.Response;
 import org.hibernate.validator.constraints.NotBlank;
@@ -44,12 +45,13 @@ public class UploadController extends AbstractController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/v2/UploadFile/{uid}", method = RequestMethod.POST)
+    @RequestMapping(value = "/v2/UploadFile", method = RequestMethod.POST)
     public Response<String> uploadFileV2(
-            @NotNull @PathVariable String uid,
             @NotNull @RequestParam("fileForUpload") MultipartFile fileForUpload,
+            @NotBlank @RequestParam("jsonPart") String requestString,
             HttpServletResponse response) {
 
-        return logicV2.execute(uid, fileForUpload, response);
+        Request request = gson.fromJson(requestString, Request.class);
+        return logicV2.execute(request.getUser().getUid(), fileForUpload, response);
     }
 }
