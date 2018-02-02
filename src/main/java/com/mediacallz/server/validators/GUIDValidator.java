@@ -1,7 +1,5 @@
 package com.mediacallz.server.validators;
 
-import org.springframework.stereotype.Component;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Matcher;
@@ -10,7 +8,6 @@ import java.util.regex.Pattern;
 /**
  * Created by Mor on 1/6/2017.
  */
-@Component
 public class GUIDValidator implements ConstraintValidator<Guid, String> {
 
     @Override
