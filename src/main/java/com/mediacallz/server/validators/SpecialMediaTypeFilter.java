@@ -14,6 +14,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = SpecialMediaTypeValidator.class)
 @Documented
 public @interface SpecialMediaTypeFilter {
+    String message() default "Invalid SpecialMediaType. You may only attach media using CALLER_MEDIA or PROFILE_MEDIA";
+
     SpecialMediaType[] allowOnly();
 
     @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER})
