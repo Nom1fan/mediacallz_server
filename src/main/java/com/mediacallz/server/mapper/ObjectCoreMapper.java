@@ -5,7 +5,8 @@ import com.mediacallz.server.model.dto.AppMetaDTO;
 import com.mediacallz.server.model.dto.ContactDTO;
 import com.mediacallz.server.model.dto.MediaCallDTO;
 import com.mediacallz.server.model.dto.MediaFileDTO;
-import com.mediacallz.server.model.request.Request;
+import com.mediacallz.server.model.push.AttachMediaData;
+import com.mediacallz.server.model.request.AttachMediaRequest;
 import com.mediacallz.server.model.request.UploadFileRequest;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
@@ -50,6 +51,11 @@ public class ObjectCoreMapper extends ConfigurableMapper {
         mapperFactory.classMap(ContactDBO.class, ContactDTO.class)
                 .field("contact_uid", "contactUid")
                 .field("contact_name", "contactName")
+                .byDefault()
+                .register();
+
+        mapperFactory.classMap(AttachMediaRequest.class, AttachMediaData.class)
+                .field("user.uid", "sourceId")
                 .byDefault()
                 .register();
 
