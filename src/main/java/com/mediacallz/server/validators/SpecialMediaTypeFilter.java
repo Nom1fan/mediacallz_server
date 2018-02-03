@@ -3,6 +3,7 @@ package com.mediacallz.server.validators;
 import com.mediacallz.server.enums.SpecialMediaType;
 
 import javax.validation.Constraint;
+import javax.validation.Payload;
 import javax.validation.constraints.NotNull;
 import java.lang.annotation.*;
 
@@ -15,6 +16,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface SpecialMediaTypeFilter {
     String message() default "Invalid SpecialMediaType. You may only attach media using CALLER_MEDIA or PROFILE_MEDIA";
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
 
     SpecialMediaType[] allowOnly();
 
