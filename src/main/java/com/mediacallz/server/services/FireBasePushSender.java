@@ -3,7 +3,9 @@ package com.mediacallz.server.services;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.gson.Gson;
 import com.mediacallz.server.model.push.PushEventKeys;
+import com.mediacallz.server.model.push.PushResponse;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -18,12 +20,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +44,9 @@ public class FireBasePushSender extends Observable implements PushSender {
 
     private final Gson gson;
 
+    @Getter
+    private PushResponse pushResponse;
+
     @Autowired
     public FireBasePushSender(Gson gson) {
         this.gson = gson;
@@ -60,9 +62,7 @@ public class FireBasePushSender extends Observable implements PushSender {
 
         setChanged();
 
-        if (deviceToken == null || deviceToken.equals("")) {
-            log.error("Invalid device token. Aborting push send");
-            notifyObservers(false);
+        if (isValidToken(deviceToken)) {
             return false;
         }
 
@@ -72,10 +72,7 @@ public class FireBasePushSender extends Observable implements PushSender {
             pushData(gson.toJson(pushMessage));
 
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Failed to send push to [Token]:" + deviceToken + ". [Exception]:" + (e.getMessage() != null ? e.getMessage() : e));
-            notifyObservers(false);
-            return false;
+            return handleFailure(deviceToken, e);
         }
 
         notifyObservers(true);
@@ -193,8 +190,10 @@ public class FireBasePushSender extends Observable implements PushSender {
                 responseString = EntityUtils.toString(response.getEntity());
             }
             int statusCode = response.getStatusLine().getStatusCode();
+            pushResponse = new PushResponse(statusCode);
             if (statusCode != HttpStatus.SC_OK) {
                 String reason = response.getStatusLine().getReasonPhrase();
+                pushResponse.setReason(reason);
                 throw new Exception("Push POST failed. Status code:" + statusCode + ". Reason:" + reason);
             }
             log.info("Push response:" + responseString);
