@@ -2,6 +2,7 @@ package com.mediacallz.server.utils;
 
 import com.mediacallz.server.enums.SpecialMediaType;
 import com.mediacallz.server.lang.ServerConstants;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -16,13 +17,15 @@ import java.util.Map;
 @Component
 public class PathUtilsImpl implements PathUtils {
 
-    protected Map<SpecialMediaType, String> specialMediaType2FolderMap;
+    @Value("${server.url}")
+    private String serverUrl;
+
+    private Map<SpecialMediaType, String> specialMediaType2FolderMap;
+
+    private final String UPLOAD_FOLDER = getWorkingDir() + ServerConstants.UPLOAD_FOLDER;
 
     @PostConstruct
     public void init() {
-        String workingDir = getWorkingDir();
-        final String UPLOAD_FOLDER = workingDir + ServerConstants.UPLOAD_FOLDER;
-
         specialMediaType2FolderMap = new HashMap<SpecialMediaType, String>() {{
             put(SpecialMediaType.CALLER_MEDIA, UPLOAD_FOLDER + ServerConstants.CALLER_MEDIA_FOLDER);
             put(SpecialMediaType.PROFILE_MEDIA, UPLOAD_FOLDER + ServerConstants.PROFILE_MEDIA_FOLDER);
@@ -39,6 +42,13 @@ public class PathUtilsImpl implements PathUtils {
         filePathBuilder.append(currentRelativePath.toAbsolutePath().toString());
         return filePathBuilder.toString();
     }
+
+    @Override
+    public String getUploadUrl() {
+        return serverUrl + ServerConstants.UPLOAD_FOLDER;
+    }
+
+
 
     @Override
     public String getFolderPath(SpecialMediaType specialMediaType) {

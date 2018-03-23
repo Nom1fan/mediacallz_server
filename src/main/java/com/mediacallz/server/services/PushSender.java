@@ -2,6 +2,7 @@ package com.mediacallz.server.services;
 
 
 import com.mediacallz.server.model.push.PushEventKeys;
+import com.mediacallz.server.model.push.PushResponse;
 
 /**
  * Created by Mor on 25/07/2016.
@@ -55,4 +56,6 @@ public interface PushSender {
             final String pushEventAction,
             String title,
             final String msg);
+
+    PushResponse getPushResponse();
 }

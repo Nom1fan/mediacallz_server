@@ -9,6 +9,8 @@ public interface PathUtils {
 
     String getWorkingDir();
 
+    String getUploadUrl();
+
     String getFolderPath(SpecialMediaType specialMediaType);
 
 }

@@ -63,7 +63,7 @@ public class NotifyMediaReadyLogic extends AbstractServerLogic {
         String destContactName = pendingDownloadData.getDestinationContactName();
         LangStrings strings = stringsFactory.getStrings(pendingDownloadData.getSourceLocale());
         String title = strings.media_ready_title();
-        String msg = String.format(strings.media_ready_body(), !destContactName.equals("") ? destContactName : destId);
+        String msg = String.format(strings.media_ready_body(), destContactName !=null && !destContactName.equals("") ? destContactName : destId);
         String token = usersDao.getUserRecord(sourceId).getToken();
         boolean sent = pushSender.sendPush(token, PushEventKeys.TRANSFER_SUCCESS, title, msg, pendingDownloadData);
         if (!sent) {
