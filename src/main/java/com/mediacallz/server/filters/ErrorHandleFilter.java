@@ -1,13 +1,10 @@
 package com.mediacallz.server.filters;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by Mor on 23/08/2016.
@@ -22,22 +19,21 @@ public class ErrorHandleFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         // ...
     }
 
     @Override
     public void doFilter(ServletRequest request,
-                         ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+                         ServletResponse response, FilterChain chain) {
 
         try {
             chain.doFilter(request, response);
         } catch (Exception ex) {
             ex.printStackTrace();
             log.error("Failed while handling request", ex);
+            ((HttpServletResponse)response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-
     }
 
 }
