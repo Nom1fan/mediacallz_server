@@ -62,10 +62,10 @@ public class NotifyMediaReadyLogic extends AbstractServerLogic {
         String destId = pendingDownloadData.getDestinationId();
         String destContactName = pendingDownloadData.getDestinationContactName();
         LangStrings strings = stringsFactory.getStrings(pendingDownloadData.getSourceLocale());
-        String title = strings.media_ready_title();
-        String msg = String.format(strings.media_ready_body(), destContactName !=null && !destContactName.equals("") ? destContactName : destId);
+        //String title = strings.media_ready_title();
+        //String msg = String.format(strings.media_ready_body(), destContactName !=null && !destContactName.equals("") ? destContactName : destId);
         String token = usersDao.getUserRecord(sourceId).getToken();
-        boolean sent = pushSender.sendPush(token, PushEventKeys.TRANSFER_SUCCESS, title, msg, pendingDownloadData);
+        boolean sent = pushSender.sendPush(token, PushEventKeys.TRANSFER_SUCCESS, pendingDownloadData);
         if (!sent) {
             log.debug("Failed to inform user " + sourceId + " of transfer success to user: " + destId);
         }
